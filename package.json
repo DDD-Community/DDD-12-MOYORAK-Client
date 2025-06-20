@@ -6,10 +6,14 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "tsc -b && vite build",
-		"lint": "eslint .",
 		"preview": "vite preview",
 		"prepare": "husky",
-		"test": "echo \"No tests yet\" && exit 0"
+		"test": "echo \"No tests yet\" && exit 0",
+		"lint": "eslint . --ext .ts,.tsx --fix",
+		"lint:check": "eslint . --ext .ts,.tsx",
+		"type-check": "tsc --noEmit",
+		"format": "prettier --write .",
+		"format:check": "prettier --check ."
 	},
 	"dependencies": {
 		"@tanstack/react-query": "^5.76.1",
