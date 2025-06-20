@@ -8,7 +8,8 @@
 		"build": "tsc -b && vite build",
 		"lint": "eslint .",
 		"preview": "vite preview",
-		"prepare": "husky"
+		"prepare": "husky",
+		"test": "echo \"No tests yet\" && exit 0"
 	},
 	"dependencies": {
 		"@tanstack/react-query": "^5.76.1",
@@ -38,6 +39,7 @@
 		"lint-staged": "^16.0.0",
 		"typescript": "~5.8.3",
 		"typescript-eslint": "^8.30.1",
-		"vite": "^6.3.5"
+		"vite": "^6.3.5",
+		"vite-plugin-svgr": "^4.3.0"
 	}
 }
