@@ -42,7 +42,7 @@ export default [
 			'react/display-name': 'off',
 
 			'@typescript-eslint/no-unused-vars': [
-				'warn',
+				'error',
 				{
 					argsIgnorePattern: '^_',
 					varsIgnorePattern: '^_',
