@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	/* HTML/Body 기본 설정 */
+	html {
+		font-size: 62.5%;
+		scroll-behavior: smooth;
+	}
+
+	body {
+		font-family: Pretendard, sans-serif;
+		line-height: 1;
+	}
+
+	input,
+	button {
+		overflow: visible;
+		padding: 0;
+		border: none;
+		border-radius: 0;
+		box-shadow: none;
+		background: inherit;
+		cursor: pointer;
+		-webkit-appearance: none;
+	}
+
+	blockquote,
+	q {
+		quotes: none;
+	}
+
+	blockquote::before,
+	blockquote::after,
+	q::before,
+	q::after {
+		content: '';
+		content: none;
+	}
+
+	table {
+		border-spacing: 0;
+		border-collapse: collapse;
+	}
+
+	textarea:focus,
+	input:focus {
+		outline: none;
+	}
+}

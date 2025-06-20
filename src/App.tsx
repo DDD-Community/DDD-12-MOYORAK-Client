@@ -1,16 +1,47 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import Main from '@/pages/Main/Main';
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
+import Main from '@/pages/Main';
+import Search from '@/pages/Search';
+import MyPage from '@/pages/MyPage';
+import Pot from '@/pages/Pot';
+import './styles/globals.css';
+import TabBar from '@/components/TabBar/TabBar';
 
-const queryClient = new QueryClient();
+const isTabBarVisible = (path: string) => {
+	return ['/', '/search', '/mypage', '/pot'].includes(path);
+};
+
+const queryClient = new QueryClient({
+	defaultOptions: {
+		queries: {
+			refetchOnWindowFocus: false,
+			retry: 1,
+			staleTime: 1000 * 60 * 5,
+			gcTime: 1000 * 60 * 60,
+		},
+	},
+});
+
+function AppRoutes() {
+	const location = useLocation();
+	return (
+		<>
+			<Routes>
+				<Route path="/" element={<Main />} />
+				<Route path="/search" element={<Search />} />
+				<Route path="/mypage" element={<MyPage />} />
+				<Route path="/pot" element={<Pot />} />
+			</Routes>
+			{isTabBarVisible(location.pathname) && <TabBar />}
+		</>
+	);
+}
 
 function App() {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<BrowserRouter>
-				<Routes>
-					<Route path="/" element={<Main />} />
-				</Routes>
+				<AppRoutes />
 			</BrowserRouter>
 		</QueryClientProvider>
 	);
