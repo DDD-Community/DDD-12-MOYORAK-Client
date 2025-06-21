@@ -1,11 +1,13 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+import TabBar from '@/components/TabBar/TabBar';
 import Main from '@/pages/Main';
-import Search from '@/pages/Search';
 import MyPage from '@/pages/MyPage';
 import Pot from '@/pages/Pot';
+import Search from '@/pages/Search';
+
 import './styles/globals.css';
-import TabBar from '@/components/TabBar/TabBar';
 
 const isTabBarVisible = (path: string) => {
 	return ['/', '/search', '/mypage', '/pot'].includes(path);
