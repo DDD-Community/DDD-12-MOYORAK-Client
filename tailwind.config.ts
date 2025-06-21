@@ -1,7 +1,5 @@
 import type { Config } from 'tailwindcss';
 
-// 디자인 나오면 더 추가할 예정
-
 const px0_10 = { ...Array.from(Array(11)).map((_, i) => `${i}px`) };
 const px0_100 = { ...Array.from(Array(101)).map((_, i) => `${i}px`) };
 const px0_200 = { ...Array.from(Array(201)).map((_, i) => `${i}px`) };
@@ -30,15 +28,11 @@ const config: Config = {
 				},
 			},
 			fontFamily: {
-				sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+				sans: ['Pretendard', 'ui-sans-serif', 'system-ui', 'sans-serif'], // Pretendard로 변경
 			},
-			// corePlugins: {
-			// 	preflight: false,
-			// },
 		},
 	},
 	plugins: [],
-
 	darkMode: 'class',
 };
 
