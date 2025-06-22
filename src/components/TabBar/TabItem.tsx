@@ -1,6 +1,6 @@
 import Icon, { type IconTypes } from '@/components/Icon';
 
-interface TabItemProps {
+interface ITabItemProps {
 	path: string;
 	iconName: IconTypes;
 	activeIconName: IconTypes;
@@ -9,7 +9,7 @@ interface TabItemProps {
 	onClick: (path: string) => void;
 }
 
-const TabItem = ({ path, iconName, activeIconName, label, currentPath, onClick }: TabItemProps) => {
+const TabItem = ({ path, iconName, activeIconName, label, currentPath, onClick }: ITabItemProps) => {
 	const isActive = currentPath === path;
 
 	return (
