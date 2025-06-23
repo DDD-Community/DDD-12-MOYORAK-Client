@@ -1,69 +1,82 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-interface ButtonProps {
+interface IButtonProps {
 	children: React.ReactNode;
 	variant?: 'disabled' | 'general' | 'active' | 'clicked';
 	onClick?: () => void;
-	disabled?: boolean;
 }
 
-const Button = ({ children, variant = 'general', onClick, disabled }: ButtonProps) => {
+const Button = ({ children, variant = 'general', onClick }: IButtonProps) => {
 	const getButtonClasses = () => {
-		const baseClasses = 'h-[50px] px-6 rounded-lg font-medium transition-all duration-200 text-sm';
+		const baseClasses = 'h-[50px] min-w-[120px] w-full font-[Pretendard] text-base font-medium leading-[150%] tracking-[0.091px] rounded-[10px]';
 
 		switch (variant) {
 			case 'disabled':
-				return `${baseClasses} bg-gray-300 text-gray-500 cursor-not-allowed`;
+				return `${baseClasses} bg-[#F0F0F0] text-[#B0B0B0] cursor-not-allowed`;
 			case 'general':
-				return `${baseClasses} bg-black text-gray-700 border border-gray-300 hover:bg-gray-50`;
+				return `${baseClasses} border-[1px] border-solid border-[var(--Grayscale-C4C4C4,#C4C4C4)] bg-[#FFF] text-[#5C5C5C]`;
 			case 'active':
-				return `${baseClasses} bg-green-500 text-white hover:bg-green-600`;
+				return `${baseClasses} bg-[#9FD926] text-white`;
 			case 'clicked':
-				return `${baseClasses} bg-green-300 text-green-800`;
+				return `${baseClasses} border-[1px] border-solid border-[var(--Primary-82DC28,#82DC28)] bg-[#9FD92626] text-[#70CE13]`;
 		}
 	};
 
 	return (
-		<button className={getButtonClasses()} onClick={onClick} disabled={disabled || variant === 'disabled'}>
+		<button className={getButtonClasses()} onClick={onClick} disabled={variant === 'disabled'}>
 			{children}
 		</button>
 	);
 };
 
-const ButtonShowcase = () => {
-	const [clickedStates, setClickedStates] = useState({
-		general: false,
-		active: false,
-		clicked: false,
-		disabled: false,
-	});
+export default Button;
 
-	const handleClick = (buttonType: string) => {
-		setClickedStates((prev) => ({
-			...prev,
-			[buttonType]: true,
-		}));
-	};
+// const ButtonShowcase = () => {
+// 	const [formValid, setFormValid] = useState(false); // 폼 유효성 상태
+// 	const [isClicked, setIsClicked] = useState(false); // 클릭 상태
 
-	return (
-		<div className="p-8 bg-gray-100 min-h-screen">
-			<div className="flex gap-4 flex-wrap">
-				<Button variant="disabled" disabled>
-					버튼
-				</Button>
+// 	const handleFormValidation = () => {
+// 		// 폼 요구사항을 만족했다고 가정
+// 		setFormValid(true);
+// 	};
 
-				<Button variant={clickedStates.general ? 'clicked' : 'general'} onClick={() => handleClick('general')}>
-					버튼
-				</Button>
+// 	const handleGeneralClick = () => {
+// 		// general ↔ clicked 토글
+// 		setIsClicked(!isClicked);
+// 	};
 
-				<Button variant={clickedStates.active ? 'clicked' : 'active'} onClick={() => handleClick('active')}>
-					버튼
-				</Button>
+// 	return (
+// 		<div className="p-8 min-h-screen">
+// 			<div className="mb-6">
+// 				<button onClick={handleFormValidation} className="px-4 py-2 bg-blue-500 text-white rounded mb-4">
+// 					폼 요구사항 만족 (테스트용)
+// 				</button>
+// 			</div>
 
-				<Button variant="clicked">버튼</Button>
-			</div>
-		</div>
-	);
-};
+// 			<div className="flex gap-4 flex-wrap">
+// 				{/* 1. disabled → 조건 만족 시 active */}
+// 				<Button variant={formValid ? 'active' : 'disabled'}>버튼1</Button>
 
-export default ButtonShowcase;
+// 				{/* 2. general → 클릭 시 clicked */}
+// 				<Button variant={isClicked ? 'clicked' : 'general'} onClick={handleGeneralClick}>
+// 					버튼2
+// 				</Button>
+
+// 				{/* 3. 항상 active 상태 (예시) */}
+// 				<Button variant="active">버튼3</Button>
+
+// 				{/* 4. 항상 clicked 상태 (예시) */}
+// 				<Button variant="clicked">버튼4</Button>
+// 			</div>
+
+// 			<div className="mt-6 text-sm text-gray-600">
+// 				<p>• 버튼1: disabled → 조건 만족 시 active</p>
+// 				<p>• 버튼2: general ↔ clicked (토글)</p>
+// 				<p>• 폼 유효성: {formValid ? '만족' : '불만족'}</p>
+// 				<p>• 클릭 상태: {isClicked ? '클릭됨' : '미클릭'}</p>
+// 			</div>
+// 		</div>
+// 	);
+// };
+
+// export default ButtonShowcase;

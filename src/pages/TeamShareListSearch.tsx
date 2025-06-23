@@ -1,4 +1,4 @@
-const Search = () => {
+const TeamShareListSearch = () => {
 	return (
 		<div>
 			<h1 className="text-2xl font-bold mb-4">Search Page</h1>
@@ -6,4 +6,4 @@ const Search = () => {
 		</div>
 	);
 };
-export default Search;
+export default TeamShareListSearch;

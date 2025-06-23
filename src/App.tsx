@@ -5,7 +5,7 @@ import TabBar from '@/components/TabBar/TabBar';
 import Main from '@/pages/Main';
 import MyPage from '@/pages/MyPage';
 import Pot from '@/pages/Pot';
-import Search from '@/pages/Search';
+import TeamShareListSearch from '@/pages/TeamShareListSearch';
 
 import './styles/globals.css';
 
@@ -30,7 +30,7 @@ const AppRoutes = () => {
 		<>
 			<Routes>
 				<Route path="/" element={<Main />} />
-				<Route path="/search" element={<Search />} />
+				<Route path="/search" element={<TeamShareListSearch />} />
 				<Route path="/mypage" element={<MyPage />} />
 				<Route path="/pot" element={<Pot />} />
 			</Routes>
