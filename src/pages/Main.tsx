@@ -1,6 +1,4 @@
 const Main = () => {
-	console.log('Main page loaded');
-
 	return (
 		<div>
 			<h1>Main Page</h1>
