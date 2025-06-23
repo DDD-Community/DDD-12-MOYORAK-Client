@@ -1,32 +1,39 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { type IconTypes } from '@/components/Icon';
+import type { IconTypes } from '../Icon';
 
 import TabItem from './TabItem';
 
-const tabItems = [
+interface ITabItems {
+	path: string;
+	iconName: IconTypes;
+	activeIconName: IconTypes;
+	label: string;
+}
+
+const TAB_ITEMS: ITabItems[] = [
 	{
 		path: '/',
-		iconName: 'home' as IconTypes,
-		activeIconName: 'activeHome' as IconTypes,
+		iconName: 'home',
+		activeIconName: 'activeHome',
 		label: '홈',
 	},
 	{
 		path: '/search',
-		iconName: 'search' as IconTypes,
-		activeIconName: 'activeSearch' as IconTypes,
+		iconName: 'search',
+		activeIconName: 'activeSearch',
 		label: '검색',
 	},
 	{
 		path: '/pot',
-		iconName: 'pot' as IconTypes,
-		activeIconName: 'activePot' as IconTypes,
+		iconName: 'pot',
+		activeIconName: 'activePot',
 		label: '팟 만들기',
 	},
 	{
 		path: '/mypage',
-		iconName: 'mypage' as IconTypes,
-		activeIconName: 'activeMypage' as IconTypes,
+		iconName: 'mypage',
+		activeIconName: 'activeMypage',
 		label: 'MY',
 	},
 ];
@@ -45,7 +52,6 @@ const TabBar = () => {
 				fixed
 				w-full
 				flex
-				bottom-0
 				h-[60px]
 				z-[9999]
 				bg-white
@@ -55,7 +61,7 @@ const TabBar = () => {
 				items-center
 			"
 		>
-			{tabItems.map((item) => (
+			{TAB_ITEMS.map((item) => (
 				<TabItem
 					key={item.path}
 					path={item.path}

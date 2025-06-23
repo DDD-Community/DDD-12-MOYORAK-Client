@@ -24,7 +24,7 @@ const queryClient = new QueryClient({
 	},
 });
 
-function AppRoutes() {
+const AppRoutes = () => {
 	const location = useLocation();
 	return (
 		<>
@@ -37,9 +37,9 @@ function AppRoutes() {
 			{isTabBarVisible(location.pathname) && <TabBar />}
 		</>
 	);
-}
+};
 
-function App() {
+const App = () => {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<BrowserRouter>
@@ -47,6 +47,6 @@ function App() {
 			</BrowserRouter>
 		</QueryClientProvider>
 	);
-}
+};
 
 export default App;
