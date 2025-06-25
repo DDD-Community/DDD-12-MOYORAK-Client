@@ -10,6 +10,7 @@ const Button = ({ children, variant = 'general', onClick }: IButtonProps) => {
 	const getButtonClasses = () => {
 		const baseClasses = 'h-[50px] min-w-[120px] w-full font-[Pretendard] text-base font-medium leading-[150%] tracking-[0.091px] rounded-[10px]';
 
+		//  todo : tailwind.config.js에서 theme.extend.colors에 추가한 후 사용
 		switch (variant) {
 			case 'disabled':
 				return `${baseClasses} bg-[#F0F0F0] text-[#B0B0B0] cursor-not-allowed`;

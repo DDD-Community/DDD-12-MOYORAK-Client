@@ -1,5 +1,5 @@
 // For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
-import storybook from "eslint-plugin-storybook";
+import storybook from 'eslint-plugin-storybook';
 
 import eslint from '@eslint/js';
 import reactRecommended from 'eslint-plugin-react/configs/recommended.js';
@@ -8,10 +8,10 @@ import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import tseslint from 'typescript-eslint';
 
 export default [
-    eslint.configs.recommended,
-    ...tseslint.configs.recommended,
-    reactRecommended,
-    {
+	eslint.configs.recommended,
+	...tseslint.configs.recommended,
+	reactRecommended,
+	{
 		files: ['**/*.{js,jsx,ts,tsx}'],
 		plugins: {
 			'react-hooks': reactHooksPlugin,
@@ -87,5 +87,5 @@ export default [
 			},
 		},
 	},
-    ...storybook.configs["flat/recommended"]
+	...storybook.configs['flat/recommended'],
 ];
