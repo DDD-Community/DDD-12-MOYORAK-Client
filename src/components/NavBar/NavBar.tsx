@@ -1,30 +1,53 @@
 import Icon, { type IconTypes } from '@/components/Icon';
 
-interface INavBarProps {
+interface BaseNavBarProps {
 	variant: 'iconOnly' | 'iconWithText' | 'iconWithTextAndRightIcon' | 'centerText';
+}
+
+interface IconOnlyProps extends BaseNavBarProps {
+	variant: 'iconOnly';
 	leftIcon?: IconTypes;
-	leftText?: string;
-	rightIcon?: IconTypes;
-	centerText?: string;
+	onLeftIconClick?: () => void;
+}
+
+interface IconWithTextProps extends BaseNavBarProps {
+	variant: 'iconWithText';
+	leftIcon?: IconTypes;
+	leftText: string;
+	onLeftIconClick?: () => void;
+}
+
+interface IconWithTextAndRightIconProps extends BaseNavBarProps {
+	variant: 'iconWithTextAndRightIcon';
+	leftIcon?: IconTypes;
+	leftText: string;
+	rightIcon: IconTypes;
 	onLeftIconClick?: () => void;
 	onRightIconClick?: () => void;
 }
 
-const NavBar = ({ variant, leftIcon = 'back', leftText, rightIcon, centerText, onLeftIconClick, onRightIconClick }: INavBarProps) => {
+interface CenterTextProps extends BaseNavBarProps {
+	variant: 'centerText';
+	centerText: string;
+}
+
+type INavBarProps = IconOnlyProps | IconWithTextProps | IconWithTextAndRightIconProps | CenterTextProps;
+
+const NavBar = (props: INavBarProps) => {
 	const renderContent = () => {
-		switch (variant) {
+		switch (props.variant) {
 			case 'iconOnly':
 				return (
 					<div className="flex items-center">
-						<Icon name={leftIcon} size={24} onClick={onLeftIconClick} />
+						<Icon name={props.leftIcon || 'back'} size={24} onClick={props.onLeftIconClick} />
 					</div>
 				);
 
 			case 'iconWithText':
 				return (
 					<div className="flex items-center gap-4">
-						<Icon name={leftIcon} size={24} onClick={onLeftIconClick} />
-						{leftText && <span className="text-[#121212] text-lg font-semibold leading-[144.5%] tracking-[-0.004px]">{leftText}</span>}
+						<Icon name={props.leftIcon || 'back'} size={24} onClick={props.onLeftIconClick} />
+						<span className="text-[#121212] text-lg font-semibold leading-[144.5%] tracking-[-0.004px]">{props.leftText}</span>
 					</div>
 				);
 
@@ -32,17 +55,17 @@ const NavBar = ({ variant, leftIcon = 'back', leftText, rightIcon, centerText, o
 				return (
 					<div className="flex items-center justify-between w-full">
 						<div className="flex items-center gap-4">
-							<Icon name={leftIcon} size={24} onClick={onLeftIconClick} />
-							{leftText && <span className="text-[#121212] text-lg font-semibold leading-[144.5%] tracking-[-0.004px]">{leftText}</span>}
+							<Icon name={props.leftIcon || 'back'} size={24} onClick={props.onLeftIconClick} />
+							<span className="text-[#121212] text-lg font-semibold leading-[144.5%] tracking-[-0.004px]">{props.leftText}</span>
 						</div>
-						{rightIcon && <Icon name={rightIcon} size={24} onClick={onRightIconClick} />}
+						<Icon name={props.rightIcon} size={24} onClick={props.onRightIconClick} />
 					</div>
 				);
 
 			case 'centerText':
 				return (
-					<div className="flex items-center justify-center w-full ">
-						{centerText && <span className="text-[#121212] text-lg font-semibold leading-[144.5%] tracking-[-0.004px]">{centerText}</span>}
+					<div className="flex items-center justify-center w-full">
+						<span className="text-[#121212] text-lg font-semibold leading-[144.5%] tracking-[-0.004px]">{props.centerText}</span>
 					</div>
 				);
 
@@ -56,7 +79,6 @@ const NavBar = ({ variant, leftIcon = 'back', leftText, rightIcon, centerText, o
 
 export default NavBar;
 
-// 사용 예시 컴포넌트
 // const NavBarShowcase = () => {
 // 	return (
 // 		<div className="space-y-4 bg-gray-50 min-h-screen">
