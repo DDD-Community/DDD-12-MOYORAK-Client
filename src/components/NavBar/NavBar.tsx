@@ -29,6 +29,7 @@ interface CenterTextProps {
 
 type INavBarProps = IconOnlyProps | IconWithTextProps | IconWithTextAndRightIconProps | CenterTextProps;
 
+// todo : Typography 컴포넌트로 적용
 const NavBar = (props: INavBarProps) => {
 	const textStyle = 'text-[#121212] text-lg font-semibold leading-[144.5%] tracking-[-0.004px]';
 
