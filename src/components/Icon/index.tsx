@@ -9,7 +9,7 @@ export interface IconProps extends SVGProps<SVGSVGElement> {
 	size?: number;
 }
 
-const Icon = ({ name, rotate, size = 24, ...props }: IconProps) => {
+const Icon = ({ name, size = 24, ...props }: IconProps) => {
 	const IconComponent = iconTypes[name];
 
 	return <IconComponent width={size} height={size} {...props} />;

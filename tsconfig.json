@@ -1,4 +1,9 @@
 {
+	"compilerOptions": {
+		"types": [
+			"kakao.maps.d.ts"
+		]
+	},
 	"files": [],
 	"references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }]
 }
