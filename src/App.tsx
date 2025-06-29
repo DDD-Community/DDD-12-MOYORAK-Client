@@ -7,7 +7,10 @@ import MyPage from '@/pages/MyPage';
 import Pot from '@/pages/Pot';
 import TeamShareListSearch from '@/pages/TeamShareListSearch';
 
+import Developer from './pages/Developer';
+
 import './styles/globals.css';
+import './styles/theme.css';
 
 const isTabBarVisible = (path: string) => {
 	return ['/', '/search', '/mypage', '/pot'].includes(path);
@@ -33,6 +36,7 @@ const AppRoutes = () => {
 				<Route path="/search" element={<TeamShareListSearch />} />
 				<Route path="/mypage" element={<MyPage />} />
 				<Route path="/pot" element={<Pot />} />
+				<Route path="/developer" element={<Developer />} />
 			</Routes>
 			{isTabBarVisible(location.pathname) && <TabBar />}
 		</>

@@ -1,8 +1,12 @@
-export { default as mypage } from './mypageIcon.svg?react';
-export { default as pot } from './potIcon.svg?react';
-export { default as search } from './searchIcon.svg?react';
-export { default as home } from './homeIcon.svg?react';
+export { default as back } from './backIcon.svg?react';
+export { default as close } from './closeIcon.svg?react';
+export { default as activeHome } from './activeHomeIcon.svg?react';
 export { default as activeMypage } from './activeMypageIcon.svg?react';
 export { default as activePot } from './activePotIcon.svg?react';
 export { default as activeSearch } from './activeSearchIcon.svg?react';
-export { default as activeHome } from './activeHomeIcon.svg?react';
+export { default as home } from './homeIcon.svg?react';
+export { default as invalidInputIcon } from './invalidInputIcon.svg?react';
+export { default as mypage } from './mypageIcon.svg?react';
+export { default as pot } from './potIcon.svg?react';
+export { default as search } from './searchIcon.svg?react';
+export { default as validInputIcon } from './validInputIcon.svg?react';

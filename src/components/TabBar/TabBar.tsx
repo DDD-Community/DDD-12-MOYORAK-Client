@@ -51,6 +51,7 @@ const TabBar = () => {
 			className="
 				fixed
 				w-full
+				bottom-0
 				flex
 				h-[60px]
 				z-[9999]
