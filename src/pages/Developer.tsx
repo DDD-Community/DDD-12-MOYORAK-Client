@@ -1,6 +1,6 @@
 import { type ChangeEvent, useState } from 'react';
 
-import Input from '@/components/Input';
+import Input from '@/components/Input/Input';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 
