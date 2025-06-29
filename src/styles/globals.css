@@ -1,0 +1,159 @@
+@import 'tailwindcss';
+
+@layer base {
+	html,
+	body,
+	div,
+	span,
+	applet,
+	object,
+	iframe,
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6,
+	p,
+	blockquote,
+	pre,
+	a,
+	abbr,
+	acronym,
+	address,
+	big,
+	cite,
+	code,
+	del,
+	dfn,
+	em,
+	img,
+	ins,
+	kbd,
+	q,
+	s,
+	samp,
+	small,
+	strike,
+	strong,
+	sub,
+	sup,
+	tt,
+	var,
+	b,
+	u,
+	i,
+	center,
+	dl,
+	dt,
+	dd,
+	ol,
+	ul,
+	li,
+	fieldset,
+	form,
+	label,
+	legend,
+	table,
+	caption,
+	tbody,
+	tfoot,
+	thead,
+	tr,
+	th,
+	td,
+	article,
+	aside,
+	canvas,
+	details,
+	embed,
+	figure,
+	figcaption,
+	footer,
+	header,
+	hgroup,
+	menu,
+	nav,
+	output,
+	ruby,
+	section,
+	summary,
+	time,
+	mark,
+	audio,
+	video,
+	textarea,
+	input {
+		box-sizing: border-box;
+		margin: 0;
+		padding: 0;
+		border: 0;
+		font: inherit;
+		font-style: normal;
+		line-height: normal;
+		vertical-align: baseline;
+	}
+
+	/* Block 요소 설정 */
+	article,
+	aside,
+	details,
+	figcaption,
+	figure,
+	footer,
+	header,
+	hgroup,
+	menu,
+	nav,
+	section {
+		display: block;
+	}
+
+	html {
+		scroll-behavior: smooth;
+	}
+
+	body {
+		font-family: Pretendard, sans-serif;
+		line-height: 1;
+	}
+
+	/* Input/Button 스타일 리셋 */
+	input,
+	button {
+		overflow: visible;
+		padding: 0;
+		border: none;
+		border-radius: 0;
+		box-shadow: none;
+		background: inherit;
+		cursor: pointer;
+		-webkit-appearance: none;
+	}
+
+	/* 인용 관련 스타일 */
+	blockquote,
+	q {
+		quotes: none;
+	}
+
+	blockquote::before,
+	blockquote::after,
+	q::before,
+	q::after {
+		content: '';
+		content: none;
+	}
+
+	/* 테이블 스타일 */
+	table {
+		border-spacing: 0;
+		border-collapse: collapse;
+	}
+
+	/* 포커스 아웃라인 제거 */
+	textarea:focus,
+	input:focus {
+		outline: none;
+	}
+}
