@@ -5,7 +5,6 @@ import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 
 const Developer = () => {
-	console.log('Developer');
 	const [state, setState] = useState('');
 
 	const handleChange = useCallback(
