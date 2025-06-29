@@ -8,6 +8,9 @@ export const PALETTE = {
 	gray07: 'gray07',
 	gray08: 'gray08',
 	gray09: 'gray09',
+	gray10: 'gray10',
+
+	white: 'white',
 	// 숫자가 클수록 진한 색
 	primary600: 'primary600',
 	primary500: 'primary500',
@@ -29,6 +32,8 @@ export const FONT_COLOR = {
 	[PALETTE.gray07]: 'text-gray-07',
 	[PALETTE.gray08]: 'text-gray-08',
 	[PALETTE.gray09]: 'text-gray-09',
+	[PALETTE.gray10]: 'text-gray-10',
+	[PALETTE.white]: 'text-white',
 
 	[PALETTE.primary600]: 'text-primary-600',
 	[PALETTE.primary500]: 'text-primary-500',
