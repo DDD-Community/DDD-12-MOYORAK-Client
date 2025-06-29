@@ -1,4 +1,6 @@
 import Icon, { type IconTypes } from '@/components/Icon';
+import Typography from '@/components/Typography';
+import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 
 interface ITabItemProps {
 	path: string;
@@ -16,7 +18,9 @@ const TabItem = ({ path, iconName, activeIconName, label, currentPath, onClick }
 		<button onClick={() => onClick(path)}>
 			<div className="flex flex-col gap-[6px] items-center">
 				<Icon name={isActive ? activeIconName : iconName} />
-				<span className="text-[#303030] text-center font-[Pretendard] text-[11px] not-italic font-medium leading-[11.719px]">{label}</span>
+				<Typography as="span" variant={FONT_VARIANT.caption02} fontColor={isActive ? PALETTE.primary200 : PALETTE.gray07} className="font-medium text-center">
+					{label}
+				</Typography>
 			</div>
 		</button>
 	);

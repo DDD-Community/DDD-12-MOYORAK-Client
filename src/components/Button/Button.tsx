@@ -1,25 +1,27 @@
-import React from 'react';
+import { type ReactNode } from 'react';
 
 interface IButtonProps {
-	children: React.ReactNode;
+	children: ReactNode;
 	variant?: 'disabled' | 'general' | 'active' | 'clicked';
 	onClick?: () => void;
 }
 
 const Button = ({ children, variant = 'general', onClick }: IButtonProps) => {
 	const getButtonClasses = () => {
-		const baseClasses = 'h-[50px] min-w-[120px] w-full font-[Pretendard] text-base font-medium leading-[150%] tracking-[0.091px] rounded-[10px]';
+		const baseClasses =
+			'h-[50px] min-w-[89px] w-full font-heading text-base font-medium leading-[150%] tracking-[0.091px] rounded-[20px] transition-colors duration-200';
 
-		//  todo : tailwind.config.js에서 theme.extend.colors에 추가한 후 사용
 		switch (variant) {
 			case 'disabled':
-				return `${baseClasses} bg-[#ECECEC] text-[#B0B0B0] cursor-not-allowed`;
+				return `${baseClasses} bg-gray-03 text-gray-05 cursor-not-allowed`;
 			case 'general':
-				return `${baseClasses} border-[1px] border-solid border-[var(--Grayscale-C4C4C4,#DCDCDC)] bg-[#FFF] text-[#5C5C5C]`;
+				return `${baseClasses} border border-gray-03 bg-white text-gray-07 hover:bg-gray-01`;
 			case 'active':
-				return `${baseClasses} bg-[#BEEE05] text-[#1F2511]`;
+				return `${baseClasses} bg-primary-200 text-primary-600 hover:bg-primary-300`;
 			case 'clicked':
-				return `${baseClasses} border-[1px] border-solid border-[var(--Primary-82DC28,#BEEE05)] bg-[#9FD92626] text-[#70CE13]`;
+				return `${baseClasses} border border-primary-200 bg-primary-200/30 text-[#70CE13]`;
+			default:
+				return `${baseClasses} border border-gray-03 bg-white text-gray-07`;
 		}
 	};
 
