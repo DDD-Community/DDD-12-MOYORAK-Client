@@ -1,3 +1,5 @@
+export { default as back } from './backIcon.svg?react';
+export { default as close } from './closeIcon.svg?react';
 export { default as activeHome } from './activeHomeIcon.svg?react';
 export { default as activeMypage } from './activeMypageIcon.svg?react';
 export { default as activePot } from './activePotIcon.svg?react';
