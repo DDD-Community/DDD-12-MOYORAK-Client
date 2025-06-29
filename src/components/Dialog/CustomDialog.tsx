@@ -1,46 +1,49 @@
-import { useState } from 'react';
-import { DialogPortal } from '@radix-ui/react-dialog';
+import { forwardRef, type ReactNode, useImperativeHandle, useState } from 'react';
 
-import Button from '../Button/Button';
+import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './BaseDialog';
+import Typography from '../Typography';
 
-export const CustomDialog = () => {
-	const [open, setOpen] = useState<boolean>(false);
+import { Dialog, DialogContent, DialogFooter, DialogHeader } from './BaseDialog';
 
-	const handleOpen = () => {
-		setOpen((prev) => !prev);
+export interface ICustomDialogRef {
+	open: () => void;
+	close: () => void;
+}
+
+interface ICustomDialogProps {
+	headerText: {
+		title: string;
+		description?: string;
 	};
+	children?: ReactNode;
+}
 
-	console.log(open);
+export const CustomDialog = forwardRef<ICustomDialogRef, ICustomDialogProps>(({ headerText, children }, ref) => {
+	const [open, setOpen] = useState(false);
+
+	useImperativeHandle(ref, () => ({
+		open: () => setOpen(true),
+		close: () => setOpen(false),
+	}));
 
 	return (
 		<Dialog open={open}>
 			<form>
-				<DialogTrigger asChild>
-					<button onClick={handleOpen}>Open Dialog</button>
-				</DialogTrigger>
-				<DialogPortal>
-					<DialogContent className="sm:max-w-[425px]">
-						<DialogHeader>
-							<DialogTitle>Edit profile</DialogTitle>
-							<DialogDescription>Make changes to your profile here. Click save when you&apos;re done.</DialogDescription>
-						</DialogHeader>
-						<div className="grid gap-4">
-							<div className="grid gap-3" />
-							<div className="grid gap-3" />
-						</div>
-						<DialogFooter>
-							<DialogClose asChild>
-								<Button onClick={handleOpen}>Cancel</Button>
-							</DialogClose>
-							<Button>Save changes</Button>
-						</DialogFooter>
-					</DialogContent>
-				</DialogPortal>
+				<DialogContent className="sm:max-w-[425px]">
+					<DialogHeader>
+						<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.gray10} className="mb-[7px]">
+							{headerText.title}
+						</Typography>
+						<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray05}>
+							{headerText.description}
+						</Typography>
+					</DialogHeader>
+					<DialogFooter>{children}</DialogFooter>
+				</DialogContent>
 			</form>
 		</Dialog>
 	);
-};
+});
 
 export default CustomDialog;
