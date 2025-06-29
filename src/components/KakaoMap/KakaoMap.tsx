@@ -1,3 +1,4 @@
+import KakaoMapCore from '@/utils/KakaoMapCore';
 import { useEffect, useRef } from 'react';
 
 interface IKakaoMapOptions {
@@ -10,85 +11,51 @@ interface IKakaoMapProps {
   optionsList?: IKakaoMapOptions[];
 }
 
-class KakaoMapCore {
-  static init(): Promise<void> {
-
-    return new Promise((resolve) => {
-      const KAKAO_MAP_URL = import.meta.env.VITE_KAKAO_MAP_URL;
-      const KAKAO_MAP_KEY = import.meta.env.VITE_KAKAO_MAP_KEY;
-      const kakaoScript = document.querySelector(`script[src*="${KAKAO_MAP_URL}"]`);
-
-      const onReady = () => {
-        if (window.kakao && window.kakao.maps) {
-          window.kakao.maps.load(() => {
-            resolve();
-          });
-        }
-      };
-
-      if (!kakaoScript) {
-        const script = document.createElement('script');
-        script.src = `${KAKAO_MAP_URL}?appkey=${KAKAO_MAP_KEY}&autoload=false`;
-        script.async = true;
-        script.onload = onReady;
-        document.head.appendChild(script);
-      } else {
-        onReady();
-      }
-    })
-}
-
-  static createMap(container: HTMLDivElement, options: IKakaoMapOptions) {
-    const mapOption = {
-      center: new window.kakao.maps.LatLng(
-        options?.center?.lat || 37.5665,
-        options?.center?.lng || 126.9780
-      ),
-      level: options?.level || 3,
-    };
-
-    return new window.kakao.maps.Map(container, mapOption);
-  }
-
-  static addMarker(map: KakaoMapCore, opt: IKakaoMapOptions) {
-    if (!opt.center) return;
-    const pos = new window.kakao.maps.LatLng(opt.center.lat, opt.center.lng);
-    const marker = new window.kakao.maps.Marker({ position: pos, map });
-
-    if (opt.placeName) {
-      const infoWindow = new window.kakao.maps.InfoWindow({
-        // TODO: 수연: 툴팁 컴포넌트 추가 예정
-        content: `<div>${opt.placeName}</div>`,
-        position: pos,
-      });
-
-      infoWindow.open(map, marker);
-    }
-
-    return marker;
-  }
-}
-
 const KakaoMap = ({ optionsList = [] }: IKakaoMapProps) => {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const mapInstance = useRef<KakaoMapCore | null>(null);
 
   useEffect(() => {
+    /**
+     * Kakao 지도 초기화 함수
+     * 
+     * - Kakao 지도 스크립트를 로드하고, 지도 인스터스를 생성합니다.
+     * - optionList 기반으로 지도를 초기화합니다.
+     * - optionList에 따라 마커와 인포윈도우를 추가합니다.
+     */
     const initialize = async () => {
       if (!mapRef.current || optionsList.length === 0) return;
 
-      await KakaoMapCore.init();
+      if (!mapInstance.current) {
+        mapInstance.current = new KakaoMapCore();
+      }
 
-      mapInstance.current = KakaoMapCore.createMap(mapRef.current, optionsList[0]);
+      try {
+      await mapInstance.current.init();
+
+      mapInstance.current.createMap(mapRef.current, optionsList[0]);
 
       optionsList.forEach(opt => {
         if (opt.center) {
-          KakaoMapCore.addMarker(mapInstance.current!, opt);
+          mapInstance.current!.addMarker(opt);
         }
       });
-    };
 
-    initialize();
+    } 
+    // TODO) 수연 - 지도 초기화 실패 시, UI 화면 처리
+    // TODO) Sentry 에러 로그 추가
+    // Alert 으로 지도 로드 실패와 같은 메시지 정의 필요
+    catch (error) {
+      console.error(error)
+    }
+  };
+
+   initialize();
+
+   return () => {
+    mapInstance.current?.destroyMap();
+    mapInstance.current = null;
+   }
   }, [optionsList]);
 
   return (
