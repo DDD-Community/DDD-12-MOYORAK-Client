@@ -1,20 +1,15 @@
-import { useRef } from 'react';
-
-import type { ICustomDialogRef } from '@/components/Dialog/CustomDialog';
+import { useCallback, useState } from 'react';
 
 const useDialogHandler = () => {
-	const dialogRef = useRef<ICustomDialogRef>(null);
+	const [open, setOpen] = useState<boolean>(false);
 
-	const handleOpen = () => {
-		dialogRef.current?.open();
-	};
+	const handleOpen = useCallback(() => setOpen(true), []);
 
-	const handleClose = () => {
-		dialogRef.current?.close();
-	};
+	const handleClose = useCallback(() => setOpen(false), []);
 
 	return {
-		dialogRef,
+		open,
+		setOpen,
 		handleOpen,
 		handleClose,
 	};
