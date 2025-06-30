@@ -1,5 +1,6 @@
 import { type ChangeEvent, useState } from 'react';
 
+import CustomDrawer from '@/components/Drawer/CustomDrawer';
 import Input from '@/components/Input/Input';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
@@ -24,6 +25,8 @@ const Developer = () => {
 			<Typography variant={FONT_VARIANT.header02} fontColor={PALETTE.gray05}>
 				테스트입니당
 			</Typography>
+
+			<CustomDrawer />
 		</>
 	);
 };
