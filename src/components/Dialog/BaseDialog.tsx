@@ -42,6 +42,7 @@ const DialogContent = ({
 			)}
 			{...props}
 		>
+			{children}
 			{showCloseButton && (
 				<DialogPrimitive.Close
 					data-slot="dialog-close"
@@ -51,7 +52,6 @@ const DialogContent = ({
 					<span className="sr-only">Close</span>
 				</DialogPrimitive.Close>
 			)}
-			<DialogTitle>{children}</DialogTitle>
 		</DialogPrimitive.Content>
 	</DialogPortal>
 );
