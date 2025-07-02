@@ -14,7 +14,7 @@ const Developer = () => {
 		setState(e.target.value);
 	};
 
-	const { dialogRef, handleOpen, handleClose } = useDialogHandler();
+	const { open, setOpen, handleOpen, handleClose } = useDialogHandler();
 
 	return (
 		<>
@@ -32,7 +32,8 @@ const Developer = () => {
 			<Button onClick={handleOpen}>Dialog 테스트</Button>
 
 			<CustomDialog
-				ref={dialogRef}
+				onOpen={open}
+				onOpenChange={setOpen}
 				headerText={{
 					title: '타이틀',
 					description: '설명',

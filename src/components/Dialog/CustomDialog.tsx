@@ -25,9 +25,11 @@ export const CustomDialog = ({ headerText, children, onOpen, onOpenChange, showC
 					<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.gray10} className="mb-[7px]">
 						{headerText.title}
 					</Typography>
-					<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray05}>
-						{headerText.description}
-					</Typography>
+					{headerText.description && (
+						<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray05}>
+							{headerText.description}
+						</Typography>
+					)}
 				</DialogHeader>
 				<DialogFooter>{children}</DialogFooter>
 			</DialogContent>
@@ -36,3 +38,21 @@ export const CustomDialog = ({ headerText, children, onOpen, onOpenChange, showC
 };
 
 export default CustomDialog;
+
+/**
+ * @example
+ * 
+ * - useDialogHandler 사용하여 핸들링
+ * const { open, setOpen, handleOpen, handleClose } = useDialogHandler();
+ * 
+ * <CustomDialog
+		onOpen={open}
+		onOpenChange={setOpen}
+			headerText={{
+				title: '타이틀',
+				description: '설명',
+			}}
+		>
+			<Button onClick={handleClose}>닫기</Button>
+			</CustomDialog>
+ */
