@@ -17,7 +17,7 @@ const TabItem = ({ path, iconName, activeIconName, label, currentPath, onClick }
 		<button onClick={() => onClick(path)}>
 			<div className="flex flex-col gap-[6px] items-center">
 				<Icon name={isActive ? activeIconName : iconName} />
-				<Typography as="span" variant={FONT_VARIANT.caption02} fontColor={isActive ? PALETTE.primary200 : PALETTE.gray07}>
+				<Typography as="span" variant={FONT_VARIANT.caption02} fontColor={isActive ? PALETTE.primary200 : PALETTE.gray07} className="font-medium">
 					{label}
 				</Typography>
 			</div>
