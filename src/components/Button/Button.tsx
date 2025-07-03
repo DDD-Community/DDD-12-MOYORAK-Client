@@ -4,9 +4,10 @@ interface IButtonProps {
 	children: React.ReactNode;
 	variant?: 'disabled' | 'general' | 'active' | 'clicked';
 	onClick?: () => void;
+	className?: string;
 }
 
-const Button = ({ children, variant = 'general', onClick }: IButtonProps) => {
+const Button = ({ children, variant = 'general', onClick, className }: IButtonProps) => {
 	const getButtonClasses = () => {
 		const baseClasses = 'h-[50px] min-w-[120px] w-full font-[Pretendard] text-base font-medium leading-[150%] tracking-[0.091px] rounded-[10px]';
 
@@ -24,7 +25,7 @@ const Button = ({ children, variant = 'general', onClick }: IButtonProps) => {
 	};
 
 	return (
-		<button className={getButtonClasses()} onClick={onClick} disabled={variant === 'disabled'}>
+		<button className={`${getButtonClasses()} ${className ?? ''}`} onClick={onClick} disabled={variant === 'disabled'}>
 			{children}
 		</button>
 	);
