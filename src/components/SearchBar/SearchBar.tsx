@@ -1,6 +1,9 @@
-import type { InputHTMLAttributes } from 'react';
+import { type InputHTMLAttributes, useMemo } from 'react';
 
-import Icon, { type IconTypes } from '../Icon';
+import { FONT_VARIANT } from '@/constants/styles';
+
+import IconButton from '../Button/IconButton';
+import { type IconTypes } from '../Icon';
 
 interface ISearchBarProps extends InputHTMLAttributes<HTMLInputElement> {
 	type: 'primary' | 'secondary';
@@ -9,19 +12,34 @@ interface ISearchBarProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 const SearchBar = ({ type, searchIconName, id, value, placeholder, className, ...props }: ISearchBarProps) => {
+	const searchTypeClass = useMemo(() => {
+		return type === 'primary' ? 'bg-white rounded-[20px]' : 'bg-gray-03 rounded-[6px]';
+	}, [type]);
+
 	return (
-		<div className="flex">
+		<div className={`relative w-full ${searchTypeClass}`}>
 			<input
+				type="text"
 				id={id}
 				name={id}
 				placeholder={placeholder}
 				value={value}
-				className={`w-full px-[18px] py-[14px] placeholder:text-xl placeholder:font-semibold 
-                    ${type === 'primary' ? '' : 'bg-gray-03'}
-                    ${className}`}
+				className={`
+                     w-full pr-[48px] px-[18px] py-[14px] ${FONT_VARIANT.header03}
+          text-md placeholder:text-md placeholder:text-gray-07 placeholder:font-medium
+          cursor-text
+          ${className}
+        `}
 				{...props}
 			/>
-			<Icon name={searchIconName ?? 'search'} />
+
+			<IconButton
+				iconStyle={{
+					name: searchIconName ?? 'search',
+					width: 22,
+				}}
+				className="absolute right-[12px] top-1/2 -translate-y-1/2 p-0"
+			/>
 		</div>
 	);
 };
