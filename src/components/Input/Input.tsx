@@ -1,13 +1,14 @@
 import { forwardRef, type InputHTMLAttributes, useMemo } from 'react';
 
-import { FONT_COLOR, FONT_VARIANT, PALETTE } from '@/constants/styles';
+import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 
 import Icon from '../Icon';
 import Typography from '../Typography';
 
+import FormLabel, { type IFormLabelProps } from './FormLabel';
+
 interface IInputProps extends InputHTMLAttributes<HTMLInputElement> {
 	isEssential?: boolean;
-	label?: string;
 	value?: string;
 	isSuccess?: boolean;
 	isError?: boolean;
@@ -20,8 +21,8 @@ const BORDER_COLOR = {
 	[PALETTE.primary200]: 'border-b-primary-200',
 };
 
-const Input = forwardRef<HTMLInputElement, IInputProps>(
-	({ isEssential, label, id, isSuccess = false, isError = false, message, placeholder, value, ...rest }, ref) => {
+const Input = forwardRef<HTMLInputElement, IInputProps & IFormLabelProps>(
+	({ isEssential, label, id, type = 'text', isSuccess = false, isError = false, message, placeholder, value, ...rest }, ref) => {
 		const borderClass = useMemo(() => {
 			if (isError) return BORDER_COLOR[PALETTE.danger01];
 			if (!value) return BORDER_COLOR[PALETTE.gray03];
@@ -30,30 +31,29 @@ const Input = forwardRef<HTMLInputElement, IInputProps>(
 
 		return (
 			<div>
-				{label && (
-					<label
-						htmlFor={id}
-						className={`${FONT_VARIANT.header04} ${FONT_COLOR[PALETTE.gray09]} my-[3px] ${isEssential ? `after:content-['*'] after:ml-[5px] after:text-danger-01` : ''}`}
-					>
-						{label}
-					</label>
-				)}
-
+				{label && <FormLabel id={id} isEssential={isEssential} label={label} />}
 				<div className="relative">
 					<input
 						ref={ref}
 						id={id}
+						name={id}
 						placeholder={placeholder}
 						value={value}
-						name={id}
+						type={type}
+						className={`
+              w-full ${FONT_VARIANT.header02} py-[7px] pr-[48px] mb-[10px]
+              placeholder:text-xl placeholder:text-gray-05 placeholder:font-semibold
+              border-b-[1px] ${borderClass}
+              cursor-text
+            `}
 						{...rest}
-						className={`w-full ${FONT_VARIANT.header02} py-[7px] mb-[10px] placeholder:text-xl placeholder:text-gray-05 placeholder:font-semibold border-b-[1px] ${borderClass}`}
 					/>
 
 					{(isError || isSuccess) && (
-						<Icon name={isSuccess ? 'validInputIcon' : 'invalidInputIcon'} width={22} className="absolute -translate-y-1/2 right-2 top-1/2" />
+						<Icon name={isSuccess ? 'validInputIcon' : 'invalidInputIcon'} width={22} className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer" />
 					)}
 				</div>
+
 				{message && <Typography variant={FONT_VARIANT.body02}>{message}</Typography>}
 			</div>
 		);
