@@ -33,7 +33,7 @@ const Input = forwardRef<HTMLInputElement, IInputProps>(
 				{label && (
 					<label
 						htmlFor={id}
-						className={`text-[14px] ${FONT_COLOR[PALETTE.gray06]} my-[3px] ${isEssential ? `after:content-['*'] after:ml-[5px] after:text-danger-01` : ''}`}
+						className={`${FONT_VARIANT.header04} ${FONT_COLOR[PALETTE.gray09]} my-[3px] ${isEssential ? `after:content-['*'] after:ml-[5px] after:text-danger-01` : ''}`}
 					>
 						{label}
 					</label>
@@ -47,7 +47,7 @@ const Input = forwardRef<HTMLInputElement, IInputProps>(
 						value={value}
 						name={id}
 						{...rest}
-						className={`w-full text-xl py-[7px] mb-[10px] placeholder:text-xl placeholder:font-semibold border-b-[1px] ${borderClass}`}
+						className={`w-full ${FONT_VARIANT.header02} py-[7px] mb-[10px] placeholder:text-xl placeholder:text-gray-05 placeholder:font-semibold border-b-[1px] ${borderClass}`}
 					/>
 
 					{(isError || isSuccess) && (
