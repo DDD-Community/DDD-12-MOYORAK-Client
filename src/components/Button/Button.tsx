@@ -11,7 +11,7 @@ interface IButtonProps {
 
 const Button = ({ children, variant = 'general', onClick, className }: IButtonProps) => {
 	const getButtonClasses = () => {
-		const baseClasses = 'h-[50px] min-w-[120px] w-full font-[Pretendard] text-base font-medium leading-[150%] tracking-[0.091px] rounded-[10px]';
+		const baseClasses = 'h-[50px] min-w-[120px] w-full font-[Pretendard] text-base font-medium leading-[150%] tracking-[0.091px] rounded-[20px]';
 
 		//  todo : tailwind.config.js에서 theme.extend.colors에 추가한 후 사용
 		switch (variant) {

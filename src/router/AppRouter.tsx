@@ -14,7 +14,7 @@ const AppRouter = () => {
 			<Route path="/search" element={<TeamShareListSearch />} />
 			<Route path="/mypage" element={<MyPage />} />
 			<Route path="/pot" element={<Pot />} />
-			<Route path="/potmake" element={<PotMake />} />
+			<Route path="/pot-make" element={<PotMake />} />
 			<Route path="/developer" element={<Developer />} />
 		</Routes>
 	);
