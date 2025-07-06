@@ -53,13 +53,15 @@ const TabBar = () => {
 				w-full
 				bottom-0
 				flex
-				h-[60px]
+				h-[70px]
 				z-[9999]
-				bg-white
+				bg-primary-500
 				shadow-[0px_-1px_7px_0px_rgba(0,0,0,0.10)]
-				px-[20px]
+				px-[30px]
+				py-[15px]
 				justify-between
 				items-center
+				rounded-[30px]
 			"
 		>
 			{TAB_ITEMS.map((item) => (
