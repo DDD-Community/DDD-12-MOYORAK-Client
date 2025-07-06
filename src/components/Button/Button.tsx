@@ -7,6 +7,8 @@ interface IButtonProps {
 	className?: string;
 }
 
+// todo : Button 컴포넌트 스타일 수정
+
 const Button = ({ children, variant = 'general', onClick, className }: IButtonProps) => {
 	const getButtonClasses = () => {
 		const baseClasses = 'h-[50px] min-w-[120px] w-full font-[Pretendard] text-base font-medium leading-[150%] tracking-[0.091px] rounded-[10px]';
