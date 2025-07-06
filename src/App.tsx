@@ -1,16 +1,10 @@
-import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
-import TabBar from '@/components/TabBar/TabBar';
+import { Toaster } from 'sonner';
 
 import AppRouter from './router/AppRouter';
 
 import './styles/globals.css';
 import './styles/theme.css';
-
-const isTabBarVisible = (path: string) => {
-	return ['/', '/search', '/mypage', '/pot'].includes(path);
-};
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -26,10 +20,8 @@ const queryClient = new QueryClient({
 const App = () => {
 	return (
 		<QueryClientProvider client={queryClient}>
-			<BrowserRouter>
-				<AppRouter />
-				{isTabBarVisible(location.pathname) && <TabBar />}
-			</BrowserRouter>
+			<AppRouter />
+			<Toaster position="bottom-center" />
 		</QueryClientProvider>
 	);
 };
