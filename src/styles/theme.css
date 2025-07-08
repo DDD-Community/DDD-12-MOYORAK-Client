@@ -1,31 +1,30 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
-  /* GrayScale */
-  --color-gray-01: #FCFCFC;
-  --color-gray-02: #F6F6F6;
-  --color-gray-03: #ECECEC;
-  --color-gray-04: #DCDCDC;
-  --color-gray-05: #C4C4C4;
-  --color-gray-06: #B0B0B0;
-  --color-gray-07: #8A8A8A;
-  --color-gray-08: #5C5C5C;
-  --color-gray-09: #303030;
-  --color-gray-10: '#121212';
+	/* GrayScale */
+	--color-gray-01: #fcfcfc;
+	--color-gray-02: #f6f6f6;
+	--color-gray-03: #ececec;
+	--color-gray-04: #dcdcdc;
+	--color-gray-05: #c4c4c4;
+	--color-gray-06: #b0b0b0;
+	--color-gray-07: #8a8a8a;
+	--color-gray-08: #5c5c5c;
+	--color-gray-09: #303030;
+	--color-gray-10: #121212;
+	--color-white: #ffff;
 
-  --color-white: '#FFFFF';
+	--color-primary-100: #fcfcfc;
+	--color-primary-200: #beee05;
+	--color-primary-300: #b4e300;
+	--color-primary-400: #7fb50d;
+	--color-primary-500: #222b0f;
+	--color-primary-600: #1f2511;
 
-  --color-primary-100: #FCFCFC;
-  --color-primary-200: #BEEE05;
-  --color-primary-300: #B4E300;
-  --color-primary-400: #7FB50D;
-  --color-primary-500: #222B0F;
-  --color-primary-600: #1F2511;
+	/* Danger */
+	--color-danger-01: #ff4242;
+	--color-danger-02: #ff6b6b;
 
-  /* Danger */
-  --color-danger-01: #FF4242;
-  --color-danger-02: #FF6b6b;
-
-  /* Font */
-  --tw-font-heading: 'Pretendard', 'Inter', sans-serif;
+	/* Font */
+	--tw-font-heading: 'Pretendard', 'Inter', sans-serif;
 }
