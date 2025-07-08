@@ -164,4 +164,14 @@
 		transform: translate(-50%, -50%);
 		background-color: white;
 	}
+
+	/* === Toast === */
+	[data-sonner-toast] {
+		border-radius: 10px;
+		background-color: #303030 !important;
+		opacity: 0.8 !important;
+		color: white !important;
+		padding: 20px 10px !important;
+		border-radius: 8px !important;
+	}
 }
