@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 
 import arrow from '@/assets/arrow.png';
 import potIcon from '@/assets/potIcon.png';
+import potIconFinger from '@/assets/potIconFinger.png';
 import Button from '@/components/Button/Button';
 import FilterButton from '@/components/FilterButton/FilterButton';
 import Icon from '@/components/Icon';
@@ -51,8 +52,9 @@ const Pot = () => {
 
 	return (
 		<div className="px-4.5 bg-gray-02">
-			<div className="flex justify-center mt-17 ">
-				<img src={potIcon} alt="팟아이콘 이미지" className="w-[100px] absolute top-4 z-9999" />
+			<div className="flex justify-center mt-29">
+				<img src={potIcon} alt="팟아이콘 이미지" className="w-[177px] absolute top-10" />
+				<img src={potIconFinger} alt="팟아이콘 손가락 이미지" className="w-[177px] absolute top-20.5 z-10" />
 			</div>
 
 			<div
@@ -104,7 +106,7 @@ const Pot = () => {
 								</Typography>
 							</div>
 							<div className="flex items-center">
-								<span className="text-danger-02 mr-0.5">★</span>
+								<Icon name="star" width={11} className="mr-0.5 mt-0.5" />
 								<Typography variant={FONT_VARIANT.caption02} fontColor={PALETTE.gray08} className="font-medium">
 									{_.rating}
 								</Typography>

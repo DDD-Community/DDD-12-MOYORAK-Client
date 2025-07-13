@@ -1,15 +1,63 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import Button from '@/components/Button/Button';
+import PotDropdown, { type TeamMember } from '@/components/Dropdown/PotDropdown';
 import Icon from '@/components/Icon';
 import FormLabel from '@/components/Input/FormLabel';
 import Input from '@/components/Input/Input';
 import NavBar from '@/components/NavBar/NavBar';
 import Radio from '@/components/Radio/Radio';
+import SelectRestaurantPopup from '@/components/SelectRestaurantPopup/SelectRestaurantPopup';
 import Switch from '@/components/Switch';
+import TimePicker from '@/components/TimePicker/TimePicker';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
+
+const MOCK_TEAM_MEMBER = [
+	{
+		id: 1,
+		name: '홍길동',
+		team: '팀1',
+	},
+	{
+		id: 2,
+		name: '이순신',
+		team: '팀1',
+	},
+	{
+		id: 3,
+		name: '강감찬',
+		team: '팀1',
+	},
+	{
+		id: 4,
+		name: '유관순',
+		team: '팀1',
+	},
+];
+
+// 오전 12:00 → 00:00 AM
+// 오후 1:05 → 13:05 PM
+function formatTo24AMPM(ampm: string, hour: number, minute: number) {
+	let h = hour;
+	const period = ampm === '오전' ? 'AM' : 'PM';
+
+	if (ampm === '오전') {
+		// 오전 12시는 0시
+		h = hour === 12 ? 0 : hour;
+	} else {
+		// 오후 12시는 12시, 오후 1~11시는 13~23시
+		h = hour === 12 ? 12 : hour + 12;
+	}
+
+	// 두 자리수로 맞추기
+	const hh = h.toString().padStart(2, '0');
+	const mm = minute.toString().padStart(2, '0');
+	return `${hh}:${mm} ${period}`;
+}
+
+// AM/PM → 오전/오후 변환 함수도 필요하면 추가
 
 const PotMake = () => {
 	const [potTitle, setPotTitle] = useState('');
@@ -17,6 +65,24 @@ const PotMake = () => {
 	const [potMethod, setPotMethod] = useState('');
 	const [isToggle, setIsToggle] = useState(false);
 	const [potDesc, setPotDesc] = useState('');
+	const [isOpen, setIsOpen] = useState(false);
+	const [selectedMembers, setSelectedMembers] = useState<TeamMember[]>([]);
+	const [optionList, _] = useState<TeamMember[]>(MOCK_TEAM_MEMBER);
+
+	const [startTime, setStartTime] = useState('오전 11:30');
+	const [announceTime, setAnnounceTime] = useState('오전 12:00');
+	const [eatTime, setEatTime] = useState('오전 12:00');
+
+	const [selectRestaurantPopup, setSelectRestaurantPopup] = useState(false);
+
+	const handleChangeOpen = () => {
+		setIsOpen(!isOpen);
+	};
+
+	const handleChangeMembers = (value: TeamMember[]) => {
+		setSelectedMembers(value);
+	};
+
 	const handleToggleChange = (checked: boolean) => {
 		setIsToggle(checked);
 	};
@@ -29,105 +95,157 @@ const PotMake = () => {
 		setPotMember(e.target.value);
 	};
 
-	const handlePotMethodChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setPotMethod(e.target.value);
-	};
-
 	const handlePotDescChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setPotDesc(e.target.value);
 	};
 
-	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
+		navigate('/pot-make-success');
+	};
+
+	const navigate = useNavigate();
+
+	const getDisplayTime = (value: string) => {
+		const [ampm, time] = value.split(' ');
+		const [hour, minute] = time.split(':');
+		return formatTo24AMPM(ampm, Number(hour), Number(minute));
 	};
 
 	return (
 		<>
-			<NavBar variant="iconWithText" leftIcon="back" leftText="팟 만들기" />
-			<div className="bg-gray-02 min-h-screen ">
-				<form className="p-4.5 flex flex-col gap-6 " onSubmit={handleSubmit}>
-					<div className="py-6 px-4 rounded-[20px] bg-white">
-						<Input label="팟 제목" isEssential id="potTitle" placeholder="제목을 입력해 주세요" value={potTitle} onChange={handlePotTitleChange} />
-					</div>
-
-					{/* 팀원 선택 */}
-					<div className="py-6 px-4 rounded-[20px] bg-white">
-						<FormLabel id="potMember" label="팀원 선택" isEssential />
-						<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray06} className="mt-[3px] mb-[15px]">
-							*미선택 시 모든 팀 인원이 참가할 수 있습니다.
-						</Typography>
-
-						<div className="flex flex-col gap-2.5">
-							<Radio label="팀원 미선택" checked={potMember === 'none'} onChange={handlePotMemberChange} value="none" name="potMember" />
-							<Radio label="팀원 선택" checked={potMember === 'select'} onChange={handlePotMemberChange} value="select" name="potMember" />
-						</div>
-
-						{potMember === 'select' && (
-							<div className="flex justify-between">
-								<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray07} className="mt-0.5 mb-5 ml-7">
-									선택 인원 외 자율참여 허용하기
-								</Typography>
-								<Switch size="S" checked={isToggle} onCheckedChange={handleToggleChange} />
+			{selectRestaurantPopup ? (
+				<SelectRestaurantPopup onClose={() => setSelectRestaurantPopup(false)} />
+			) : (
+				<>
+					<NavBar variant="iconWithText" leftIcon="back" leftText="팟 만들기" onLeftIconClick={() => navigate('/pot')} />
+					<div className="bg-gray-02 min-h-screen ">
+						<form className="p-4.5 flex flex-col gap-6 " onSubmit={handleSubmit}>
+							<div className="py-6 px-4 rounded-[20px] bg-white">
+								<Input label="팟 제목" isEssential id="potTitle" placeholder="제목을 입력해 주세요" value={potTitle} onChange={handlePotTitleChange} />
 							</div>
-						)}
 
-						{/* 
-						드롭다운 컴포넌트 추가
-						*/}
+							{/* 팀원 선택 */}
+							<div className="py-6 px-4 rounded-[20px] bg-white">
+								<FormLabel id="potMember" label="팀원 선택" isEssential />
+								<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray06} className="mt-[3px] mb-[15px]">
+									*미선택 시 모든 팀 인원이 참가할 수 있습니다.
+								</Typography>
+
+								<div className="flex flex-col gap-2.5">
+									<Radio label="팀원 미선택" checked={potMember === 'none'} onChange={handlePotMemberChange} value="none" name="potMember" />
+									<Radio label="팀원 선택" checked={potMember === 'select'} onChange={handlePotMemberChange} value="select" name="potMember" />
+								</div>
+
+								{potMember === 'select' && (
+									<>
+										<div className="flex justify-between">
+											<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray07} className="mt-0.5 mb-5 ml-7">
+												선택 인원 외 자율참여 허용하기
+											</Typography>
+											<Switch size="S" checked={isToggle} onCheckedChange={handleToggleChange} />
+										</div>
+
+										<PotDropdown
+											isOpen={isOpen}
+											selectedMembers={selectedMembers}
+											onChangeOpen={handleChangeOpen}
+											onChange={handleChangeMembers}
+											optionList={optionList}
+											placeholder="팀에서 팀원 선택하기"
+										/>
+									</>
+								)}
+							</div>
+
+							{/* 식당 선택 */}
+							<div className="py-6 px-4 rounded-[20px] bg-white">
+								<FormLabel id="potRestaurant" label="식당 선택" isEssential />
+								<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray06} className="mt-[3px] mb-[15px]">
+									*팀 내 등록된 맛집에서만 추가가 가능합니다.
+									<br />
+									*최대 5개까지 추가할 수 있습니다.
+								</Typography>
+
+								<Button variant="general" className="flex items-center justify-center" onClick={() => setSelectRestaurantPopup(true)}>
+									<Icon name="restaurantPlusButton" />
+								</Button>
+							</div>
+
+							{/* 방식 선택 */}
+							<div className="py-6 px-4 rounded-[20px] bg-white ">
+								<FormLabel id="potMethod" label="방식 선택" isEssential />
+								<div className="flex flex-col gap-2.5 mt-[15px]">
+									<Radio label="일반 투표" checked={potMethod === 'normal'} onChange={() => setPotMethod('normal')} value="normal" name="potMethod" />
+									{potMethod === 'normal' && (
+										<div className="rounded-[12px] border border-gray-04 px-5 py-4.25 flex flex-col my-1.25">
+											<div className="flex justify-between items-center border-b border-gray-02 pb-2.5">
+												<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray08}>
+													시작 시간
+												</Typography>
+												<TimePicker value={startTime} onChange={setStartTime} displayValue={getDisplayTime(startTime)} />
+											</div>
+											<div className="flex justify-between items-center border-b border-gray-02 pb-2.5 pt-2.5">
+												<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray08}>
+													발표 시간
+												</Typography>
+												<TimePicker value={announceTime} onChange={setAnnounceTime} displayValue={getDisplayTime(announceTime)} />
+											</div>
+											<div className="flex justify-between items-center">
+												<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray08} className="pt-2.5">
+													식사 시간
+												</Typography>
+												<TimePicker value={eatTime} onChange={setEatTime} displayValue={getDisplayTime(eatTime)} />
+											</div>
+										</div>
+									)}
+									<Radio label="랜덤 추첨" checked={potMethod === 'random'} onChange={() => setPotMethod('random')} value="random" name="potMethod" />
+									{potMethod === 'random' && (
+										<div className="rounded-[12px] border border-gray-04 px-5 py-4.25 flex flex-col gap-2">
+											<div className="flex justify-between items-center border-b border-gray-02 pb-2.5">
+												<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray08}>
+													발표 시간
+												</Typography>
+												<TimePicker value={announceTime} onChange={setAnnounceTime} displayValue={getDisplayTime(announceTime)} />
+											</div>
+											<div className="flex justify-between items-center">
+												<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray08} className="pt-2.5">
+													식사 시간
+												</Typography>
+												<TimePicker value={eatTime} onChange={setEatTime} displayValue={getDisplayTime(eatTime)} />
+											</div>
+										</div>
+									)}
+								</div>
+							</div>
+
+							{/* 팟 설명 */}
+							<div className="py-6 px-4 rounded-[20px] bg-white relative">
+								<FormLabel id="potMember" label="팟 설명" />
+								<textarea
+									className="w-full h-[79px]
+							border border-gray-04 rounded-[12px] p-[15px] mt-[10px] placeholder:text-gray-06 text-[16px]"
+									placeholder="팟 설명을 입력해주세요"
+									maxLength={50}
+									value={potDesc}
+									onChange={handlePotDescChange}
+								/>
+								<div className="absolute right-7 bottom-10">
+									<Typography as="span" variant={FONT_VARIANT.label01} fontColor={PALETTE.gray10}>
+										{potDesc.length}
+									</Typography>
+									<Typography as="span" variant={FONT_VARIANT.label01} fontColor={PALETTE.gray07}>
+										/50
+									</Typography>
+								</div>
+							</div>
+							<div className="w-full">
+								<Button variant={!potTitle || !potMethod || !potMember ? 'disabled' : 'active'}>등록하기</Button>
+							</div>
+						</form>
 					</div>
-
-					{/* 식당 선택 */}
-					<div className="py-6 px-4 rounded-[20px] bg-white">
-						<FormLabel id="potRestaurant" label="식당 선택" isEssential />
-						<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray06} className="mt-[3px] mb-[15px]">
-							*팀 내 등록된 맛집에서만 추가가 가능합니다.
-							<br />
-							*최대 5개까지 추가할 수 있습니다.
-						</Typography>
-
-						<Link to="/select-restaurant">
-							<Button variant="general" className="flex items-center justify-center">
-								<Icon name="restaurantPlusButton" />
-							</Button>
-						</Link>
-					</div>
-
-					{/* 방식 선택 */}
-					<div className="py-6 px-4 rounded-[20px] bg-white">
-						<FormLabel id="potMember" label="방식 선택" isEssential />
-
-						<div className="flex flex-col gap-2.5 mt-[15px]">
-							<Radio label="일반 투표" checked={potMethod === 'normal'} onChange={handlePotMethodChange} value="normal" name="potMethod" />
-							<Radio label="랜덤 추첨" checked={potMethod === 'random'} onChange={handlePotMethodChange} value="random" name="potMethod" />
-						</div>
-					</div>
-
-					{/* 팟 설명 */}
-					<div className="py-6 px-4 rounded-[20px] bg-white">
-						<FormLabel id="potMember" label="팟 설명" />
-						<textarea
-							className="w-full h-[79px]
-							relative
-							border border-gray-04 rounded-[12px] p-[15px] mt-[10px] placeholder:text-gray-06 text-[16px] placeholder:text-gray-06"
-							placeholder="팟 설명을 입력해주세요"
-							maxLength={50}
-							value={potDesc}
-							onChange={handlePotDescChange}
-						/>
-						<div className="absolute right-10 text-xs text-gray-400">
-							<Typography as="span" variant={FONT_VARIANT.label01} fontColor={PALETTE.gray10}>
-								{potDesc.length}
-							</Typography>
-							<Typography as="span" variant={FONT_VARIANT.label01} fontColor={PALETTE.gray07}>
-								/50
-							</Typography>
-						</div>
-					</div>
-
-					{/* 버튼 */}
-					<Button variant={!potTitle || !potMethod || !potMember ? 'disabled' : 'active'}>팟 만들기</Button>
-				</form>
-			</div>
+				</>
+			)}
 		</>
 	);
 };

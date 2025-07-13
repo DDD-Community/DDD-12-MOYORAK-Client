@@ -2,6 +2,7 @@ export { default as activeHome } from './activeHomeIcon.svg?react';
 export { default as activeMypage } from './activeMypageIcon.svg?react';
 export { default as activePot } from './activePotIcon.svg?react';
 export { default as activeSearch } from './activeSearchIcon.svg?react';
+export { default as avatar } from './avatar.svg?react';
 export { default as back } from './backIcon.svg?react';
 export { default as close } from './closeIcon.svg?react';
 export { default as home } from './homeIcon.svg?react';
@@ -14,4 +15,5 @@ export { default as restaurantPlusButton } from './restaurantPlusButton.svg?reac
 export { default as search } from './searchIcon.svg?react';
 export { default as selectClose } from './selectClose.svg?react';
 export { default as selectOpen } from './selectOpen.svg?react';
+export { default as star } from './star.svg?react';
 export { default as validInput } from './validInputIcon.svg?react';

@@ -5,6 +5,7 @@ import Main from '@/pages/Main';
 import MyPage from '@/pages/MyPage';
 import Pot from '@/pages/Pot';
 import PotMake from '@/pages/PotMake';
+import PotMakeSuccess from '@/pages/PotMakeSuccess';
 import TeamShareListSearch from '@/pages/TeamShareListSearch';
 
 const AppRouter = () => {
@@ -15,6 +16,7 @@ const AppRouter = () => {
 			<Route path="/mypage" element={<MyPage />} />
 			<Route path="/pot" element={<Pot />} />
 			<Route path="/pot-make" element={<PotMake />} />
+			<Route path="/pot-make-success" element={<PotMakeSuccess />} />
 			<Route path="/developer" element={<Developer />} />
 		</Routes>
 	);

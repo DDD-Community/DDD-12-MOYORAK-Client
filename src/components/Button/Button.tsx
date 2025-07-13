@@ -20,7 +20,7 @@ const Button = ({ children, variant = 'general', onClick, className }: IButtonPr
 			case 'general':
 				return `${baseClasses} border border-gray-03 bg-white text-gray-07 hover:bg-gray-01`;
 			case 'active':
-				return `${baseClasses} bg-primary-200 text-primary-600 hover:bg-primary-300`;
+				return `${baseClasses} bg-primary-200 text-primary-600 hover:bg-primary-200`;
 			case 'clicked':
 				return `${baseClasses} border border-primary-200 bg-primary-200/30 text-[#70CE13]`;
 			default:

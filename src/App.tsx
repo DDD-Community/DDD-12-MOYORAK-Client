@@ -1,4 +1,4 @@
-import { BrowserRouter } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import TabBar from '@/components/TabBar/TabBar';
@@ -24,12 +24,12 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
+	const location = useLocation();
+
 	return (
 		<QueryClientProvider client={queryClient}>
-			<BrowserRouter>
-				<AppRouter />
-				{isTabBarVisible(location.pathname) && <TabBar />}
-			</BrowserRouter>
+			<AppRouter />
+			{isTabBarVisible(location.pathname) && <TabBar />}
 		</QueryClientProvider>
 	);
 };
