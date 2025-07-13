@@ -67,6 +67,9 @@ const Pot = () => {
 				<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.white} className="font-semibold mb-6">
 					오늘 점심시간을 함께 할<br /> 팀원을 모아보세요!
 				</Typography>
+				{/*
+				TODO : 버튼 배경색 안 먹는 이슈 있음 해결 필요
+				*/}
 				<Button variant="active" className="rounded-[40px] flex justify-between items-center px-[12px] py-[8px]" onClick={() => navigate('/pot-make')}>
 					<Icon size={31} name="potPlusButton" />
 					모여락으로 팀원 모으기
