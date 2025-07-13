@@ -12,7 +12,7 @@ interface ISelectRestaurantPopupProps {
 	onClose: () => void;
 }
 
-interface Restaurant {
+interface IRestaurant {
 	id: number;
 	name: string;
 	category: string;
@@ -20,7 +20,7 @@ interface Restaurant {
 	reviewCount: number;
 }
 
-const mockRestaurants: Restaurant[] = [
+const MOCK_RESTAURANTS: IRestaurant[] = [
 	{ id: 1, name: '은희네 해장국', category: '카테고리', rating: 5.0, reviewCount: 50 },
 	{ id: 2, name: '식당이름', category: '카테고리', rating: 5.0, reviewCount: 50 },
 	{ id: 3, name: '식당이름', category: '카테고리', rating: 5.0, reviewCount: 50 },
@@ -54,10 +54,10 @@ const SelectRestaurantPopup = ({ onClose }: ISelectRestaurantPopupProps) => {
 	};
 
 	// 검색 필터링 + 선택된 식당 제외
-	const filteredRestaurants = mockRestaurants.filter((r) => r.name.includes(searchValue) && !selectedIds.includes(r.id));
+	const filteredRestaurants = MOCK_RESTAURANTS.filter((r) => r.name.includes(searchValue) && !selectedIds.includes(r.id));
 
 	// 선택된 식당 정보
-	const selectedRestaurants = mockRestaurants.filter((r) => selectedIds.includes(r.id));
+	const selectedRestaurants = MOCK_RESTAURANTS.filter((r) => selectedIds.includes(r.id));
 
 	return (
 		<div className="bg-gray-02 min-h-screen ">

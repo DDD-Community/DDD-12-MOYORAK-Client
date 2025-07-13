@@ -3,7 +3,7 @@ import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 
 import Typography from '../Typography';
 
-export interface TeamMember {
+export interface ITeamMember {
 	id: number;
 	name: string;
 	team: string;
@@ -11,10 +11,10 @@ export interface TeamMember {
 
 interface IPotDropdownProps {
 	isOpen: boolean;
-	selectedMembers: TeamMember[];
+	selectedMembers: ITeamMember[];
 	onChangeOpen: () => void;
-	onChange: (selected: TeamMember[]) => void;
-	optionList: TeamMember[];
+	onChange: (selected: ITeamMember[]) => void;
+	optionList: ITeamMember[];
 	placeholder?: string;
 }
 
@@ -22,10 +22,10 @@ const PotDropdown = ({ isOpen, selectedMembers, onChange, onChangeOpen, optionLi
 	const selectedIds = selectedMembers.map((m) => m.id);
 	const availableMembers = optionList.filter((m) => !selectedIds.includes(m.id));
 
-	const handleSelect = (member: TeamMember) => {
+	const handleSelect = (member: ITeamMember) => {
 		onChange([...selectedMembers, member]);
 	};
-	const handleRemove = (member: TeamMember) => {
+	const handleRemove = (member: ITeamMember) => {
 		onChange(selectedMembers.filter((m) => m.id !== member.id));
 	};
 

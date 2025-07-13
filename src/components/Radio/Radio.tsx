@@ -3,7 +3,7 @@ import React from 'react';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 
-interface RadioProps {
+interface IRadioProps {
 	label: string;
 	checked: boolean;
 	onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -13,7 +13,7 @@ interface RadioProps {
 	className?: string;
 }
 
-const Radio = ({ label, checked, onChange, value, name, disabled = false, className = '' }: RadioProps) => {
+const Radio = ({ label, checked, onChange, value, name, disabled = false, className = '' }: IRadioProps) => {
 	return (
 		<label className={`flex items-center  gap-2 cursor-pointer select-none ${className}`}>
 			<span className="relative flex items-center w-[19px] h-[19px] ">

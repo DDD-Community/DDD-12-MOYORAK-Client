@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Button from '@/components/Button/Button';
-import PotDropdown, { type TeamMember } from '@/components/Dropdown/PotDropdown';
+import PotDropdown, { type ITeamMember } from '@/components/Dropdown/PotDropdown';
 import Icon from '@/components/Icon';
 import FormLabel from '@/components/Input/FormLabel';
 import Input from '@/components/Input/Input';
@@ -37,27 +37,20 @@ const MOCK_TEAM_MEMBER = [
 	},
 ];
 
-// 오전 12:00 → 00:00 AM
-// 오후 1:05 → 13:05 PM
 function formatTo24AMPM(ampm: string, hour: number, minute: number) {
 	let h = hour;
 	const period = ampm === '오전' ? 'AM' : 'PM';
 
 	if (ampm === '오전') {
-		// 오전 12시는 0시
 		h = hour === 12 ? 0 : hour;
 	} else {
-		// 오후 12시는 12시, 오후 1~11시는 13~23시
 		h = hour === 12 ? 12 : hour + 12;
 	}
 
-	// 두 자리수로 맞추기
 	const hh = h.toString().padStart(2, '0');
 	const mm = minute.toString().padStart(2, '0');
 	return `${hh}:${mm} ${period}`;
 }
-
-// AM/PM → 오전/오후 변환 함수도 필요하면 추가
 
 const PotMake = () => {
 	const [potTitle, setPotTitle] = useState('');
@@ -66,8 +59,8 @@ const PotMake = () => {
 	const [isToggle, setIsToggle] = useState(false);
 	const [potDesc, setPotDesc] = useState('');
 	const [isOpen, setIsOpen] = useState(false);
-	const [selectedMembers, setSelectedMembers] = useState<TeamMember[]>([]);
-	const [optionList, _] = useState<TeamMember[]>(MOCK_TEAM_MEMBER);
+	const [selectedMembers, setSelectedMembers] = useState<ITeamMember[]>([]);
+	const [optionList, _] = useState<ITeamMember[]>(MOCK_TEAM_MEMBER);
 
 	const [startTime, setStartTime] = useState('오전 11:30');
 	const [announceTime, setAnnounceTime] = useState('오전 12:00');
@@ -79,7 +72,7 @@ const PotMake = () => {
 		setIsOpen(!isOpen);
 	};
 
-	const handleChangeMembers = (value: TeamMember[]) => {
+	const handleChangeMembers = (value: ITeamMember[]) => {
 		setSelectedMembers(value);
 	};
 
