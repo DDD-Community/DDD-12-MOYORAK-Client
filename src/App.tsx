@@ -1,8 +1,8 @@
 import { useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from 'sonner';
 
-import TabBar from '@/components/TabBar/TabBar';
-
+import TabBar from './components/TabBar/TabBar';
 import AppRouter from './router/AppRouter';
 
 import './styles/globals.css';
@@ -30,6 +30,7 @@ const App = () => {
 		<QueryClientProvider client={queryClient}>
 			<AppRouter />
 			{isTabBarVisible(location.pathname) && <TabBar />}
+			<Toaster position="bottom-center" />
 		</QueryClientProvider>
 	);
 };

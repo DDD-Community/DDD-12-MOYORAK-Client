@@ -14,7 +14,7 @@ interface ITabItems {
 const TAB_ITEMS: ITabItems[] = [
 	{
 		path: '/',
-		iconName: 'home',
+		iconName: 'homeTab',
 		activeIconName: 'activeHome',
 		label: '홈',
 	},
