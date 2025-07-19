@@ -8,7 +8,6 @@ import NewRestaurantSelect from '@/pages/NewRestaurantSelect';
 import Pot from '@/pages/Pot';
 import PotMake from '@/pages/PotMake';
 import PotMakeSuccess from '@/pages/PotMakeSuccess';
-import RestaurantDetail from '@/pages/RestaurantDetail';
 import RestaurantRegistration from '@/pages/RestaurantRegistration';
 import RestaurantSearch from '@/pages/RestaurantSearch';
 import TeamShareListSearch from '@/pages/TeamShareListSearch';
@@ -27,7 +26,6 @@ const AppRouter = () => {
 			<Route path="/restaurant-search" element={<RestaurantSearch />} />
 			<Route path="/new-restaurant-select" element={<NewRestaurantSelect />} />
 			<Route path="/new-restaurant-registration" element={<NewRestaurantRegistration />} />
-			<Route path="/restaurant-detail/" element={<RestaurantDetail />} />
 		</Routes>
 	);
 };
