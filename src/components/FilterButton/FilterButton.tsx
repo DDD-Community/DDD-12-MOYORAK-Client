@@ -1,14 +1,15 @@
-import { type ReactNode } from 'react';
+import React from 'react';
 
 interface IFilterButtonProps {
-	children: ReactNode;
+	children: React.ReactNode;
 	variant?: 'general' | 'active' | 'clicked';
 	onClick?: () => void;
 	borderRadius: string;
-	className?: string;
+	width?: string;
+	type?: 'button';
 }
 
-const FilterButton = ({ children, variant = 'general', onClick, borderRadius, className }: IFilterButtonProps) => {
+const FilterButton = ({ children, variant = 'general', onClick, borderRadius, width, type = 'button' }: IFilterButtonProps) => {
 	const getFilterButtonClasses = () => {
 		const baseClasses = 'h-[32px] w-auto font-[Pretendard] text-sm not-italic font-medium leading-[143%] tracking-[0.14px]; px-[14px]';
 
@@ -24,7 +25,7 @@ const FilterButton = ({ children, variant = 'general', onClick, borderRadius, cl
 	};
 
 	return (
-		<button className={`${getFilterButtonClasses()} ${className}`} style={{ borderRadius: `${borderRadius}px` }} onClick={onClick}>
+		<button className={getFilterButtonClasses()} style={{ borderRadius: `${borderRadius}px`, width: width }} onClick={onClick} type={type}>
 			{children}
 		</button>
 	);

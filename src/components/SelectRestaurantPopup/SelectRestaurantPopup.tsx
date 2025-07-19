@@ -105,7 +105,7 @@ const SelectRestaurantPopup = ({ onClose }: ISelectRestaurantPopupProps) => {
 											</Typography>
 										</div>
 									</div>
-									<Icon name="validInput" size={22} className="cursor-pointer mx-2" onClick={() => handleRemoveSelected(r.id)} />
+									<Icon name="validInput" size={22} className="cursor-pointer" onClick={() => handleRemoveSelected(r.id)} />
 								</div>
 							))}
 						</div>

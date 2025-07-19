@@ -79,9 +79,11 @@ const Pot = () => {
 
 			<div className={`p-[22px] rounded-[30px] bg-[#FFF] relative border ${IS_VOTING ? 'border-[#BEEE0540]' : 'border-gray-04'}`}>
 				{IS_VOTING && (
-					<FilterButton variant="active" borderRadius="10" className="absolute top-[-10px] right-[20px]">
-						참여했어요!
-					</FilterButton>
+					<div className="absolute top-[-10px] right-[20px]">
+						<FilterButton variant="active" borderRadius="10">
+							참여했어요!
+						</FilterButton>
+					</div>
 				)}
 				<div className="flex items-center mb-2">
 					<FilterButton variant="clicked" borderRadius="10">
