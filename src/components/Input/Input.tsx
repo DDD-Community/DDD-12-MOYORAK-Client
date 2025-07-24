@@ -50,7 +50,7 @@ const Input = forwardRef<HTMLInputElement, IInputProps & IFormLabelProps>(
 					/>
 
 					{(isError || isSuccess) && (
-						<Icon name={isSuccess ? 'validInputIcon' : 'invalidInputIcon'} width={22} className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer" />
+						<Icon name={isSuccess ? 'validInput' : 'invalidInput'} width={22} className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer" />
 					)}
 				</div>
 

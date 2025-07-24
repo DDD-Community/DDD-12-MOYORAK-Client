@@ -6,7 +6,7 @@ type TTypographyProps<T extends ElementType> = {
 	as?: T;
 	variant: TFontVariantKeys;
 	fontColor?: TFontColorTypes;
-	children?: ReactNode; // string에서 ReactNode로 변경
+	children?: ReactNode;
 } & ComponentPropsWithoutRef<T>;
 
 /**
