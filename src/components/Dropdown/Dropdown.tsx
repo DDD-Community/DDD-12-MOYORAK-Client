@@ -31,7 +31,7 @@ const Dropdown = <T extends string>({ isOpen, selected, onChange, onChangeOpen, 
 							<button key={item} type="button" onClick={() => onChange(item)} className={`w-full px-4 text-left hover:bg-gray-100`}>
 								<div className={`flex justify-between items-center py-3 ${FONT_VARIANT.header04} text-gray-08 ${!isLast ? 'border-b border-gray-200' : ''}`}>
 									{item}
-									<Icon name="optionIcon" width={14} height={14} />
+									<Icon name="option" width={14} height={14} />
 								</div>
 							</button>
 						);
