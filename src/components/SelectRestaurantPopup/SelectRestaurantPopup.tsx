@@ -29,6 +29,14 @@ const MOCK_RESTAURANTS: IRestaurant[] = [
 	{ id: 6, name: '식당이름', category: '카테고리', rating: 5.0, reviewCount: 50 },
 ];
 
+const MAX_SELECTED_RESTAURANTS = 5;
+
+const SORT_BY = {
+	distance: '거리순',
+	rating: '평점순',
+	latest: '최신순',
+};
+
 const SelectRestaurantPopup = ({ onClose }: ISelectRestaurantPopupProps) => {
 	const [filterButton, setFilterButton] = useState<string>('distance');
 	const [searchValue, setSearchValue] = useState<string>('');
@@ -41,13 +49,15 @@ const SelectRestaurantPopup = ({ onClose }: ISelectRestaurantPopupProps) => {
 
 	// 선택/해제
 	const handleSelect = (id: number) => {
+		if (selectedIds.length >= MAX_SELECTED_RESTAURANTS) return;
+
 		if (selectedIds.includes(id)) {
 			setSelectedIds(selectedIds.filter((sid) => sid !== id));
-		} else if (selectedIds.length < 5) {
-			setSelectedIds([...selectedIds, id]);
+			return;
 		}
-	};
 
+		setSelectedIds([...selectedIds, id]);
+	};
 	// 선택된 식당 삭제
 	const handleRemoveSelected = (id: number) => {
 		setSelectedIds(selectedIds.filter((sid) => sid !== id));
@@ -61,13 +71,7 @@ const SelectRestaurantPopup = ({ onClose }: ISelectRestaurantPopupProps) => {
 
 	return (
 		<div className="bg-gray-02 min-h-screen ">
-			<NavBar
-				variant="iconWithText"
-				leftText="식당 선택하기"
-				onLeftIconClick={() => {
-					onClose();
-				}}
-			/>
+			<NavBar variant="iconWithText" leftText="식당 선택하기" onLeftIconClick={onClose} />
 
 			<div className="px-4.5 py-6.25">
 				<SearchInput placeholder="찾으려는 식당을 검색해 주세요" id="restaurantName" onChange={handleSearch} value={searchValue} />
@@ -116,13 +120,13 @@ const SelectRestaurantPopup = ({ onClose }: ISelectRestaurantPopupProps) => {
 				<div className="bg-white rounded-[20px] px-4.5 py-6.5">
 					<div className="flex gap-2 mb-5">
 						<FilterButton borderRadius="17" variant={filterButton === 'distance' ? 'active' : 'general'} onClick={() => setFilterButton('distance')}>
-							거리순
+							{SORT_BY.distance}
 						</FilterButton>
 						<FilterButton borderRadius="17" variant={filterButton === 'rating' ? 'active' : 'general'} onClick={() => setFilterButton('rating')}>
-							평점순
+							{SORT_BY.rating}
 						</FilterButton>
 						<FilterButton borderRadius="17" variant={filterButton === 'latest' ? 'active' : 'general'} onClick={() => setFilterButton('latest')}>
-							최신순
+							{SORT_BY.latest}
 						</FilterButton>
 					</div>
 

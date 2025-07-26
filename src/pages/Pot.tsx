@@ -7,41 +7,9 @@ import Button from '@/components/Button/Button';
 import FilterButton from '@/components/FilterButton/FilterButton';
 import Icon from '@/components/Icon';
 import Typography from '@/components/Typography';
+import { POT_PARTICIPANTS, POT_PARTICIPANTS_IMAGE, POT_TITLE } from '@/constants/constant';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 
-const POT_TITLE = '오늘 같이 점심 드실 분 구해요!!';
-const POT_PARTICIPANTS = [
-	{
-		name: '육지로 간 고래',
-		category: '한식',
-		rating: 5.0,
-		reviewCount: 50,
-	},
-	{
-		name: '육지로 간 고래',
-		category: '한식',
-		rating: 5.0,
-		reviewCount: 50,
-	},
-	{
-		name: '육지로 간 고래',
-		category: '한식',
-		rating: 5.0,
-		reviewCount: 50,
-	},
-];
-
-const POT_PARTICIPANTS_IMAGE = [
-	{
-		image: 'https://picsum.photos/200/300',
-	},
-	{
-		image: 'https://picsum.photos/200/300',
-	},
-	{
-		image: 'https://picsum.photos/200/300',
-	},
-];
 const POT_PARTICIPANTS_COUNT = 3;
 const IS_VOTING = true;
 
