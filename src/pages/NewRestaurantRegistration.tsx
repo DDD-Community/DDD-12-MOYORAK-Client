@@ -8,13 +8,14 @@ import Input from '@/components/Input/Input';
 import NavBar from '@/components/NavBar/NavBar';
 
 const NewRestaurantRegistration = () => {
-	const navigate = useNavigate();
-	const location = useLocation();
-	const restaurant = location.state?.restaurant;
 	const [restaurantAddress, setRestaurantAddress] = useState('');
 	const [restaurantLink, setRestaurantLink] = useState('');
 	const [restaurantCategory, setRestaurantCategory] = useState('');
 	const [isOpen, setIsOpen] = useState(false);
+
+	const navigate = useNavigate();
+	const location = useLocation();
+	const { restaurant } = (location.state as { restaurant?: { name: string } } | undefined) ?? {};
 
 	return (
 		<div className="bg-gray-02 min-h-screen">
@@ -22,7 +23,7 @@ const NewRestaurantRegistration = () => {
 
 			<div className="px-4.5 py-6.25 ">
 				<div className="px-4.5 py-6.5 rounded-[20px] bg-white flex flex-col gap-10">
-					<Input label="식당 이름" id="restaurant-name" isEssential isSuccess value={restaurant?.name} />
+					<Input label="식당 이름" id="restaurant-name" isEssential isSuccess value={restaurant?.name ?? ''} />
 					<Input
 						label="식당 주소"
 						id="restaurant-address"

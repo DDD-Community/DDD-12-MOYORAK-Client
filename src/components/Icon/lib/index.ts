@@ -2,6 +2,7 @@ export { default as activeHome } from './activeHome.svg?react';
 export { default as activeMypage } from './activeMypage.svg?react';
 export { default as activePot } from './activePot.svg?react';
 export { default as activeSearch } from './activeSearch.svg?react';
+export { default as arrow } from './arrow.svg?react';
 export { default as avatar } from './avatar.svg?react';
 export { default as back } from './back.svg?react';
 export { default as camera } from './camera.svg?react';

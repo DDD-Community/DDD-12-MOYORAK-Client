@@ -11,20 +11,9 @@ interface ITimePickerProps {
 	disabled?: boolean;
 }
 
-const AM_PM_LIST: { ampm?: string; hour: number; minute: number }[] = [
-	{ ampm: '오전', hour: 12, minute: 0 },
-	{ ampm: '오후', hour: 1, minute: 5 },
-	{ hour: 2, minute: 10 },
-	{ hour: 3, minute: 15 },
-	{ hour: 4, minute: 20 },
-	{ hour: 5, minute: 25 },
-	{ hour: 6, minute: 30 },
-	{ hour: 7, minute: 35 },
-	{ hour: 8, minute: 40 },
-	{ hour: 9, minute: 45 },
-	{ hour: 10, minute: 50 },
-	{ hour: 11, minute: 55 },
-];
+const AM_PM_OPTIONS = ['오전', '오후'];
+const HOUR_OPTIONS = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+const MINUTE_OPTIONS = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
 
 const TimePicker = ({ value, onChange, disabled, displayValue }: ITimePickerProps) => {
 	const [open, setOpen] = useState(false);
@@ -53,7 +42,7 @@ const TimePicker = ({ value, onChange, disabled, displayValue }: ITimePickerProp
 		setOpen(false);
 	};
 
-	const isAmpmActive = (ampm?: string) => ampm && ampm === tempSelected.ampm;
+	const isAmpmActive = (ampm: string) => ampm === tempSelected.ampm;
 	const isHourActive = (hour: number) => hour === tempSelected.hour;
 	const isMinuteActive = (minute: number) => minute === tempSelected.minute;
 
@@ -73,37 +62,51 @@ const TimePicker = ({ value, onChange, disabled, displayValue }: ITimePickerProp
 						onClick={(e) => e.stopPropagation()}
 					>
 						<div className="max-h-[240px] overflow-y-auto py-2">
-							{AM_PM_LIST.map((row) => (
-								<div key={`${row.ampm ?? ''}-${row.hour}-${row.minute}`} className="flex items-center px-2">
-									<Typography
-										variant={FONT_VARIANT.body02}
-										fontColor={PALETTE.gray10}
-										onClick={row.ampm ? () => handleClickAmpm(row.ampm!) : undefined}
-										className={`w-[60px] h-[38px] text-center flex items-center justify-center ${isAmpmActive(row.ampm) && 'bg-lime-50'}`}
-									>
-										{row.ampm ? row.ampm : ''}
-									</Typography>
-
-									<span
-										className={`w-[60px] h-[38px] text-center flex items-center justify-center ${isHourActive(row.hour) && 'bg-lime-50'}`}
-										onClick={() => handleClickHour(row.hour)}
-									>
-										<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray10}>
-											{row.hour}
-										</Typography>
-									</span>
-									<span
-										className={`w-[60px] h-[38px] text-center flex items-center justify-center ${isMinuteActive(row.minute) && 'bg-lime-50'}`}
-										onClick={() => handleClickMinute(row.minute)}
-									>
-										<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray10}>
-											{row.minute.toString().padStart(2, '0')}
-										</Typography>
-									</span>
+							<div className="flex items-start px-2">
+								<div className="w-[60px]">
+									{AM_PM_OPTIONS.map((ampm) => (
+										<div
+											key={ampm}
+											className={`h-[38px] text-center flex items-center justify-center ${isAmpmActive(ampm) && 'bg-lime-50'}`}
+											onClick={() => handleClickAmpm(ampm)}
+										>
+											<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray10}>
+												{ampm}
+											</Typography>
+										</div>
+									))}
 								</div>
-							))}
+
+								<div className="w-[60px]">
+									{HOUR_OPTIONS.map((hour) => (
+										<div
+											key={hour}
+											className={`h-[38px] text-center flex items-center justify-center ${isHourActive(hour) && 'bg-lime-50'}`}
+											onClick={() => handleClickHour(hour)}
+										>
+											<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray10}>
+												{hour}
+											</Typography>
+										</div>
+									))}
+								</div>
+
+								<div className="w-[60px]">
+									{MINUTE_OPTIONS.map((minute) => (
+										<div
+											key={minute}
+											className={`h-[38px] text-center flex items-center justify-center ${isMinuteActive(minute) && 'bg-lime-50'}`}
+											onClick={() => handleClickMinute(minute)}
+										>
+											<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray10}>
+												{minute.toString().padStart(2, '0')}
+											</Typography>
+										</div>
+									))}
+								</div>
+							</div>
 						</div>
-						<div className="flex justify-between items-center border-t px-5 py-2 bg-white sticky bottom-0">
+						<div className="flex justify-between items-center border-t border-gray-02 px-4.5 py-3.5 bg-white sticky bottom-0">
 							<Typography variant={FONT_VARIANT.label01} className="font-semibold" fontColor={PALETTE.gray07}>
 								현재
 							</Typography>

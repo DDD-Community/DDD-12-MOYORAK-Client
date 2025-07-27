@@ -73,7 +73,7 @@ const Pot = () => {
 				<Button variant="active" className="rounded-[40px] flex justify-between items-center px-[12px] py-[8px]" onClick={() => navigate('/pot-make')}>
 					<Icon size={31} name="potPlusButton" />
 					모여락으로 팀원 모으기
-					<img src={arrow} alt="" />
+					<img src={arrow} alt="arrow" />
 				</Button>
 			</div>
 

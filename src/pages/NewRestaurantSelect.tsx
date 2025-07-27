@@ -9,7 +9,16 @@ import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 const NewRestaurantSelect = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const restaurant = location.state?.restaurant;
+	const { restaurant } = (location.state as { restaurant?: { name: string } } | undefined) ?? {};
+
+	const handleAddRestaurant = () => {
+		navigate('/new-restaurant-registration', {
+			state: {
+				restaurant,
+			},
+			replace: true,
+		});
+	};
 
 	return (
 		<div className="bg-gray-02 min-h-screen">
@@ -41,18 +50,7 @@ const NewRestaurantSelect = () => {
 							</div>
 						</div>
 
-						<FilterButton
-							borderRadius="8.75"
-							variant="active"
-							onClick={() => {
-								navigate('/new-restaurant-registration', {
-									state: {
-										restaurant,
-									},
-									replace: true,
-								});
-							}}
-						>
+						<FilterButton borderRadius="8.75" variant="active" onClick={handleAddRestaurant}>
 							추가
 						</FilterButton>
 					</div>

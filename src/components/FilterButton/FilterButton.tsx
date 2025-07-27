@@ -5,11 +5,10 @@ interface IFilterButtonProps {
 	variant?: 'general' | 'active' | 'clicked';
 	onClick?: () => void;
 	borderRadius: string;
-	width?: string;
 	type?: 'button';
 }
 
-const FilterButton = ({ children, variant = 'general', onClick, borderRadius, width, type = 'button' }: IFilterButtonProps) => {
+const FilterButton = ({ children, variant = 'general', onClick, borderRadius, type = 'button' }: IFilterButtonProps) => {
 	const getFilterButtonClasses = () => {
 		const baseClasses = 'h-[32px] w-auto font-[Pretendard] text-sm not-italic font-medium leading-[143%] tracking-[0.14px]; px-[14px]';
 
@@ -25,7 +24,7 @@ const FilterButton = ({ children, variant = 'general', onClick, borderRadius, wi
 	};
 
 	return (
-		<button className={getFilterButtonClasses()} style={{ borderRadius: `${borderRadius}px`, width: width }} onClick={onClick} type={type}>
+		<button className={getFilterButtonClasses()} style={{ borderRadius: `${borderRadius}px` }} onClick={onClick} type={type}>
 			{children}
 		</button>
 	);

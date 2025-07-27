@@ -8,6 +8,14 @@ import NavBar from '@/components/NavBar/NavBar';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 
+const FILTER_TYPES = {
+	DISTANCE: '거리순',
+	RATING: '평점순',
+	LATEST: '최신순',
+} as const;
+
+type FilterType = (typeof FILTER_TYPES)[keyof typeof FILTER_TYPES];
+
 interface ISelectRestaurantPopupProps {
 	onClose: () => void;
 }
@@ -29,8 +37,10 @@ const MOCK_RESTAURANTS: IRestaurant[] = [
 	{ id: 6, name: '식당이름', category: '카테고리', rating: 5.0, reviewCount: 50 },
 ];
 
+const MAX_SELECTED_RESTAURANTS = 5;
+
 const SelectRestaurantPopup = ({ onClose }: ISelectRestaurantPopupProps) => {
-	const [filterButton, setFilterButton] = useState<string>('distance');
+	const [buttonType, setButtonType] = useState<FilterType>(FILTER_TYPES.DISTANCE);
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [selectedIds, setSelectedIds] = useState<number[]>([]);
 	const [selectedOpen, setSelectedOpen] = useState<boolean>(false);
@@ -41,13 +51,15 @@ const SelectRestaurantPopup = ({ onClose }: ISelectRestaurantPopupProps) => {
 
 	// 선택/해제
 	const handleSelect = (id: number) => {
+		if (selectedIds.length >= MAX_SELECTED_RESTAURANTS) return;
+
 		if (selectedIds.includes(id)) {
 			setSelectedIds(selectedIds.filter((sid) => sid !== id));
-		} else if (selectedIds.length < 5) {
-			setSelectedIds([...selectedIds, id]);
+			return;
 		}
-	};
 
+		setSelectedIds([...selectedIds, id]);
+	};
 	// 선택된 식당 삭제
 	const handleRemoveSelected = (id: number) => {
 		setSelectedIds(selectedIds.filter((sid) => sid !== id));
@@ -115,14 +127,26 @@ const SelectRestaurantPopup = ({ onClose }: ISelectRestaurantPopupProps) => {
 				{/* 식당 리스트 */}
 				<div className="bg-white rounded-[20px] px-4.5 py-6.5">
 					<div className="flex gap-2 mb-5">
-						<FilterButton borderRadius="17" variant={filterButton === 'distance' ? 'active' : 'general'} onClick={() => setFilterButton('distance')}>
-							거리순
+						<FilterButton
+							borderRadius="17"
+							variant={buttonType === FILTER_TYPES.DISTANCE ? 'active' : 'general'}
+							onClick={() => setButtonType(FILTER_TYPES.DISTANCE)}
+						>
+							{FILTER_TYPES.DISTANCE}
 						</FilterButton>
-						<FilterButton borderRadius="17" variant={filterButton === 'rating' ? 'active' : 'general'} onClick={() => setFilterButton('rating')}>
-							평점순
+						<FilterButton
+							borderRadius="17"
+							variant={buttonType === FILTER_TYPES.RATING ? 'active' : 'general'}
+							onClick={() => setButtonType(FILTER_TYPES.RATING)}
+						>
+							{FILTER_TYPES.RATING}
 						</FilterButton>
-						<FilterButton borderRadius="17" variant={filterButton === 'latest' ? 'active' : 'general'} onClick={() => setFilterButton('latest')}>
-							최신순
+						<FilterButton
+							borderRadius="17"
+							variant={buttonType === FILTER_TYPES.LATEST ? 'active' : 'general'}
+							onClick={() => setButtonType(FILTER_TYPES.LATEST)}
+						>
+							{FILTER_TYPES.LATEST}
 						</FilterButton>
 					</div>
 
