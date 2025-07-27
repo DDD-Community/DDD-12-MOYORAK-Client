@@ -8,6 +8,14 @@ import NavBar from '@/components/NavBar/NavBar';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 
+const FILTER_TYPES = {
+	DISTANCE: '거리순',
+	RATING: '평점순',
+	LATEST: '최신순',
+} as const;
+
+type FilterType = (typeof FILTER_TYPES)[keyof typeof FILTER_TYPES];
+
 interface ISelectRestaurantPopupProps {
 	onClose: () => void;
 }
@@ -31,14 +39,8 @@ const MOCK_RESTAURANTS: IRestaurant[] = [
 
 const MAX_SELECTED_RESTAURANTS = 5;
 
-const SORT_BY = {
-	distance: '거리순',
-	rating: '평점순',
-	latest: '최신순',
-};
-
 const SelectRestaurantPopup = ({ onClose }: ISelectRestaurantPopupProps) => {
-	const [filterButton, setFilterButton] = useState<string>('distance');
+	const [buttonType, setButtonType] = useState<FilterType>(FILTER_TYPES.DISTANCE);
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [selectedIds, setSelectedIds] = useState<number[]>([]);
 	const [selectedOpen, setSelectedOpen] = useState<boolean>(false);
@@ -71,7 +73,13 @@ const SelectRestaurantPopup = ({ onClose }: ISelectRestaurantPopupProps) => {
 
 	return (
 		<div className="bg-gray-02 min-h-screen ">
-			<NavBar variant="iconWithText" leftText="식당 선택하기" onLeftIconClick={onClose} />
+			<NavBar
+				variant="iconWithText"
+				leftText="식당 선택하기"
+				onLeftIconClick={() => {
+					onClose();
+				}}
+			/>
 
 			<div className="px-4.5 py-6.25">
 				<SearchInput placeholder="찾으려는 식당을 검색해 주세요" id="restaurantName" onChange={handleSearch} value={searchValue} />
@@ -109,7 +117,7 @@ const SelectRestaurantPopup = ({ onClose }: ISelectRestaurantPopupProps) => {
 											</Typography>
 										</div>
 									</div>
-									<Icon name="validInput" size={22} className="cursor-pointer mx-2" onClick={() => handleRemoveSelected(r.id)} />
+									<Icon name="validInput" size={22} className="cursor-pointer" onClick={() => handleRemoveSelected(r.id)} />
 								</div>
 							))}
 						</div>
@@ -119,14 +127,26 @@ const SelectRestaurantPopup = ({ onClose }: ISelectRestaurantPopupProps) => {
 				{/* 식당 리스트 */}
 				<div className="bg-white rounded-[20px] px-4.5 py-6.5">
 					<div className="flex gap-2 mb-5">
-						<FilterButton borderRadius="17" variant={filterButton === 'distance' ? 'active' : 'general'} onClick={() => setFilterButton('distance')}>
-							{SORT_BY.distance}
+						<FilterButton
+							borderRadius="17"
+							variant={buttonType === FILTER_TYPES.DISTANCE ? 'active' : 'general'}
+							onClick={() => setButtonType(FILTER_TYPES.DISTANCE)}
+						>
+							{FILTER_TYPES.DISTANCE}
 						</FilterButton>
-						<FilterButton borderRadius="17" variant={filterButton === 'rating' ? 'active' : 'general'} onClick={() => setFilterButton('rating')}>
-							{SORT_BY.rating}
+						<FilterButton
+							borderRadius="17"
+							variant={buttonType === FILTER_TYPES.RATING ? 'active' : 'general'}
+							onClick={() => setButtonType(FILTER_TYPES.RATING)}
+						>
+							{FILTER_TYPES.RATING}
 						</FilterButton>
-						<FilterButton borderRadius="17" variant={filterButton === 'latest' ? 'active' : 'general'} onClick={() => setFilterButton('latest')}>
-							{SORT_BY.latest}
+						<FilterButton
+							borderRadius="17"
+							variant={buttonType === FILTER_TYPES.LATEST ? 'active' : 'general'}
+							onClick={() => setButtonType(FILTER_TYPES.LATEST)}
+						>
+							{FILTER_TYPES.LATEST}
 						</FilterButton>
 					</div>
 
