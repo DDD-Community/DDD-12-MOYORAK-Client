@@ -41,7 +41,7 @@ const RestaurantSearch = () => {
 	const getRestaurants = async (keyword: string) => {
 		if (!keyword.trim()) return;
 		try {
-			const response = await get<IRestaurantResponse>(`/restaurants/search?keyword=${encodeURIComponent(keyword)}&size=10&currentPage=1`);
+			const response = await get<IRestaurantResponse>(`/api/restaurants/search?keyword=${encodeURIComponent(keyword)}&size=10&currentPage=1`);
 			setRestaurants((response as IRestaurantResponse).data || []);
 			setSearchPerformed(true);
 		} catch (error) {
@@ -113,9 +113,11 @@ const RestaurantSearch = () => {
 										</Typography>
 									</div>
 								</div>
-								<FilterButton variant="active" borderRadius="8.75" onClick={() => handleRegister(restaurant)}>
-									등록
-								</FilterButton>
+								<div className="flex-shrink-0">
+									<FilterButton variant="active" borderRadius="8.75" onClick={() => handleRegister(restaurant)}>
+										등록
+									</FilterButton>
+								</div>
 							</div>
 						))}
 					</div>

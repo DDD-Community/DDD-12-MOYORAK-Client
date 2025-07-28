@@ -31,7 +31,7 @@ const RestaurantRegistration = () => {
 	const navigate = useNavigate();
 
 	const registerRestaurant = async () => {
-		const response = await post(`/teams/${teamId}/restaurants`, {
+		const response = await post(`/api/teams/${teamId}/restaurants`, {
 			restaurantId: Number(restaurant?.id),
 			summary: restaurantDescription,
 		});
