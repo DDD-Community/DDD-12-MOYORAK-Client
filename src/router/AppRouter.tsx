@@ -1,5 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 
+import AuthPage from '@/pages/AuthPage/AuthPage';
+import RedirectPage from '@/pages/AuthPage/RedirectPage';
 import Developer from '@/pages/Developer';
 import Main from '@/pages/Main';
 import MyPage from '@/pages/MyPage';
@@ -19,6 +21,8 @@ const AppRouter = () => {
 	return (
 		<Routes>
 			<Route path="/" element={<Main />} />
+			<Route path="/auth" element={<AuthPage />} />
+			<Route path="/redirect" element={<RedirectPage />} />
 			<Route path="/search" element={<TeamShareListSearch />} />
 			<Route path="/mypage" element={<MyPage />} />
 			<Route path="/pot" element={<Pot />} />
