@@ -174,4 +174,14 @@
 		padding: 20px 10px !important;
 		border-radius: 8px !important;
 	}
+
+	/* === Scrollbar Hide === */
+	.scrollbar-hide {
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+	}
+
+	.scrollbar-hide::-webkit-scrollbar {
+		display: none;
+	}
 }

@@ -1,12 +1,13 @@
 import type { ComponentPropsWithoutRef, ElementType, ReactNode } from 'react';
 
 import { FONT_COLOR, PALETTE, type TFontColorTypes, type TFontVariantKeys } from '@/constants/styles';
+import { cn } from '@/utils/shadcn';
 
 type TTypographyProps<T extends ElementType> = {
 	as?: T;
 	variant: TFontVariantKeys;
 	fontColor?: TFontColorTypes;
-	children?: ReactNode; // string에서 ReactNode로 변경
+	children?: ReactNode;
 } & ComponentPropsWithoutRef<T>;
 
 /**
@@ -19,11 +20,8 @@ type TTypographyProps<T extends ElementType> = {
 const Typography = <T extends ElementType>({ as, variant, fontColor = PALETTE.gray09, children, className, ...props }: TTypographyProps<T>) => {
 	const Component = as || 'p';
 
-	// className을 별도로 분리하여 처리
-	const combinedClassName = `${variant} ${FONT_COLOR[fontColor]} ${className ?? ''}`;
-
 	return (
-		<Component className={combinedClassName} {...props}>
+		<Component className={cn(variant, FONT_COLOR[fontColor], className)} {...props}>
 			{children}
 		</Component>
 	);

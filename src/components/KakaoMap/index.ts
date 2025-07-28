@@ -1,1 +1,1 @@
-export { default } from './KakaoMap'
+export { default } from './KakaoMap';

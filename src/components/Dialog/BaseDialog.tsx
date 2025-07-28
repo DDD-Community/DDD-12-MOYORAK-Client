@@ -37,7 +37,7 @@ const DialogContent = ({
 		<DialogPrimitive.Content
 			data-slot="dialog-content"
 			className={cn(
-				'bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] rounded-[20px] p-[18px] shadow-lg duration-200',
+				'bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] rounded-[20px] px-[18px] pt-[30px] pb-[18px] shadow-lg duration-200',
 				className
 			)}
 			{...props}
@@ -57,7 +57,7 @@ const DialogContent = ({
 );
 
 const DialogHeader = ({ className, ...props }: React.ComponentProps<'div'>) => (
-	<div data-slot="dialog-header" className={cn('flex flex-col gap-2 text-center sm:text-left', className)} {...props} />
+	<div data-slot="dialog-header" className={cn('flex flex-col text-center sm:text-left', className)} {...props} />
 );
 
 const DialogFooter = ({ className, ...props }: React.ComponentProps<'div'>) => (
