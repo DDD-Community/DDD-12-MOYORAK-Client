@@ -16,6 +16,11 @@ const AuthPage = () => {
 			scope: 'email profile',
 		});
 
+		if (!CLIENT_ID || !REDIRECT_URI) {
+			throw new Error('Google OAuth 설정이 누락되었습니다.');
+			return;
+		}
+
 		const link = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
 		window.location.href = link;
 	};
