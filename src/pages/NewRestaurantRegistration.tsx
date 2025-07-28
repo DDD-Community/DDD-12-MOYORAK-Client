@@ -43,8 +43,8 @@ const NewRestaurantRegistration = () => {
 				category: CATEGORY_API_MAPPING[newRestaurantRegistration.category as TCategoryDisplay],
 			};
 
-			const response = await post<INewRestaurantRegistrationRequest>('/restaurants', apiData);
-			navigate('/restaurant-registration', { state: { restaurant: response } });
+			await post<INewRestaurantRegistrationRequest>('/api/restaurants', apiData);
+			navigate('/restaurant-registration', { state: { restaurant: newRestaurantRegistration } });
 		} catch (error) {
 			console.error('식당 등록 API 에러:', error);
 		}

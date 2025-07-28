@@ -44,7 +44,7 @@ const ReviewInfo = () => {
 
 	const getRestaurantReviewInfo = async () => {
 		try {
-			const response = await get<IReviewListResponse>(`/teams/${teamId}/restaurants/${teamRestaurantId}/reviews?currentPage=1&size=10`);
+			const response = await get<IReviewListResponse>(`/api/teams/${teamId}/restaurants/${teamRestaurantId}/reviews?currentPage=1&size=10`);
 			setReviewList(response as IReviewListResponse);
 		} catch (error) {
 			console.error('리뷰 정보를 불러오는데 실패했습니다:', error);
