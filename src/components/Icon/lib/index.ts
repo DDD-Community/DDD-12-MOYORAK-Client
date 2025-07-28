@@ -11,6 +11,7 @@ export { default as categorySelectClose } from './categorySelectClose.svg?react'
 export { default as check } from './check.svg?react';
 export { default as close } from './close.svg?react';
 export { default as copy } from './copy.svg?react';
+export { default as googleLogin } from './googleLogin.svg?react';
 export { default as homeTab } from './homeTab.svg?react';
 export { default as invalidInput } from './invalidInput.svg?react';
 export { default as link } from './link.svg?react';
