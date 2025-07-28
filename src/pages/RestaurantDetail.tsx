@@ -60,12 +60,12 @@ const RestaurantDetail = () => {
 	};
 
 	const getRestaurantInfo = async () => {
-		const response = await get(`/teams/${teamId}/restaurants/${teamRestaurantId}`);
+		const response = await get(`/api/teams/${teamId}/restaurants/${teamRestaurantId}`);
 		setRestaurantInfo(response as IRestaurantInfoResponse);
 	};
 
 	const getRestaurantReviewPhotos = async () => {
-		const response = await get(`/teams/${teamId}/restaurants/${teamRestaurantId}/reviews/photos?currentPage=1&size=10`);
+		const response = await get(`/api/teams/${teamId}/restaurants/${teamRestaurantId}/reviews/photos?currentPage=1&size=10`);
 		setReviewPhotos(response as IReviewPhotosResponse);
 	};
 

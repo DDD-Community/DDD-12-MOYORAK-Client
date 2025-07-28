@@ -34,7 +34,7 @@ const NewRestaurantSelect = () => {
 	const getNewRestaurantSelect = async () => {
 		try {
 			const response = await get<INewRestaurantSelectResponse>(
-				`/restaurants/external/search?query=${restaurant?.name}&longitude=127.043616&latitude=37.279838&radius=2000&page=1&size=15`
+				`/api/restaurants/external/search?query=${restaurant?.name}&longitude=127.043616&latitude=37.279838&radius=2000&page=1&size=15`
 			);
 			setNewRestaurantSelect(response as INewRestaurantSelectResponse);
 		} catch (error) {
@@ -82,7 +82,7 @@ const NewRestaurantSelect = () => {
 										{item.name}
 									</Typography>
 
-									<div className="flex gap-[7px] items-center">
+									<div className="flex gap-[7px]">
 										<div className="w-[41px] h-[26px] rounded-[4px] bg-white border border-solid border-[#E9E9E9] flex items-center justify-center">
 											<Typography variant={FONT_VARIANT.label01} className="text-[#70CE13]">
 												주소
