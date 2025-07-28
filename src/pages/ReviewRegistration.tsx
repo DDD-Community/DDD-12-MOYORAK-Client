@@ -1,131 +1,50 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
-import { post } from '@/apis';
 import emptyStarIcon from '@/assets/emptyStar.png';
+import reviewRegistration from '@/assets/reviewRegistration.png';
 import starIcon from '@/assets/star.png';
 import Button from '@/components/Button/Button';
-import { CustomDialog } from '@/components/Dialog/CustomDialog';
+import CustomDialog from '@/components/Dialog/CustomDialog';
 import FilterButton from '@/components/FilterButton/FilterButton';
 import Icon from '@/components/Icon';
 import FormLabel from '@/components/Input/FormLabel';
-import Input from '@/components/Input/Input';
 import NavBar from '@/components/NavBar/NavBar';
 import Typography from '@/components/Typography/Typography';
 import { FOOD_PREP_TIME_OPTIONS, SATISFACTION_OPTIONS, WAITING_TIME_OPTIONS } from '@/constants/data.constant';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 
-const RestaurantRegistration = () => {
-	const [restaurantDescription, setRestaurantDescription] = useState('');
-	const [waitingTime, setWaitingTime] = useState<string>('');
-	const [foodPrepTime, setFoodPrepTime] = useState<string>('');
-	const [satisfaction, setSatisfaction] = useState<number>(0);
-	const [review, setReview] = useState<string>('');
+const ReviewRegistration = () => {
+	const { id } = useParams();
+	const isEdit = !!id;
+	const navigate = useNavigate();
+	const [waitingTime, setWaitingTime] = useState('');
+	const [foodPrepTime, setFoodPrepTime] = useState('');
+	const [satisfaction, setSatisfaction] = useState(0);
+	const [review, setReview] = useState('');
 	const [images, setImages] = useState<File[]>([]);
 	const [isOpen, setIsOpen] = useState(false);
-	const [restaurantName, setRestaurantName] = useState('');
-	const teamId = 1;
-
 	const location = useLocation();
-	const { restaurant } = (location.state as { restaurant?: { id: string; name: string; address: string } } | undefined) ?? {};
-	const navigate = useNavigate();
-
-	const registerRestaurant = async () => {
-		const response = await post(`/teams/${teamId}/restaurants`, {
-			restaurantId: Number(restaurant?.id),
-			summary: restaurantDescription,
-		});
-		console.log(response);
-	};
-
-	useEffect(() => {
-		if (restaurant?.name) {
-			setRestaurantName(restaurant.name);
-		}
-	}, [restaurant]);
+	const restaurant = location.state?.restaurant;
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setIsOpen(true);
 	};
 
-	const isButtonActive =
-		restaurantName.length > 0 &&
-		restaurantDescription.length > 0 &&
-		waitingTime.length > 0 &&
-		foodPrepTime.length > 0 &&
-		satisfaction > 0 &&
-		review.length > 0 &&
-		images.length > 0;
-
-	const handleRestaurantSearch = () => {
-		navigate('/restaurant-search');
-	};
+	const isButtonActive = waitingTime.length > 0 && foodPrepTime.length > 0 && satisfaction > 0 && review.length > 0 && images.length > 0;
 
 	return (
 		<>
 			<NavBar
 				variant="iconWithText"
-				leftText="식당 등록"
+				leftText={restaurant}
 				onLeftIconClick={() => {
 					navigate(-1);
 				}}
 			/>
 			<div className="bg-gray-02 min-h-screen ">
 				<form className="p-4.5 flex flex-col gap-6 " onSubmit={handleSubmit}>
-					<div className="py-6 px-4 rounded-[20px] bg-white flex flex-col gap-6.25">
-						<div className="flex flex-col gap-1.25">
-							<FormLabel label="식당 이름" isEssential id="restaurant" className="font-semibold" />
-							<div className="relative">
-								<div
-									className={`
-										w-full ${FONT_VARIANT.header02} py-[7px] pr-[48px] mb-[10px]
-										flex items-center cursor-pointer
-										transition-colors duration-200
-										border-b-[1px] ${restaurantName ? 'border-b-primary-200' : 'border-b-gray-04'}
-										hover:border-b-primary-500 focus:border-b-primary-500
-									`}
-									onClick={handleRestaurantSearch}
-									onKeyDown={(e) => {
-										if (e.key === 'Enter' || e.key === ' ') {
-											e.preventDefault();
-											handleRestaurantSearch();
-										}
-									}}
-									tabIndex={0}
-									role="button"
-									aria-label="식당 검색하기"
-								>
-									<Typography
-										variant={FONT_VARIANT.header02}
-										fontColor={restaurantName ? PALETTE.gray10 : PALETTE.gray05}
-										className={!restaurantName ? 'text-xl font-medium' : ''}
-									>
-										{restaurantName || '식당을 검색해 주세요'}
-									</Typography>
-								</div>
-								<Icon
-									name={restaurantName ? 'inputValueSearch' : 'inputSearch'}
-									size={22}
-									className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-gray-06"
-								/>
-							</div>
-						</div>
-						<div className="flex flex-col gap-1.25">
-							<Input
-								label="한줄 소개"
-								isEssential
-								id="potTitle"
-								placeholder="식당을 간단하게 소개해 주세요"
-								value={restaurantDescription}
-								onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRestaurantDescription(e.target.value)}
-							/>
-							<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray06}>
-								간단한 설명을 함께 적어주시면, 팀원들이 식당에 대해 빠르게 파악할 수 있어요.
-							</Typography>
-						</div>
-					</div>
-
 					<div className="py-6 px-4 rounded-[20px] bg-white flex flex-col gap-8.75">
 						<div className="flex flex-col gap-3.75">
 							<FormLabel label="웨이팅이 있었나요?" isEssential id="waiting" className="font-semibold" />
@@ -184,7 +103,7 @@ const RestaurantRegistration = () => {
 
 						<div className="flex flex-col gap-3.75 relative">
 							<FormLabel label="자세한 리뷰를 남겨주세요" isEssential id="satisfaction" className="font-semibold" />
-							<div className="flex gap-2 flex-wrap">
+							<div className="flex gap-2">
 								<label
 									className={`w-[80px] h-[80px] flex flex-col items-center justify-center border border-gray-05 rounded-[12px] bg-white cursor-pointer relative ${images.length >= 5 ? 'opacity-50 pointer-events-none' : ''}`}
 								>
@@ -246,18 +165,34 @@ const RestaurantRegistration = () => {
 						</div>
 					</div>
 
-					<Button variant={isButtonActive ? 'active' : 'disabled'} onClick={registerRestaurant}>
-						등록하기
-					</Button>
+					<Button variant={isButtonActive ? 'active' : 'disabled'}>등록하기</Button>
 				</form>
-				<CustomDialog headerText={{ title: '식당 등록이 완료되었어요' }} onOpen={isOpen} onOpenChange={setIsOpen} className="w-[271px]">
-					<Button variant="active" onClick={() => navigate('/restaurant-detail/1')} className="mt-[17px]">
-						확인
-					</Button>
-				</CustomDialog>
+
+				{isEdit ? (
+					<CustomDialog headerText={{ title: '리뷰 수정이 완료되었어요' }} onOpen={isOpen} onOpenChange={setIsOpen} className="w-[271px]">
+						<Button variant="active" onClick={() => navigate('/restaurant-detail/1')} className="mt-[24px]">
+							확인
+						</Button>
+					</CustomDialog>
+				) : (
+					<CustomDialog
+						headerText={{
+							title: '리뷰 등록이 완료되었어요',
+							description: '작성하신 리뷰는 언제든지 식당페이지에서 수정 가능해요!',
+						}}
+						onOpen={isOpen}
+						onOpenChange={setIsOpen}
+						className="w-[271px]"
+					>
+						<img src={reviewRegistration} alt="리뷰 등록 완료" className="w-[175px] h-[102px] absolute bottom-44 left-11" />
+						<Button variant="active" onClick={() => navigate('/restaurant-detail')} className="mt-[24px]">
+							확인
+						</Button>
+					</CustomDialog>
+				)}
 			</div>
 		</>
 	);
 };
 
-export default RestaurantRegistration;
+export default ReviewRegistration;

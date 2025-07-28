@@ -7,7 +7,7 @@ import Button from '@/components/Button/Button';
 import FilterButton from '@/components/FilterButton/FilterButton';
 import Icon from '@/components/Icon';
 import Typography from '@/components/Typography';
-import { POT_PARTICIPANTS, POT_PARTICIPANTS_IMAGE, POT_TITLE } from '@/constants/constant';
+import { POT_PARTICIPANTS, POT_PARTICIPANTS_IMAGE, POT_TITLE } from '@/constants/data.constant';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 
 const POT_PARTICIPANTS_COUNT = 3;
