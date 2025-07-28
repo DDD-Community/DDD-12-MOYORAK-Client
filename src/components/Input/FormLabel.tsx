@@ -3,8 +3,8 @@ import React from 'react';
 import { FONT_COLOR, FONT_VARIANT, PALETTE } from '@/constants/styles';
 
 export interface IFormLabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
-	id: string;
-	label: string;
+	id?: string;
+	label?: string;
 	isEssential?: boolean;
 }
 
