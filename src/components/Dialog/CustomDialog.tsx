@@ -1,6 +1,7 @@
 import { type ReactNode } from 'react';
 
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
+import { cn } from '@/utils/shadcn';
 
 import Typography from '../Typography';
 
@@ -15,14 +16,15 @@ interface ICustomDialogProps {
 	onOpen: boolean;
 	onOpenChange: (onOpen: boolean) => void;
 	showCloseButton?: boolean;
+	className?: string;
 }
 
-export const CustomDialog = ({ headerText, children, onOpen, onOpenChange, showCloseButton = false }: ICustomDialogProps) => {
+export const CustomDialog = ({ headerText, children, onOpen, onOpenChange, showCloseButton = false, className }: ICustomDialogProps) => {
 	return (
 		<Dialog open={onOpen} onOpenChange={onOpenChange}>
-			<DialogContent showCloseButton={showCloseButton} className="sm:max-w-[425px]">
+			<DialogContent showCloseButton={showCloseButton} className={cn('sm:max-w-[425px]', className)}>
 				<DialogHeader>
-					<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.gray10} className="mb-[7px]">
+					<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.gray10} className="mb-[7px] font-semibold">
 						{headerText.title}
 					</Typography>
 					{headerText.description && (

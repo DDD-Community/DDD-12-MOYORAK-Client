@@ -21,8 +21,8 @@ const BORDER_COLOR = {
 	[PALETTE.primary200]: 'border-b-primary-200',
 };
 
-const Input = forwardRef<HTMLInputElement, IInputProps & IFormLabelProps>(
-	({ isEssential, label, id, type = 'text', isSuccess = false, isError = false, message, placeholder, value, ...rest }, ref) => {
+const Input = forwardRef<HTMLInputElement, IInputProps & Omit<IFormLabelProps, 'onChange'>>(
+	({ isEssential, label, id, type = 'text', isSuccess = false, onChange, isError = false, message, placeholder, value, ...rest }, ref) => {
 		const borderClass = useMemo(() => {
 			if (isError) return BORDER_COLOR[PALETTE.danger01];
 			if (!value) return BORDER_COLOR[PALETTE.gray03];
@@ -37,12 +37,13 @@ const Input = forwardRef<HTMLInputElement, IInputProps & IFormLabelProps>(
 						ref={ref}
 						id={id}
 						name={id}
+						onChange={onChange}
 						placeholder={placeholder}
 						value={value}
 						type={type}
 						className={`
               w-full ${FONT_VARIANT.header02} py-[7px] pr-[48px] mb-[10px]
-              placeholder:text-xl placeholder:text-gray-05 placeholder:font-semibold
+              placeholder:text-xl placeholder:text-gray-05 placeholder:font-medium
               border-b-[1px] ${borderClass}
               cursor-text
             `}
