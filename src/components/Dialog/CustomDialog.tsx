@@ -28,7 +28,7 @@ export const CustomDialog = ({ headerText, children, onOpen, onOpenChange, showC
 						{headerText.title}
 					</Typography>
 					{headerText.description && (
-						<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray05}>
+						<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray08}>
 							{headerText.description}
 						</Typography>
 					)}
