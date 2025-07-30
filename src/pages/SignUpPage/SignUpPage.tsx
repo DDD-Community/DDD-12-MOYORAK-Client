@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import NavBar from '@/components/NavBar/NavBar';
 import Typography from '@/components/Typography';
