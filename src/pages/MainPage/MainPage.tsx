@@ -53,7 +53,6 @@ const MainPage = () => {
 					<FilterButton
 						variant="active"
 						onClick={() => {
-							console.log('????');
 							navigate('/auth');
 						}}
 						className="rounded-[17px] w-[135px] px-3.5 h-[26px] flex items-center mt-5"

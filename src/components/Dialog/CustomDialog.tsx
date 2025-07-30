@@ -17,14 +17,28 @@ interface ICustomDialogProps {
 	onOpenChange: (onOpen: boolean) => void;
 	showCloseButton?: boolean;
 	className?: string;
+	alignHeaderCenter?: boolean;
+	headerAdornment?: ReactNode;
+	overlay?: boolean;
 }
 
-export const CustomDialog = ({ headerText, children, onOpen, onOpenChange, showCloseButton = false, className }: ICustomDialogProps) => {
+export const CustomDialog = ({
+	headerText,
+	children,
+	onOpen,
+	onOpenChange,
+	showCloseButton = false,
+	className,
+	alignHeaderCenter = true,
+	headerAdornment,
+	overlay = true,
+}: ICustomDialogProps) => {
 	return (
 		<Dialog open={onOpen} onOpenChange={onOpenChange}>
-			<DialogContent showCloseButton={showCloseButton} className={cn('sm:max-w-[425px]', className)}>
-				<DialogHeader>
-					<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.gray10} className="mb-[7px] font-semibold">
+			<DialogContent showCloseButton={showCloseButton} overlay={overlay} className={cn('sm:max-w-[425px]', className)}>
+				{headerAdornment && headerAdornment}
+				<DialogHeader className={`${!alignHeaderCenter ? 'text-left' : ''}`}>
+					<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.gray10} className="mb-[7px] font-semibold whitespace-pre-line">
 						{headerText.title}
 					</Typography>
 					{headerText.description && (

@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 import auth from '@/assets/auth.png';
 import Icon from '@/components/Icon';
 import NavBar from '@/components/NavBar/NavBar';
@@ -5,6 +7,8 @@ import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 
 const AuthPage = () => {
+	const navigate = useNavigate();
+
 	const googleLogin = () => {
 		const CLIENT_ID = import.meta.env.VITE_GOOGLE_AUTH_CLIENT_ID as string;
 		const REDIRECT_URI = import.meta.env.VITE_GOOGLE_AUTH_REDIRECT_URI as string;
@@ -28,7 +32,7 @@ const AuthPage = () => {
 	return (
 		<main>
 			<header>
-				<NavBar variant="iconOnly" />
+				<NavBar variant="iconOnly" onLeftIconClick={() => navigate(-1)} />
 			</header>
 
 			<section className="px-5 mb-[89px]">
@@ -52,9 +56,12 @@ const AuthPage = () => {
 				<Typography variant={FONT_VARIANT.body01}>Google로 간편하게 시작</Typography>
 			</button>
 
-			<Typography variant={FONT_VARIANT.caption01} className="text-center">
-				모여락은 현재 구글 간편 로그인으로만 이용할 수 있습니다.
-			</Typography>
+			<div className="flex items-center justify-center gap-[5px]">
+				<Icon name="notice" width={18} height={18} />
+				<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray08} className="text-center">
+					모여락은 현재 구글 간편 로그인으로만 이용할 수 있습니다.
+				</Typography>
+			</div>
 		</main>
 	);
 };

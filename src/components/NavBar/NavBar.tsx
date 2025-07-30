@@ -2,6 +2,8 @@ import Icon, { type IconTypes } from '@/components/Icon';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 
+import IconButton from '../Button/IconButton';
+
 interface IconOnlyProps {
 	variant: 'iconOnly';
 	leftIcon?: IconTypes;
@@ -37,14 +39,26 @@ const NavBar = (props: INavBarProps) => {
 			case 'iconOnly':
 				return (
 					<div className="flex items-center">
-						<Icon name={props.leftIcon || 'back'} size={24} onClick={props.onLeftIconClick} />
+						<IconButton
+							iconStyle={{
+								name: props.leftIcon || 'back',
+								size: 24,
+							}}
+							onClick={props.onLeftIconClick}
+						/>
 					</div>
 				);
 
 			case 'iconWithText':
 				return (
 					<div className="flex items-center gap-4">
-						<Icon name={props.leftIcon || 'back'} size={24} onClick={props.onLeftIconClick} />
+						<IconButton
+							iconStyle={{
+								name: props.leftIcon || 'back',
+								size: 24,
+							}}
+							onClick={props.onLeftIconClick}
+						/>
 						<Typography as="span" variant={FONT_VARIANT.header03} fontColor={PALETTE.gray10} className="font-semibold tracking-[-0.004px]">
 							{props.leftText}
 						</Typography>
@@ -55,7 +69,13 @@ const NavBar = (props: INavBarProps) => {
 				return (
 					<div className="flex items-center justify-between w-full">
 						<div className="flex items-center gap-4">
-							<Icon name={props.leftIcon || 'back'} size={24} onClick={props.onLeftIconClick} />
+							<IconButton
+								iconStyle={{
+									name: props.leftIcon || 'back',
+									size: 24,
+								}}
+								onClick={props.onLeftIconClick}
+							/>
 							<Typography as="span" variant={FONT_VARIANT.header03} fontColor={PALETTE.gray10} className="font-semibold tracking-[-0.004px]">
 								{props.leftText}
 							</Typography>
