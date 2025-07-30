@@ -4,8 +4,8 @@ import { FONT_COLOR, FONT_VARIANT, PALETTE } from '@/constants/styles';
 import { cn } from '@/utils/shadcn';
 
 export interface IFormLabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
-	id: string;
-	label: string;
+	id?: string;
+	label?: string;
 	isEssential?: boolean;
 	className?: string;
 }

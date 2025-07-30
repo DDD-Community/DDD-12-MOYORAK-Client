@@ -8,7 +8,7 @@ import { cn } from '@/utils/shadcn';
 
 import { Button, buttonVariants } from './Button';
 
-function Calendar({
+const Calendar = ({
 	className,
 	classNames,
 	showOutsideDays = true,
@@ -19,7 +19,7 @@ function Calendar({
 	...props
 }: React.ComponentProps<typeof DayPicker> & {
 	buttonVariant?: React.ComponentProps<typeof Button>['variant'];
-}) {
+}) => {
 	const defaultClassNames = getDefaultClassNames();
 
 	return (
@@ -110,9 +110,9 @@ function Calendar({
 			{...props}
 		/>
 	);
-}
+};
 
-function CalendarDayButton({ className, day, modifiers, ...props }: React.ComponentProps<typeof DayButton>) {
+const CalendarDayButton = ({ className, day, modifiers, ...props }: React.ComponentProps<typeof DayButton>) => {
 	const defaultClassNames = getDefaultClassNames();
 
 	const ref = React.useRef<HTMLButtonElement>(null);
@@ -138,6 +138,6 @@ function CalendarDayButton({ className, day, modifiers, ...props }: React.Compon
 			{...props}
 		/>
 	);
-}
+};
 
 export { Calendar, CalendarDayButton };

@@ -20,6 +20,7 @@ const BasicProfile = () => {
 
 			<div className="flex flex-col gap-[50px]">
 				<Input label="이름" isEssential placeholder="이름을 입력해주세요." value={username} onChange={(e) => setUsername(e.target.value)} />
+
 				<Input
 					label="생년월일"
 					isEssential
