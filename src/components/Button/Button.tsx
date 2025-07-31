@@ -1,6 +1,6 @@
-import { type ReactNode } from 'react';
+import { type ButtonHTMLAttributes, type ReactNode } from 'react';
 
-interface IButtonProps {
+interface IButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	children: ReactNode;
 	variant?: 'disabled' | 'general' | 'active' | 'clicked';
 	onClick?: () => void;
@@ -9,7 +9,7 @@ interface IButtonProps {
 
 // todo : Button 컴포넌트 스타일 수정
 
-const Button = ({ children, variant = 'general', onClick, className }: IButtonProps) => {
+const Button = ({ children, variant = 'general', onClick, className, ...rest }: IButtonProps) => {
 	const getButtonClasses = () => {
 		const baseClasses =
 			'h-[50px] min-w-[89px] w-full font-heading text-base font-medium leading-[150%] tracking-[0.091px] rounded-[20px] transition-colors duration-200';
@@ -29,7 +29,7 @@ const Button = ({ children, variant = 'general', onClick, className }: IButtonPr
 	};
 
 	return (
-		<button className={`${getButtonClasses()} ${className ?? ''}`} onClick={onClick} disabled={variant === 'disabled'}>
+		<button className={`${getButtonClasses()} ${className ?? ''}`} onClick={onClick} disabled={variant === 'disabled'} {...rest}>
 			{children}
 		</button>
 	);
