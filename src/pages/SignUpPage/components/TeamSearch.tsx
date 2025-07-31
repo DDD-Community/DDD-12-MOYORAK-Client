@@ -13,7 +13,7 @@ const TeamSearch = () => {
 		setStep('success');
 	};
 
-    return (
+	return (
 		<section className="px-5">
 			<Typography as="h1" variant={FONT_VARIANT.header02} fontColor={PALETTE.gray10} className="mb-[5px]">
 				우리 팀 찾기
@@ -30,7 +30,7 @@ const TeamSearch = () => {
 			</FilterButton>
 
 			<div className="fixed bottom-[30px] left-0 w-full px-5">
-				<Button variant="active" onClick={handleSuccess}>
+				<Button variant={!team ? 'disabled' : 'active'} onClick={handleSuccess}>
 					다음
 				</Button>
 			</div>

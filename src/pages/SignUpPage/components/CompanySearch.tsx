@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import { useQuerySearchCompany } from '@/apis/useQuerySearchCompany';
 import Button from '@/components/Button/Button';
 import Input from '@/components/Input/Input';
@@ -18,7 +19,6 @@ const CompanySearch = () => {
 		if (isError) return '입력한 회사 이름이 초대받은 회사 이름과 일치하지 않습니다.';
 		return '';
 	};
-
 
 	return (
 		<section className="px-5">
@@ -57,7 +57,7 @@ const CompanySearch = () => {
 			)}
 
 			<div className="fixed bottom-[30px] left-0 w-full px-5">
-				<Button variant="active" onClick={nextStep}>
+				<Button variant={!company ? 'disabled' : 'active'} onClick={nextStep}>
 					다음
 				</Button>
 			</div>

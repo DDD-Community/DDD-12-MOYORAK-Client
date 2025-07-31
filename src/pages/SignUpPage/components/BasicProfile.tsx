@@ -43,7 +43,7 @@ const BasicProfile = () => {
 			</div>
 
 			<div className="fixed bottom-[30px] left-0 w-full px-5">
-				<Button variant="active" onClick={nextStep}>
+				<Button variant={!username || !birth || !gender ? 'disabled' : 'active'} onClick={nextStep}>
 					<Typography variant={FONT_VARIANT.header04}>다음</Typography>
 				</Button>
 			</div>
