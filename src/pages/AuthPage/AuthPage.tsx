@@ -13,20 +13,12 @@ const AuthPage = () => {
 		const CLIENT_ID = import.meta.env.VITE_GOOGLE_AUTH_CLIENT_ID as string;
 		const REDIRECT_URI = import.meta.env.VITE_GOOGLE_AUTH_REDIRECT_URI as string;
 
-		const params = new URLSearchParams({
-			client_id: CLIENT_ID,
-			redirect_uri: REDIRECT_URI,
-			response_type: 'code',
-			scope: 'email profile',
-		});
-
 		if (!CLIENT_ID || !REDIRECT_URI) {
 			throw new Error('Google OAuth 설정이 누락되었습니다.');
 			return;
 		}
 
-		const link = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
-		window.location.href = link;
+		window.location.href = 'http://moyorak.o-r.kr/oauth2/authorization/google';
 	};
 
 	return (
