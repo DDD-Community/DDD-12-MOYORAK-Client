@@ -116,7 +116,7 @@ export default class KakaoMapCore {
 	}
 
 	destroyMap() {
-		this.markers.forEach((marker) => marker.setMap(null));
+		this.markers.forEach(({ marker }) => marker.setMap(null));
 		this.markers = [];
 		this.map = null;
 	}
