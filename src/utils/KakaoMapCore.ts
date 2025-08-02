@@ -95,11 +95,6 @@ export default class KakaoMapCore {
 		});
 
 		customOverlay.setMap(this.map);
-
-		content.addEventListener('click', () => {
-			this.handleMarkerClick(index);
-		});
-
 		// 마커 리스트에는 overlay만 저장
 		this.markers.push({ marker: customOverlay, index });
 	}
