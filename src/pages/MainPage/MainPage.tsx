@@ -1,3 +1,5 @@
+import { useLocation } from 'react-router-dom';
+
 import KakaoMap from '@/components/KakaoMap';
 import NavBar from '@/components/NavBar/NavBar';
 
@@ -21,13 +23,11 @@ const MOCK_MARKER_OPTIONS = [
 ];
 
 const MainPage = () => {
-	// const {
-	// 	state: { login },
-	// } = useLocation();
+	const {
+		state: { login },
+	} = useLocation();
 
-	const IS_LOGIN = false;
-
-	if (IS_LOGIN) {
+	if (login) {
 		return (
 			<>
 				<NavBar variant="iconWithTextAndRightIcon" leftIcon="company" leftText="WEB 2팀" rightIcon="menu" />
