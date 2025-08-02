@@ -53,11 +53,19 @@ const ReviewRegistration = () => {
 		// 파일명에서 확장자 추출
 		const fileName = file.name;
 		const lastDotIndex = fileName.lastIndexOf('.');
+		let extension = '';
+
 		if (lastDotIndex !== -1) {
-			return fileName.substring(lastDotIndex + 1).toLowerCase();
+			extension = fileName.substring(lastDotIndex + 1).toLowerCase();
 		}
 
-		// 파일명에 확장자가 없으면 MIME 타입에서 추출
+		// HEIC/HEIF 같은 모바일 포맷은 JPG로 변환
+		if (extension === 'heic' || extension === 'heif') {
+			console.log(`${extension} 포맷을 JPG로 변환합니다.`);
+			return 'jpg';
+		}
+
+		// MIME 타입에서 확장자 추출
 		const mimeType = file.type;
 		switch (mimeType) {
 			case 'image/jpeg':
@@ -72,30 +80,38 @@ const ReviewRegistration = () => {
 				return 'svg';
 			case 'image/bmp':
 				return 'bmp';
+			case 'image/heic':
+			case 'image/heif':
+				console.log('HEIC/HEIF MIME 타입을 JPG로 변환합니다.');
+				return 'jpg';
 			default:
-				return 'jpg'; // 기본값
+				return 'jpg';
 		}
 	};
 
 	// 단일 이미지 업로드 함수
 	const uploadSingleImage = async (file: File): Promise<string> => {
 		const extension = getFileExtension(file);
+
 		try {
-			const response = await post<IImageUploadResponse>('/api/images', {
+			console.log('업로드 요청:', { extension, fileName: file.name });
+
+			const response = await post<IImageUploadResponse>('/images', {
 				extensionName: extension,
 			});
-			if (
-				typeof response === 'object' &&
-				response !== null &&
-				'data' in response &&
-				typeof (response as any).data === 'object' &&
-				(response as any).data !== null
-			) {
-				const data = (response as any).data as IImageUploadResponse;
-				return data.url || data.path;
-			} else {
-				throw new Error('서버 응답 형식이 올바르지 않습니다.');
+
+			let imageUrl = '';
+
+			if (response && typeof response === 'object' && 'path' in response) {
+				imageUrl = (response as { path: string }).path;
 			}
+
+			if (!imageUrl) {
+				console.error('응답에서 path를 찾을 수 없습니다:', response);
+				throw new Error('서버 응답에서 이미지 path를 찾을 수 없습니다.');
+			}
+
+			return imageUrl;
 		} catch (error) {
 			console.error('이미지 업로드 실패:', error);
 			throw new Error('이미지 업로드에 실패했습니다.');
@@ -109,13 +125,30 @@ const ReviewRegistration = () => {
 		const fileArr = Array.from(e.target.files).slice(0, 5 - images.length);
 		if (fileArr.length === 0) return;
 
-		// 지원하는 이미지 형식 체크
-		const supportedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/bmp'];
+		// 지원하는 이미지 형식 체크 (HEIC/HEIF 포함)
+		const supportedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/heic', 'image/heif'];
+
 		const validFiles = fileArr.filter((file) => {
-			if (!supportedTypes.includes(file.type)) {
-				alert(`${file.name}은(는) 지원하지 않는 파일 형식입니다. JPG, PNG, GIF, WEBP, BMP 파일만 업로드 가능합니다.`);
+			// MIME 타입 체크
+			const isValidMimeType = supportedTypes.includes(file.type);
+
+			// 파일 확장자 체크 (MIME 타입이 없거나 잘못된 경우 대비)
+			const fileName = file.name.toLowerCase();
+			const hasValidExtension =
+				fileName.endsWith('.jpg') ||
+				fileName.endsWith('.jpeg') ||
+				fileName.endsWith('.png') ||
+				fileName.endsWith('.gif') ||
+				fileName.endsWith('.webp') ||
+				fileName.endsWith('.bmp') ||
+				fileName.endsWith('.heic') ||
+				fileName.endsWith('.heif');
+
+			if (!isValidMimeType && !hasValidExtension) {
+				alert(`${file.name}은(는) 지원하지 않는 파일 형식입니다. JPG, PNG, GIF, WEBP, BMP, HEIC, HEIF 파일만 업로드 가능합니다.`);
 				return false;
 			}
+
 			return true;
 		});
 
@@ -124,13 +157,31 @@ const ReviewRegistration = () => {
 		setIsUploading(true);
 
 		try {
-			// 새로 선택된 이미지들을 하나씩 업로드
-			const uploadPromises = validFiles.map((file) => uploadSingleImage(file));
-			const uploadedUrls = await Promise.all(uploadPromises);
+			console.log(
+				'업로드 시작:',
+				validFiles.map((f) => `${f.name} (${f.type})`)
+			);
 
-			// 상태 업데이트
-			setImages((prev) => [...prev, ...validFiles].slice(0, 5));
+			const uploadedUrls: string[] = [];
+
+			for (const file of validFiles) {
+				try {
+					const url = await uploadSingleImage(file);
+					uploadedUrls.push(url);
+					console.log(`${file.name} 업로드 성공:`, url);
+				} catch (error) {
+					console.error(`${file.name} 업로드 실패:`, error);
+				}
+			}
+
+			if (uploadedUrls.length === 0) {
+				throw new Error('모든 이미지 업로드에 실패했습니다.');
+			}
+
+			setImages((prev) => [...prev, ...validFiles.slice(0, uploadedUrls.length)].slice(0, 5));
 			setImageUrls((prev) => [...prev, ...uploadedUrls].slice(0, 5));
+
+			console.log('업로드 완료:', uploadedUrls);
 		} catch (error) {
 			alert('이미지 업로드에 실패했습니다.');
 			console.error('이미지 업로드 에러:', error);
@@ -157,7 +208,7 @@ const ReviewRegistration = () => {
 				servingTimeId: Number(foodPrepTime),
 				waitingTimeId: Number(waitingTime),
 				score: satisfaction,
-				photoPaths: imageUrls, // 업로드된 URL들 사용
+				photoPaths: imageUrls,
 				extraText: review,
 			});
 			setIsOpen(true);
@@ -246,7 +297,7 @@ const ReviewRegistration = () => {
 								>
 									<input
 										type="file"
-										accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/bmp"
+										accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/bmp,image/heic,image/heif,.heic,.heif"
 										multiple
 										hidden
 										disabled={images.length >= 5 || isUploading}
@@ -288,12 +339,6 @@ const ReviewRegistration = () => {
 										>
 											<Icon name="close" size={16} />
 										</button>
-										{/* 업로드 완료 표시 */}
-										{imageUrls[idx] && (
-											<div className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
-												<Icon name="check" size={10} color="white" />
-											</div>
-										)}
 									</div>
 								))}
 							</div>
