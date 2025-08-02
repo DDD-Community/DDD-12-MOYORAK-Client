@@ -5,6 +5,30 @@ import RestaurantReview from './RestaurantReview';
 const BASIC_HEIGHT = 300;
 const MIN_HEIGHT = 120;
 
+const UP_THRESHOLD = 8;
+const DOWN_THRESHOLD = 8;
+
+const REVIEW_LIST = [
+	{
+		id: 1,
+		name: '식당이름',
+		score: 3,
+		review: 30,
+	},
+	{
+		id: 2,
+		name: '식당이름',
+		score: 3,
+		review: 30,
+	},
+	{
+		id: 3,
+		name: '식당이름',
+		score: 3,
+		review: 30,
+	},
+];
+
 interface ICustomDrawerProps {
 	header: ReactNode;
 }
@@ -21,9 +45,6 @@ const CustomDrawer = ({ header }: ICustomDrawerProps) => {
 	const fullHeightRef = useRef(window.innerHeight);
 	const maxHeightRef = useRef(window.innerHeight * 0.9);
 	const newHeight = useRef(height);
-
-	const UP_THRESHOLD = 8;
-	const DOWN_THRESHOLD = 8;
 
 	// 핸들 영역 ref
 	const handleRef = useRef<HTMLDivElement>(null);
@@ -177,7 +198,9 @@ const CustomDrawer = ({ header }: ICustomDrawerProps) => {
 			{/* 내용 */}
 			<div className={`flex-1 p-4 ${isDragging ? 'overflow-hidden' : 'overflow-auto'}`}>
 				<ul className="px-[18px]">
-					<RestaurantReview />
+					{REVIEW_LIST.map((item, id) => (
+						<RestaurantReview key={id} item={item} />
+					))}
 				</ul>
 			</div>
 		</div>
