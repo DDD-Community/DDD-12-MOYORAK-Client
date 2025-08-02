@@ -58,9 +58,10 @@ const CategoryDropdown = <T extends string>({ isOpen, selected, onChange, onChan
 							last:rounded-b-[20px]
 							`}
 							>
-								<div className={`flex justify-between items-center py-3 ${FONT_VARIANT.header04} text-gray-08 hover:text-[#70CE13] `}>
+								<div className={`flex justify-between items-center py-3 ${FONT_VARIANT.header04} text-gray-08 hover:text-[#70CE13] group`}>
 									{item}
-									<Icon name="categoryOption" size={18} />
+
+									<Icon name="categoryOption" size={18} className="opacity-0 group-hover:opacity-100 transition-opacity" />
 								</div>
 							</button>
 						);
