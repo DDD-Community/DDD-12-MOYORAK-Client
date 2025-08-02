@@ -8,8 +8,8 @@ export interface IKakaoMapOptions {
 }
 
 export default class KakaoMapCore {
-	private map: kakao.maps.Map | null = null;
-	private markers: kakao.maps.Marker[] = [];
+	private map: any = null;
+	private markers: any[] = [];
 
 	async init(): Promise<void> {
 		return new Promise((resolve, reject) => {
