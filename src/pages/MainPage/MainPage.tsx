@@ -23,11 +23,9 @@ const MOCK_MARKER_OPTIONS = [
 ];
 
 const MainPage = () => {
-	const {
-		state: { login },
-	} = useLocation();
+	const { state } = useLocation() as { state?: { login: boolean } };
 
-	if (login) {
+	if (state?.login) {
 		return (
 			<>
 				<NavBar variant="iconWithTextAndRightIcon" leftIcon="company" leftText="WEB 2팀" rightIcon="menu" />
