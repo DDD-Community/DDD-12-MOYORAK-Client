@@ -10,7 +10,7 @@ const MainIntro = () => {
 	const navigate = useNavigate();
 
 	return (
-		<div className="w-[339px] fixed top-1/3 left-1/2 -translate-x-1/2 z-30">
+		<div className="w-[339px] fixed top-[84px] left-1/2 -translate-x-1/2 z-30">
 			<img src={onBoardingIcon} className="shadow-gray-custom absolute -top-[60px] right-0 w-[105px] h-[108px] z-0" alt="온보딩 아이콘" />
 
 			<div className="relative z-10 bg-white rounded-[20px] px-[25px] py-[30px] max-w-md shadow-lg">

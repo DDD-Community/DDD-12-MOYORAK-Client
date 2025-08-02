@@ -1,7 +1,7 @@
 import KakaoMap from '@/components/KakaoMap';
 import NavBar from '@/components/NavBar/NavBar';
 
-import CustomDrawer from './components/CustomDrawer';
+import MainBottomSheet from './components/MainBottomSheet';
 import MainIntro from './components/MainIntro';
 
 const COMPANY_LOCATION = {
@@ -25,14 +25,14 @@ const MainPage = () => {
 	// 	state: { login },
 	// } = useLocation();
 
-	const IS_LOGIN = true;
+	const IS_LOGIN = false;
 
 	if (IS_LOGIN) {
 		return (
 			<>
 				<NavBar variant="iconWithTextAndRightIcon" leftIcon="company" leftText="WEB 2팀" rightIcon="menu" />
 				<KakaoMap companyLocation={COMPANY_LOCATION} optionsList={MOCK_MARKER_OPTIONS} />
-				<CustomDrawer />
+				<MainBottomSheet />
 			</>
 		);
 	}

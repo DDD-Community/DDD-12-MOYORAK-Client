@@ -1,12 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 
-import MainBottomSheet from './MainBottomSheet';
 import RestaurantReview from './RestaurantReview';
 
 const BASIC_HEIGHT = 300;
 const MIN_HEIGHT = 120;
 
-const CustomDrawer = () => {
+interface ICustomDrawerProps {
+	header: ReactNode;
+}
+
+const CustomDrawer = ({ header }: ICustomDrawerProps) => {
 	const [height, setHeight] = useState(BASIC_HEIGHT);
 	const dragging = useRef(false);
 	const startY = useRef(0);
@@ -169,9 +172,7 @@ const CustomDrawer = () => {
 				</div>
 			)}
 
-			<header className="px-[18px] py-[10px]">
-				<MainBottomSheet />
-			</header>
+			<header className="px-[18px] py-[10px]">{header && header}</header>
 
 			{/* 내용 */}
 			<div className={`flex-1 p-4 ${isDragging ? 'overflow-hidden' : 'overflow-auto'}`}>
