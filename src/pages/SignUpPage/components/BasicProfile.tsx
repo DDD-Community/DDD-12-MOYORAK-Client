@@ -20,7 +20,6 @@ const BasicProfile = () => {
 
 			<div className="flex flex-col gap-[50px]">
 				<Input label="이름" isEssential placeholder="이름을 입력해주세요." value={username} onChange={(e) => setUsername(e.target.value)} />
-
 				<Input
 					label="생년월일"
 					isEssential
@@ -43,8 +42,10 @@ const BasicProfile = () => {
 			</div>
 
 			<div className="fixed bottom-[30px] left-0 w-full px-5">
-				<Button variant="active" onClick={nextStep}>
-					<Typography variant={FONT_VARIANT.header04}>다음</Typography>
+				<Button variant={!username || !birth || !gender ? 'disabled' : 'active'} onClick={nextStep}>
+					<Typography variant={FONT_VARIANT.header04} fontColor={!username || !birth || !gender ? PALETTE.gray06 : PALETTE.primary600}>
+						다음
+					</Typography>
 				</Button>
 			</div>
 		</section>
