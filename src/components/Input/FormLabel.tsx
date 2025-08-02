@@ -15,9 +15,9 @@ const FormLabel = ({ id, label, isEssential = false, className = '', ...props }:
 		<label
 			htmlFor={id}
 			className={cn(
-				FONT_VARIANT.header04,
-				FONT_COLOR[PALETTE.gray09],
-				'my-[3px]',
+				FONT_VARIANT.label01,
+				FONT_COLOR[PALETTE.gray07],
+				'mb-[10px] block',
 				isEssential && "after:content-['*'] after:ml-[5px] after:text-danger-01",
 				className
 			)}

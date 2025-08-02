@@ -7,7 +7,9 @@ const config: Config = {
 			spacing: {},
 			fontSize: {},
 			lineHeight: {},
-
+			boxShadow: {
+				'gray-custom': '0 0 14px 0 rgba(102, 102, 102, 0.20)',
+			},
 			colors: {
 				primary: {},
 				secondary: {},
