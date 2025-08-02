@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 
 import NavBar from '@/components/NavBar/NavBar';
 import Typography from '@/components/Typography';
@@ -15,6 +15,9 @@ import TeamSearch from './components/TeamSearch';
 const TOTAL_STEPS = 4;
 
 const SignUpPage = () => {
+	const { state } = useLocation();
+
+	console.log(state);
 	const [searchParams, setSearchParams] = useSearchParams();
 
 	const step = useSignupStore((state) => state.step);
