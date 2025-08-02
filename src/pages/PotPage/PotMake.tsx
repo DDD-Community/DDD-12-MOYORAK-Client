@@ -8,11 +8,11 @@ import FormLabel from '@/components/Input/FormLabel';
 import Input from '@/components/Input/Input';
 import NavBar from '@/components/NavBar/NavBar';
 import Radio from '@/components/Radio/Radio';
-import SelectRestaurantPopup from '@/components/SelectRestaurantPopup/SelectRestaurantPopup';
 import Switch from '@/components/Switch';
 import TimePicker from '@/components/TimePicker/TimePicker';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
+import SelectRestaurantPopup from '@/pages/PotPage/components/SelectRestaurantPopup';
 
 const MOCK_TEAM_MEMBER = [
 	{

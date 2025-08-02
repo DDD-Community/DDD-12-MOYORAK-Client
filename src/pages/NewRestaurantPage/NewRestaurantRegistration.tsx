@@ -43,10 +43,18 @@ const NewRestaurantRegistration = () => {
 				category: CATEGORY_API_MAPPING[newRestaurantRegistration.category as TCategoryDisplay],
 			};
 
-			await post<INewRestaurantRegistrationRequest>('/api/restaurants', apiData);
-			navigate('/restaurant-registration', { state: { restaurant: newRestaurantRegistration } });
+			const response = await post<INewRestaurantRegistrationRequest>('/restaurants', apiData);
+			navigate('/restaurant-registration', {
+				state: {
+					restaurant: {
+						id: (response as { restaurantId: string }).restaurantId,
+						name: newRestaurantRegistration.name,
+					},
+				},
+			});
 		} catch (error) {
-			console.error('식당 등록 API 에러:', error);
+			console.error('식당 등록에 실패했습니다:', error);
+			alert('식당 등록에 실패했습니다.');
 		}
 	};
 

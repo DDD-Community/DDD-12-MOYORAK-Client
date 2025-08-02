@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import { get } from '@/apis';
@@ -9,10 +8,9 @@ import starIcon from '@/assets/star.png';
 import Button from '@/components/Button/Button';
 import CustomDialog from '@/components/Dialog/CustomDialog';
 import Icon from '@/components/Icon';
+import { CustomToast } from '@/components/Toast/BaseToaster';
 import Typography from '@/components/Typography/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
-
-import { CustomToast } from '../Toast/BaseToaster';
 
 interface IReviewListResponse {
 	size: number;
@@ -28,6 +26,7 @@ interface IReviewListResponse {
 			userNickname: string;
 			userProfileImageUrl: string;
 			photoUrls: string[];
+			createdDate: string;
 		},
 	];
 }
@@ -38,13 +37,12 @@ const ReviewInfo = () => {
 	const [openOptionMenu, setOpenOptionMenu] = useState<number | null>(null);
 	const [isOpen, setIsOpen] = useState(false);
 	const [reviewList, setReviewList] = useState<IReviewListResponse | null>(null);
-	const [currentPage, setCurrentPage] = useState(1);
 	const teamId = 1;
-	const teamRestaurantId = 1;
+	const { teamRestaurantId } = useParams<{ teamRestaurantId: string }>();
 
 	const getRestaurantReviewInfo = async () => {
 		try {
-			const response = await get<IReviewListResponse>(`/api/teams/${teamId}/restaurants/${teamRestaurantId}/reviews?currentPage=1&size=10`);
+			const response = await get<IReviewListResponse>(`/teams/${teamId}/restaurants/${teamRestaurantId}/reviews?currentPage=1&size=10`);
 			setReviewList(response as IReviewListResponse);
 		} catch (error) {
 			console.error('리뷰 정보를 불러오는데 실패했습니다:', error);
@@ -89,23 +87,6 @@ const ReviewInfo = () => {
 		setIsOpen(true);
 	};
 
-	const getReviewList = async (page: number = 1) => {
-		try {
-			const response = await axios.get(
-				`${import.meta.env.VITE_API_URL}/api/teams/${teamId}/restaurants/${teamRestaurantId}/reviews?currentPage=${page}&size=10`
-			);
-			console.log(response.data);
-			setReviewList(response.data);
-			setCurrentPage(page);
-		} catch (error) {
-			console.error('리뷰 목록을 불러오는데 실패했습니다:', error);
-		}
-	};
-
-	const handlePageChange = (page: number) => {
-		getReviewList(page);
-	};
-
 	return (
 		<div>
 			<div className="flex items-center gap-1.5 mb-5">
@@ -134,7 +115,7 @@ const ReviewInfo = () => {
 											{review.userNickname}
 										</Typography>
 										<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray07}>
-											2024.06.24
+											{review.createdDate}
 										</Typography>
 									</div>
 								</div>
@@ -189,30 +170,30 @@ const ReviewInfo = () => {
 							</div>
 
 							{/* 별점 및 정보 */}
-							<div className="flex items-center gap-1 mb-3">
+							<div className="flex items-center mb-3">
 								<div className="flex items-center mr-1.5">
 									<img src={starIcon} alt="star" className="w-3.75 h-3.75 mr-1" />
 									<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray08}>
 										{review.score}.0
 									</Typography>
 								</div>
-								<Typography variant={FONT_VARIANT.label02} fontColor={PALETTE.gray07} className="font-normal mr-1">
+								<Typography variant={FONT_VARIANT.caption02} fontColor={PALETTE.gray07} className="font-normal mr-1.5">
 									/
 								</Typography>
-								<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray08} className="font-normal">
+								<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray08} className="font-normal mr-0.5">
 									입장 대기
 								</Typography>
-								<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray09} className="font-medium">
-									{review.waitingTime}분
+								<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray09} className="font-medium">
+									{review.waitingTime}
 								</Typography>
-								<Typography variant={FONT_VARIANT.label02} fontColor={PALETTE.gray07} className="font-normal mx-1">
+								<Typography variant={FONT_VARIANT.caption02} fontColor={PALETTE.gray07} className="font-normal mx-1.5">
 									/
 								</Typography>
-								<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray08} className="font-normal">
+								<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray08} className="font-normal mr-0.5">
 									음식 준비시간
 								</Typography>
-								<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray09} className="font-medium">
-									{review.servingTime}분
+								<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray09} className="font-medium">
+									{review.servingTime}
 								</Typography>
 							</div>
 
@@ -221,7 +202,7 @@ const ReviewInfo = () => {
 								<div className="flex mb-3.25 overflow-x-auto scrollbar-hide">
 									<div className="flex gap-2 flex-nowrap">
 										{review.photoUrls.map((_, imageIndex) => (
-											<div key={imageIndex} className="w-[130px] h-[130px] bg-gray-03 rounded-[6px] flex-shrink-0" />
+											<img key={imageIndex} src={review.photoUrls[imageIndex]} className="w-[130px] h-[130px] bg-gray-03 rounded-[6px] flex-shrink-0" />
 										))}
 									</div>
 								</div>
@@ -259,33 +240,6 @@ const ReviewInfo = () => {
 						</div>
 					);
 				})}
-
-				{/* 페이지네이션 - 임시로 하드코딩된 총 개수 사용 */}
-				{(() => {
-					const totalCount = reviewList?.totalCount || 25; // 임시로 25개라고 가정
-					const totalPages = Math.ceil(totalCount / 10);
-
-					if (totalPages <= 1) return null;
-
-					return (
-						<div className="flex justify-center items-center gap-2 mt-8">
-							{/* 페이지 번호들 */}
-							{Array.from({ length: totalPages }, (_, i) => i + 1)
-								.slice(Math.max(0, currentPage - 3), Math.min(totalPages, currentPage + 2))
-								.map((pageNum) => (
-									<button
-										key={pageNum}
-										onClick={() => handlePageChange(pageNum)}
-										className={`px-3 py-2 rounded-lg ${
-											currentPage === pageNum ? 'bg-primary-600 text-primary-200' : 'bg-gray-01 text-gray-09 hover:bg-gray-02'
-										}`}
-									>
-										{pageNum}
-									</button>
-								))}
-						</div>
-					);
-				})()}
 			</>
 		</div>
 	);

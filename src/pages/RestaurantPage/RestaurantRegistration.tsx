@@ -15,6 +15,17 @@ import Typography from '@/components/Typography/Typography';
 import { FOOD_PREP_TIME_OPTIONS, SATISFACTION_OPTIONS, WAITING_TIME_OPTIONS } from '@/constants/data.constant';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 
+interface IRestaurantRegistrationRequest {
+	restaurantId: number;
+	summary: string;
+	userId: number;
+	servingTimeId: number;
+	waitingTimeId: number;
+	score: number;
+	photoPaths: string[];
+	extraText: string;
+}
+
 const RestaurantRegistration = () => {
 	const [restaurantDescription, setRestaurantDescription] = useState('');
 	const [waitingTime, setWaitingTime] = useState<string>('');
@@ -27,15 +38,29 @@ const RestaurantRegistration = () => {
 	const teamId = 1;
 
 	const location = useLocation();
-	const { restaurant } = (location.state as { restaurant?: { id: string; name: string; address: string } } | undefined) ?? {};
+	const { restaurant } = (location.state as { restaurant?: { id: string; name: string } } | undefined) ?? {};
 	const navigate = useNavigate();
 
+	const [teamRestaurantId, setTeamRestaurantId] = useState<number>(0);
+
 	const registerRestaurant = async () => {
-		const response = await post(`/api/teams/${teamId}/restaurants`, {
-			restaurantId: Number(restaurant?.id),
-			summary: restaurantDescription,
-		});
-		console.log(response);
+		try {
+			const response = await post<IRestaurantRegistrationRequest>(`/teams/${teamId}/restaurants`, {
+				restaurantId: Number(restaurant?.id),
+				summary: restaurantDescription,
+				userId: 5,
+				servingTimeId: Number(foodPrepTime),
+				waitingTimeId: Number(waitingTime),
+				score: satisfaction,
+				photoPaths: images.map((img) => URL.createObjectURL(img)),
+				extraText: review,
+			} as IRestaurantRegistrationRequest);
+			setTeamRestaurantId(Number((response as { teamRestaurantId: string }).teamRestaurantId));
+			setIsOpen(true);
+		} catch (error) {
+			console.error('식당 등록에 실패했습니다:', error);
+			alert('식당 등록 실패');
+		}
 	};
 
 	useEffect(() => {
@@ -46,7 +71,7 @@ const RestaurantRegistration = () => {
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		setIsOpen(true);
+		registerRestaurant();
 	};
 
 	const isButtonActive =
@@ -251,7 +276,7 @@ const RestaurantRegistration = () => {
 					</Button>
 				</form>
 				<CustomDialog headerText={{ title: '식당 등록이 완료되었어요' }} onOpen={isOpen} onOpenChange={setIsOpen} className="w-[271px]">
-					<Button variant="active" onClick={() => navigate('/restaurant-detail/1')} className="mt-[17px]">
+					<Button variant="active" onClick={() => navigate(`/restaurant-detail/${teamRestaurantId}`)} className="mt-[17px]">
 						확인
 					</Button>
 				</CustomDialog>

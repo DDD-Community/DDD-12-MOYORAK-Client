@@ -1,16 +1,15 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import { get } from '@/apis';
 import noGallery from '@/assets/noGallery.png';
 import starIcon from '@/assets/star.png';
 import Icon from '@/components/Icon';
-import ReviewInfo from '@/components/ReviewInfo/ReviewInfo';
 import { CustomToast } from '@/components/Toast/BaseToaster';
 import Typography from '@/components/Typography/Typography';
-import { REVIEW_LIST } from '@/constants/data.constant';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
+import ReviewInfo from '@/pages/RestaurantPage/components/ReviewInfo';
 
 interface IRestaurantInfoResponse {
 	name: string;
@@ -20,6 +19,7 @@ interface IRestaurantInfoResponse {
 	waitingTime: number;
 	reviewCount: number;
 	score: number;
+	photoPath: string;
 }
 
 interface IReviewPhotosResponse {
@@ -40,43 +40,48 @@ const RestaurantDetail = () => {
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const [lastToastTime, setLastToastTime] = useState(0);
 
-	const imageUrl = true;
-
 	const [restaurantInfo, setRestaurantInfo] = useState<IRestaurantInfoResponse | null>(null);
+	const imageUrl = restaurantInfo?.photoPath;
+
 	const [reviewPhotos, setReviewPhotos] = useState<IReviewPhotosResponse | null>(null);
 
-	const teamId = 1;
-	const teamRestaurantId = 1;
-
-	console.log(restaurantInfo);
 	console.log(reviewPhotos);
+
+	const teamId = 1;
+	const { teamRestaurantId } = useParams<{ teamRestaurantId: string }>();
+
+	const allImages = reviewPhotos?.data?.map((photo) => photo.path) || [];
 
 	const handleReviewWrite = () => {
 		navigate('/review-registration', {
 			state: {
-				restaurant: restaurantInfo,
+				teamId,
+				teamRestaurantId,
+				name: restaurantInfo?.name,
 			},
 		});
 	};
 
 	const getRestaurantInfo = async () => {
-		const response = await get(`/api/teams/${teamId}/restaurants/${teamRestaurantId}`);
+		if (!teamRestaurantId) return;
+
+		const response = await get(`/teams/${teamId}/restaurants/${teamRestaurantId}`);
 		setRestaurantInfo(response as IRestaurantInfoResponse);
 	};
 
 	const getRestaurantReviewPhotos = async () => {
-		const response = await get(`/api/teams/${teamId}/restaurants/${teamRestaurantId}/reviews/photos?currentPage=1&size=10`);
+		if (!teamRestaurantId) return;
+
+		const response = await get(`/teams/${teamId}/restaurants/${teamRestaurantId}/reviews/photos?currentPage=1&size=10`);
 		setReviewPhotos(response as IReviewPhotosResponse);
 	};
 
 	useEffect(() => {
-		getRestaurantInfo();
-		getRestaurantReviewPhotos();
-	}, []);
-
-	const allImages = REVIEW_LIST.reduce((acc: number[], review) => {
-		return [...acc, ...review.images];
-	}, []);
+		if (teamRestaurantId) {
+			getRestaurantInfo();
+			getRestaurantReviewPhotos();
+		}
+	}, [teamRestaurantId]);
 
 	const openGallery = (imageIndex: number) => {
 		setCurrentImageIndex(imageIndex);
@@ -106,6 +111,16 @@ const RestaurantDetail = () => {
 		toast(<CustomToast title="식당 정보 링크가 복사되었습니다." icon="copy" />);
 		setLastToastTime(currentTime);
 	};
+
+	if (!teamRestaurantId) {
+		return (
+			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
+					잘못된 접근입니다.
+				</Typography>
+			</div>
+		);
+	}
 
 	return (
 		<div className="bg-gray-02 min-h-screen">
@@ -182,7 +197,7 @@ const RestaurantDetail = () => {
 									입장 대기시간
 								</Typography>
 								<Typography variant={FONT_VARIANT.header04} fontColor={PALETTE.gray09} className="font-semibold">
-									{restaurantInfo?.waitingTime}분
+									{restaurantInfo?.waitingTime}
 								</Typography>
 							</div>
 							<div className="flex flex-col items-center">
@@ -191,7 +206,7 @@ const RestaurantDetail = () => {
 									음식 준비시간
 								</Typography>
 								<Typography variant={FONT_VARIANT.header04} fontColor={PALETTE.gray09} className="font-semibold">
-									{restaurantInfo?.servingTime}분
+									{restaurantInfo?.servingTime}
 								</Typography>
 							</div>
 							<div className="flex flex-col items-center" onClick={() => window.open(restaurantInfo?.placeUrl, '_blank')}>
@@ -233,9 +248,8 @@ const RestaurantDetail = () => {
 					{activeTab === 'photos' && (
 						<div>
 							{(() => {
-								const reviewsWithPhotos = REVIEW_LIST.filter((review) => review.images.length > 0);
-								const totalPhotos = reviewsWithPhotos.reduce((sum, review) => sum + review.images.length, 0);
-								let globalImageIndex = 0;
+								const reviewsWithPhotos = reviewPhotos?.data?.filter((photo) => photo.path.length > 0) || [];
+								const totalPhotos = reviewsWithPhotos.length;
 
 								return (
 									<>
@@ -248,27 +262,18 @@ const RestaurantDetail = () => {
 											</Typography>
 										</div>
 
-										{reviewsWithPhotos.length > 0 ? (
-											reviewsWithPhotos.map((review, reviewIndex) => (
-												<div className="mb-6" key={`photo-${review.name}-${reviewIndex}`}>
-													<div className="flex items-start">
-														<div className="flex-1">
-															<div className="grid grid-cols-2 gap-2 mb-3">
-																{review.images.map((_, imageIndex) => {
-																	const currentGlobalIndex = globalImageIndex++;
-																	return (
-																		<div
-																			key={`${reviewIndex}-${imageIndex}`}
-																			className="aspect-square bg-gray-03 rounded-[6px] cursor-pointer"
-																			onClick={() => openGallery(currentGlobalIndex)}
-																		/>
-																	);
-																})}
-															</div>
-														</div>
+										{reviewPhotos?.data && reviewPhotos.data.length > 0 ? (
+											<div className="grid grid-cols-2 gap-1.75">
+												{reviewPhotos.data.map((photo, index) => (
+													<div
+														key={`photo-${index}`}
+														className="aspect-square bg-gray-03 rounded-[6px] cursor-pointer overflow-hidden"
+														onClick={() => openGallery(index)}
+													>
+														<img src={photo.path} alt={`리뷰 사진 ${index + 1}`} className="w-full h-full object-cover" />
 													</div>
-												</div>
-											))
+												))}
+											</div>
 										) : (
 											<div className="flex flex-col items-center justify-center mt-12">
 												<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07} className="text-center mb-3.25">
@@ -287,11 +292,10 @@ const RestaurantDetail = () => {
 				</div>
 			</div>
 
-			{/* 갤러리 모달 */}
 			{isGalleryOpen && (
-				<div className="fixed inset-0 bg-gray-10 z-50 flex flex-col">
+				<div className="fixed inset-0 z-50 flex flex-col">
 					{/* 헤더 */}
-					<div className="bg-black h-55">
+					<div className="bg-gray-10 h-55">
 						<div className="flex items-center gap-5 px-5 py-4">
 							<button onClick={closeGallery}>
 								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -309,11 +313,9 @@ const RestaurantDetail = () => {
 						</div>
 					</div>
 
-					{/* 이미지 영역 */}
 					<div className="flex-1 flex items-center justify-center bg-black relative">
 						<div className="w-full h-full bg-gray-03" />
 
-						{/* 이전 버튼 */}
 						<button
 							onClick={goToPrevImage}
 							className="absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-black/50 rounded-full flex items-center justify-center"
@@ -321,7 +323,6 @@ const RestaurantDetail = () => {
 							<Icon name="selectArrow" size={20} color="white" />
 						</button>
 
-						{/* 다음 버튼 */}
 						<button
 							onClick={goToNextImage}
 							className="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-black/50 rounded-full flex items-center justify-center"
@@ -330,8 +331,7 @@ const RestaurantDetail = () => {
 						</button>
 					</div>
 
-					{/* 하단 정보 */}
-					<div className="bg-black h-55 flex items-center justify-center">
+					<div className="bg-gray-10 h-55 flex items-center justify-center">
 						<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.white} className="text-center">
 							{currentImageIndex + 1} / {allImages.length}
 						</Typography>

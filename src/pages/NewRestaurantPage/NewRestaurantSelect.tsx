@@ -34,13 +34,14 @@ const NewRestaurantSelect = () => {
 	const getNewRestaurantSelect = async () => {
 		try {
 			const response = await get<INewRestaurantSelectResponse>(
-				`/api/restaurants/external/search?query=${restaurant?.name}&longitude=127.043616&latitude=37.279838&radius=2000&page=1&size=15`
+				`/restaurants/external/search?query=${restaurant?.name}&longitude=127.043616&latitude=37.279838&radius=2000&page=1&size=15`
 			);
 			setNewRestaurantSelect(response as INewRestaurantSelectResponse);
 		} catch (error) {
 			console.error('식당 정보를 불러오는데 실패했습니다:', error);
 		}
 	};
+	console.log(newRestaurantSelect);
 
 	useEffect(() => {
 		getNewRestaurantSelect();
@@ -88,15 +89,17 @@ const NewRestaurantSelect = () => {
 												주소
 											</Typography>
 										</div>
-										<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray08} className="max-w-[200px]">
+										<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray08} className="max-w-[184px]">
 											{item.roadAddress}
 										</Typography>
 									</div>
 								</div>
 
-								<FilterButton borderRadius="8.75" variant="active" onClick={() => handleAddRestaurant(item)}>
-									추가
-								</FilterButton>
+								<div className="flex shrink-0">
+									<FilterButton borderRadius="8.75" variant="active" onClick={() => handleAddRestaurant(item)}>
+										추가
+									</FilterButton>
+								</div>
 							</div>
 						))}
 					</div>

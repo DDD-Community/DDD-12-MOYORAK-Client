@@ -41,7 +41,7 @@ const RestaurantSearch = () => {
 	const getRestaurants = async (keyword: string) => {
 		if (!keyword.trim()) return;
 		try {
-			const response = await get<IRestaurantResponse>(`/api/restaurants/search?keyword=${encodeURIComponent(keyword)}&size=10&currentPage=1`);
+			const response = await get<IRestaurantResponse>(`/restaurants/search?keyword=${keyword}&size=10&currentPage=1`);
 			setRestaurants((response as IRestaurantResponse).data || []);
 			setSearchPerformed(true);
 		} catch (error) {
@@ -71,7 +71,6 @@ const RestaurantSearch = () => {
 				restaurant: {
 					id: restaurant.restaurantId,
 					name: restaurant.restaurantName,
-					address: restaurant.roadAddress,
 				},
 			},
 		});
@@ -108,7 +107,7 @@ const RestaurantSearch = () => {
 										<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray10}>
 											{restaurant.restaurantName}
 										</Typography>
-										<Typography variant={FONT_VARIANT.label02} fontColor={PALETTE.gray07}>
+										<Typography variant={FONT_VARIANT.label02} fontColor={PALETTE.gray07} className="max-w-[184px]">
 											{restaurant.roadAddress}
 										</Typography>
 									</div>
