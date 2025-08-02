@@ -114,8 +114,8 @@
 	}
 
 	body {
-		font-family: Pretendard, sans-serif;
 		line-height: 1;
+		font-family: 'Pretendard', sans-serif;
 	}
 
 	/* Input/Button 스타일 리셋 */
