@@ -48,27 +48,28 @@ export const POT_PARTICIPANTS_IMAGE = [
 ];
 
 export const WAITING_TIME_OPTIONS = [
-	{ label: '웨이팅 없음', value: '웨이팅 없음' },
-	{ label: '5분 이내', value: '5분 이내' },
-	{ label: '10~15분 이내', value: '10~15분 이내' },
-	{ label: '30분 이내', value: '30분 이내' },
-	{ label: '30분 이상', value: '30분 이상' },
+	{ label: '웨이팅 없음', value: '1' },
+	{ label: '5분 이내', value: '2' },
+	{ label: '10~15분 이내', value: '3' },
+	{ label: '30분 이내', value: '4' },
+	{ label: '30분 이상', value: '5' },
 ];
 
 export const FOOD_PREP_TIME_OPTIONS = [
-	{ label: '바로 준비됨', value: '바로 준비됨' },
-	{ label: '5분 이내', value: '5분 이내' },
-	{ label: '10~15분 이내', value: '10~15분 이내' },
-	{ label: '30분 이내', value: '30분 이내' },
-	{ label: '30분 이상', value: '30분 이상' },
+	{ label: '바로 준비됨', value: '1' },
+	{ label: '5분 이내', value: '2' },
+	{ label: '10~15분 이내', value: '3' },
+	{ label: '30분 이내', value: '4' },
+	{ label: '30분 이상', value: '5' },
 ];
 
 export const SATISFACTION_OPTIONS = [
-	{ label: '감동적인 맛!', value: '5' },
-	{ label: '맛있어요!', value: '4' },
-	{ label: '괜찮아요!', value: '3' },
-	{ label: '별로에요!', value: '2' },
-	{ label: '싫어요!', value: '1' },
+	{ label: '감동적인 맛이에요!', value: '5' },
+	{ label: '기대 이상이었어요!', value: '4' },
+	{ label: '무난했어요', value: '3' },
+	{ label: '좀 아쉬웠어요', value: '2' },
+	{ label: '실망스러웠어요', value: '1' },
+	{ label: '별점을 눌러주세요', value: '0' },
 ];
 
 export const REVIEW_LIST = [
