@@ -5,16 +5,16 @@ import RedirectPage from '@/pages/AuthPage/RedirectPage';
 import Developer from '@/pages/Developer';
 import MainPage from '@/pages/MainPage/MainPage';
 import MyPage from '@/pages/MyPage';
-import NewRestaurantRegistration from '@/pages/NewRestaurantRegistration';
-import NewRestaurantSelect from '@/pages/NewRestaurantSelect';
+import NewRestaurantRegistration from '@/pages/NewRestaurantPage/NewRestaurantRegistration';
+import NewRestaurantSelect from '@/pages/NewRestaurantPage/NewRestaurantSelect';
 import NotFound from '@/pages/NotFound';
-import Pot from '@/pages/Pot';
-import PotMake from '@/pages/PotMake';
-import PotMakeSuccess from '@/pages/PotMakeSuccess';
-import RestaurantDetail from '@/pages/RestaurantDetail';
-import RestaurantRegistration from '@/pages/RestaurantRegistration';
-import RestaurantSearch from '@/pages/RestaurantSearch';
-import ReviewRegistration from '@/pages/ReviewRegistration';
+import Pot from '@/pages/PotPage/Pot';
+import PotMake from '@/pages/PotPage/PotMake';
+import PotMakeSuccess from '@/pages/PotPage/PotMakeSuccess';
+import RestaurantDetail from '@/pages/RestaurantPage/RestaurantDetail';
+import RestaurantRegistration from '@/pages/RestaurantPage/RestaurantRegistration';
+import RestaurantSearch from '@/pages/RestaurantPage/RestaurantSearch';
+import ReviewRegistration from '@/pages/RestaurantPage/ReviewRegistration';
 import SignUpPage from '@/pages/SignUpPage/SignUpPage';
 import TeamShareListSearch from '@/pages/TeamShareListSearch';
 
@@ -35,7 +35,7 @@ const AppRouter = () => {
 			<Route path="/restaurant-search" element={<RestaurantSearch />} />
 			<Route path="/new-restaurant-select" element={<NewRestaurantSelect />} />
 			<Route path="/new-restaurant-registration" element={<NewRestaurantRegistration />} />
-			<Route path="/restaurant-detail/:restaurantId" element={<RestaurantDetail />} />
+			<Route path="/restaurant-detail/:teamRestaurantId" element={<RestaurantDetail />} />
 			<Route path="/review-registration" element={<ReviewRegistration />} />
 			<Route path="/review-registration/:id" element={<ReviewRegistration />} />
 			<Route path="*" element={<NotFound />} />
