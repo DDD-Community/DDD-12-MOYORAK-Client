@@ -9,10 +9,11 @@ interface IKakaoMapOptions {
 }
 
 interface IKakaoMapProps {
+	companyLocation: IKakaoMapOptions;
 	optionsList?: IKakaoMapOptions[];
 }
 
-const KakaoMap = ({ optionsList = [] }: IKakaoMapProps) => {
+const KakaoMap = ({ companyLocation, optionsList = [] }: IKakaoMapProps) => {
 	const mapRef = useRef<HTMLDivElement | null>(null);
 	const mapInstance = useRef<KakaoMapCore | null>(null);
 
@@ -35,12 +36,14 @@ const KakaoMap = ({ optionsList = [] }: IKakaoMapProps) => {
 				await mapInstance.current.init();
 
 				// optionsList는 사용자의 회사 위도 및 경도 정보
-				mapInstance.current.createMap(mapRef.current, optionsList[0]);
+				mapInstance.current.createMap(mapRef.current, companyLocation);
 
-				optionsList.forEach((opt) => {
-					if (opt.center && mapInstance.current) {
-						mapInstance.current.addMarker(opt);
-					}
+				// 회사 마커 생성
+				mapInstance.current.addCompanyMarker(companyLocation);
+
+				// 일반 마커 생성
+				optionsList.forEach((opt, idx) => {
+					mapInstance.current?.addMarker(opt, idx);
 				});
 			} catch (error) {
 				// TODO) 수연 - 지도 초기화 실패 시, UI 화면 처리
@@ -56,10 +59,10 @@ const KakaoMap = ({ optionsList = [] }: IKakaoMapProps) => {
 			mapInstance.current?.destroyMap();
 			mapInstance.current = null;
 		};
-	}, [optionsList]);
+	}, [optionsList, companyLocation]);
 
 	return (
-		<div className="relative z-0 w-full max-w-4xl mx-auto bg-white rounded-lg shadow-lg">
+		<div className="relative  h-[calc(100vh-70px)] mx-auto bg-white rounded-lg shadow-lg">
 			<div ref={mapRef} className="w-full h-screen bg-gray-200" />
 		</div>
 	);
