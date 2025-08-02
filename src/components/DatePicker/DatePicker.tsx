@@ -32,6 +32,7 @@ export const DatePicker = ({ date, onChangeDate }: IDatePickerProps) => {
 					<IconButton
 						iconStyle={{
 							name: 'calendar',
+							className: date ? 'text-primary-300' : 'text-gray-05',
 						}}
 					/>
 				</PopoverTrigger>

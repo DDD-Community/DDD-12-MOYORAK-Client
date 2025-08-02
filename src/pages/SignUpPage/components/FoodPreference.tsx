@@ -48,6 +48,22 @@ const FoodPreference = () => {
 		</button>
 	);
 
+	const handleKeyDown = useCallback(
+		(e: React.KeyboardEvent<Element>) => {
+			if (e.key === 'Enter') {
+				e.preventDefault();
+				const target = e.currentTarget as HTMLInputElement;
+				const type = target.name as 'allergy' | 'disliked';
+
+				const inputValue = foodInputValues[type].trim();
+				if (!inputValue) return;
+
+				addFood(type);
+			}
+		},
+		[addFood, foodInputValues]
+	);
+
 	const removeFood = useCallback(
 		(type: 'allergy' | 'disliked', foodToRemove: string) => {
 			const setter = type === 'allergy' ? setAllergyFoods : setDislikedFoods;
@@ -61,19 +77,22 @@ const FoodPreference = () => {
 
 	const renderFoodTags = (foods: string[], type: 'allergy' | 'disliked') =>
 		foods.map((food) => (
-			<div key={food} className="border-[1px] border-solid rounded-[17px] border-gray-05 px-[14px] h-8 inline-flex items-center gap-[2px] w-auto max-w-max">
-				<Typography variant={FONT_VARIANT.label01} as="span">
+			<div key={food} className="border border-solid rounded-[17px] border-gray-05 px-[14px] h-8 inline-flex items-center gap-[4px] w-auto max-w-max">
+				<Typography variant={FONT_VARIANT.label01} as="span" fontColor={PALETTE.gray07} className="leading-none">
 					{food}
 				</Typography>
-				<IconButton
-					iconStyle={{
-						name: 'close',
-						width: 18,
-						height: 18,
-						color: '#c4c4c4',
-					}}
-					onClick={() => removeFood(type, food)}
-				/>
+
+				<div className="flex items-center justify-center">
+					<IconButton
+						iconStyle={{
+							name: 'close',
+							width: 18,
+							height: 18,
+							className: 'text-gray-05',
+						}}
+						onClick={() => removeFood(type, food)}
+					/>
+				</div>
 			</div>
 		));
 
@@ -94,7 +113,8 @@ const FoodPreference = () => {
 						placeholder="알러지가 있는 음식을 입력해주세요."
 						value={foodInputValues.allergy}
 						onChange={handleInputChange}
-						rightButton={renderRightButton(() => addFood('allergy'))}
+						onKeyDown={handleKeyDown}
+						rightButton={foodInputValues.allergy && renderRightButton(() => addFood('allergy'))}
 					/>
 					<div className="flex flex-wrap gap-2 mt-2">{renderFoodTags(allergyFoods, 'allergy')}</div>
 				</div>
@@ -107,15 +127,17 @@ const FoodPreference = () => {
 						placeholder="선호하지 않는 음식을 입력해주세요."
 						value={foodInputValues.disliked}
 						onChange={handleInputChange}
-						rightButton={renderRightButton(() => addFood('disliked'))}
+						rightButton={foodInputValues.disliked && renderRightButton(() => addFood('disliked'))}
 					/>
 					<div className="flex flex-wrap gap-2 mt-2">{renderFoodTags(dislikedFoods, 'disliked')}</div>
 				</div>
 			</div>
 
 			<div className="fixed bottom-[30px] left-0 w-full px-5">
-				<Button variant="active" onClick={nextStep}>
-					다음
+				<Button variant={allergyFoods.length === 0 || dislikedFoods.length === 0 ? 'disabled' : 'active'} onClick={nextStep}>
+					<Typography variant={FONT_VARIANT.header04} fontColor={allergyFoods.length === 0 || dislikedFoods.length === 0 ? PALETTE.gray06 : PALETTE.primary600}>
+						다음
+					</Typography>
 				</Button>
 			</div>
 		</section>
