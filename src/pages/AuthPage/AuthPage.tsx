@@ -10,15 +10,14 @@ const AuthPage = () => {
 	const navigate = useNavigate();
 
 	const googleLogin = () => {
-		const CLIENT_ID = import.meta.env.VITE_GOOGLE_AUTH_CLIENT_ID as string;
 		const REDIRECT_URI = import.meta.env.VITE_GOOGLE_AUTH_REDIRECT_URI as string;
 
-		if (!CLIENT_ID || !REDIRECT_URI) {
+		if (!REDIRECT_URI) {
 			throw new Error('Google OAuth 설정이 누락되었습니다.');
 			return;
 		}
 
-		window.location.href = 'http://moyorak.o-r.kr/oauth2/authorization/google';
+		window.location.href = REDIRECT_URI;
 	};
 
 	return (
