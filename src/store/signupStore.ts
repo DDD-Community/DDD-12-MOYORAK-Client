@@ -11,6 +11,8 @@ interface SignupState {
 	allergyFoods?: string[];
 	dislikedFoods?: string[];
 	company: string;
+	baseAddress: string;
+	detailAddress?: string;
 	team: string;
 
 	setUsername: (name: string) => void;
@@ -19,6 +21,8 @@ interface SignupState {
 	setAllergyFoods: (foods?: string[]) => void;
 	setDislikedFoods: (foods?: string[]) => void;
 	setCompany: (company: string) => void;
+	setBaseAddress: (baseAddress: string) => void;
+	setDetailAddress: (detailAddress?: string) => void;
 	setTeam: (team: string) => void;
 
 	nextStep: () => void;
@@ -36,6 +40,8 @@ export const useSignupStore = create<SignupState>((set) => ({
 	dislikedFoods: undefined,
 	company: '',
 	team: '',
+	baseAddress: '',
+	detailAddress: '',
 
 	setUsername: (username) => set({ username }),
 	setBirth: (birth) => set({ birth }),
@@ -43,6 +49,8 @@ export const useSignupStore = create<SignupState>((set) => ({
 	setAllergyFoods: (foods) => set({ allergyFoods: foods }),
 	setDislikedFoods: (foods) => set({ dislikedFoods: foods }),
 	setCompany: (company) => set({ company }),
+	setBaseAddress: (baseAddress) => set({ baseAddress }),
+	setDetailAddress: (detailAddress) => set({ detailAddress }),
 	setTeam: (team) => set({ team }),
 
 	nextStep: () =>

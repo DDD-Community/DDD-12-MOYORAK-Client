@@ -15,6 +15,7 @@ import RestaurantDetail from '@/pages/RestaurantPage/RestaurantDetail';
 import RestaurantRegistration from '@/pages/RestaurantPage/RestaurantRegistration';
 import RestaurantSearch from '@/pages/RestaurantPage/RestaurantSearch';
 import ReviewRegistration from '@/pages/RestaurantPage/ReviewRegistration';
+import PopupAddress from '@/pages/SignUpPage/components/PopupAddress';
 import SignUpPage from '@/pages/SignUpPage/SignUpPage';
 import TeamShareListSearch from '@/pages/TeamShareListSearch';
 
@@ -25,6 +26,7 @@ const AppRouter = () => {
 			<Route path="/auth" element={<AuthPage />} />
 			<Route path="/redirect" element={<RedirectPage />} />
 			<Route path="/signup" element={<SignUpPage />} />
+			<Route path="/popup-address" element={<PopupAddress />} />
 			<Route path="/search" element={<TeamShareListSearch />} />
 			<Route path="/mypage" element={<MyPage />} />
 			<Route path="/pot" element={<Pot />} />
