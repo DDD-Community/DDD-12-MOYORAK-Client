@@ -11,6 +11,7 @@ export default class KakaoMapCore {
 	private map: any = null;
 	private markers: any[] = [];
 	private selectedMarkerElement: HTMLImageElement | null = null;
+	private selectedOverlay: any = null;
 
 	async init(): Promise<void> {
 		return new Promise((resolve, reject) => {
@@ -117,7 +118,7 @@ export default class KakaoMapCore {
 		};
 	}
 
-	private showInfoOverlay(option: IKakaoMapOptions, position: kakao.maps.LatLng) {
+	private showInfoOverlay(option: IKakaoMapOptions, position: any) {
 		// 기존 팝업 제거
 		if (this.selectedOverlay) {
 			this.selectedOverlay.setMap(null);
