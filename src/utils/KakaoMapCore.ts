@@ -10,6 +10,7 @@ export interface IKakaoMapOptions {
 export default class KakaoMapCore {
 	private map: any = null;
 	private markers: any[] = [];
+	private selectedMarkerElement: HTMLImageElement | null = null;
 
 	async init(): Promise<void> {
 		return new Promise((resolve, reject) => {
@@ -81,7 +82,6 @@ export default class KakaoMapCore {
 		label.textContent = option.placeName ?? '';
 		label.style.marginTop = '4px';
 		label.style.fontSize = '14px';
-		label.style.background = 'white';
 		label.style.padding = '2px 6px';
 		label.style.whiteSpace = 'nowrap';
 
@@ -97,6 +97,55 @@ export default class KakaoMapCore {
 		customOverlay.setMap(this.map);
 		// 마커 리스트에는 overlay만 저장
 		this.markers.push({ marker: customOverlay, index });
+
+		content.onclick = () => {
+			// 이전 마커 크기 원복
+			if (this.selectedMarkerElement) {
+				this.selectedMarkerElement.style.width = '32px';
+				this.selectedMarkerElement.style.height = '32px';
+			}
+
+			// 현재 마커 크기 확대
+			img.style.width = '48px';
+			img.style.height = '48px';
+
+			// 현재 마커 저장
+			this.selectedMarkerElement = img;
+
+			// 팝업 표시
+			this.showInfoOverlay(option, pos);
+		};
+	}
+
+	private showInfoOverlay(option: IKakaoMapOptions, position: kakao.maps.LatLng) {
+		// 기존 팝업 제거
+		if (this.selectedOverlay) {
+			this.selectedOverlay.setMap(null);
+		}
+
+		// 팝업 콘텐츠
+		const infoContent = document.createElement('div');
+		infoContent.style.padding = '10px';
+		infoContent.style.background = 'white';
+		infoContent.style.borderRadius = '8px';
+		infoContent.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
+		infoContent.style.fontSize = '14px';
+		infoContent.style.minWidth = '120px';
+
+		infoContent.innerHTML = `
+			<strong>${option.placeName}</strong><br/>
+			위도: ${option.center?.lat}<br/>
+			경도: ${option.center?.lng}
+		`;
+
+		const infoOverlay = new kakao.maps.CustomOverlay({
+			content: infoContent,
+			position,
+			yAnchor: 1.3,
+		});
+
+		infoOverlay.setMap(this.map);
+		this.selectedOverlay = infoOverlay;
 	}
 
 	addCompanyMarker(option: IKakaoMapOptions) {
