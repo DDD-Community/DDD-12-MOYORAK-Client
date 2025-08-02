@@ -10,7 +10,7 @@ interface IRestaurantProps {
 	review: number;
 }
 
-const RestaurantReview = ({ item }: IRestaurantProps) => {
+const RestaurantReview = ({ item }: { item: IRestaurantProps }) => {
 	return (
 		<li className="flex items-start gap-3">
 			<img src="" alt="식당 사진" className="w-[71px] h-[71px] object-cover rounded-md" />
