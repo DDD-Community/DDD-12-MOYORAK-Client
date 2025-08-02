@@ -25,6 +25,12 @@ const SignUpPage = () => {
 	useEffect(() => {
 		const rawStep = searchParams.get('step');
 
+		if (!rawStep) {
+			setStep(1);
+			setSearchParams({ step: '1' });
+			return;
+		}
+
 		const stepParam = Number(rawStep);
 		if (!isNaN(stepParam) && stepParam !== step) {
 			setStep(stepParam);

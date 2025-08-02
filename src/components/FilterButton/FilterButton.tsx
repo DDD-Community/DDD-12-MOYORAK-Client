@@ -7,12 +7,13 @@ interface IFilterButtonProps {
 	variant?: 'general' | 'active' | 'clicked';
 	onClick?: () => void;
 	type?: 'button';
+	borderRadius?: string;
 	className?: string;
 }
 
-const FilterButton = ({ children, variant = 'general', onClick, className, type = 'button' }: IFilterButtonProps) => {
+const FilterButton = ({ children, variant = 'general', onClick, className, borderRadius, type = 'button' }: IFilterButtonProps) => {
 	const getFilterButtonClasses = () => {
-		const baseClasses = 'h-[32px] w-auto font-[Pretendard] text-sm not-italic font-medium leading-[143%] tracking-[0.14px]; px-[14px]';
+		const baseClasses = `rounded-[${borderRadius}px] h-[32px] w-auto font-[Pretendard] text-sm not-italic font-medium leading-[143%] tracking-[0.14px]; px-[14px]`;
 
 		//  todo : tailwind.config.js에서 theme.extend.colors에 추가한 후 사용
 		switch (variant) {

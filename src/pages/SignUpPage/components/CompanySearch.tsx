@@ -49,6 +49,7 @@ const CompanySearch = () => {
 		setIsSearchEnabled(false);
 	};
 
+
 	return (
 		<section className="px-5 relative">
 			<Typography as="h1" variant={FONT_VARIANT.header02} fontColor={PALETTE.gray10} className="mb-[5px]">
