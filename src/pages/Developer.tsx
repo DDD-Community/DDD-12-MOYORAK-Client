@@ -2,11 +2,7 @@ import { type ChangeEvent, useState } from 'react';
 
 import Button from '@/components/Button/Button';
 import CustomDialog from '@/components/Dialog/CustomDialog';
-
 import CustomDrawer from '@/components/Drawer/CustomDrawer';
-
-import Button from '@/components/Button/Button';
-import CustomDialog from '@/components/Dialog/CustomDialog';
 import Input from '@/components/Input/Input';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
