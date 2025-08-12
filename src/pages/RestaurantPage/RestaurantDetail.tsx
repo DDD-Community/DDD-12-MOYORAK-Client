@@ -123,176 +123,8 @@ const RestaurantDetail = () => {
 	}
 
 	return (
-		<div className="bg-gray-02 min-h-screen">
-			<div className="relative">
-				<div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-gray-10/80 to-transparent ">
-					<div>
-						<nav className="flex items-center gap-5 h-15 px-5">
-							<Icon name="restaurantBack" size={24} onClick={() => navigate(-1)} />
-							<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.white} className="font-semibold">
-								{restaurantInfo?.name}
-							</Typography>
-						</nav>
-					</div>
-				</div>
-				{imageUrl ? (
-					<img src="/src/assets/restaurantTest.jpg" alt="restaurantTest" className="w-full object-cover" />
-				) : (
-					<div className="w-full h-[280px] bg-gray-03 flex flex-col items-center justify-center">
-						<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
-							등록된 사진이 아직 없어요..
-						</Typography>
-						<img src="/src/assets/noImage.png" alt="noImage" className="w-[157px] h-[109px] absolute top-46" />
-						<img src="/src/assets/noImagePlus.png" alt="noImagePlus" className="absolute top-63 left-27 w-35 h-7.5 z-999" />
-					</div>
-				)}
-
-				<button
-					className="absolute bottom-6 right-4 w-[50px] h-[50px] bg-white/80 rounded-[30px] backdrop-blur-sm flex items-center justify-center"
-					onClick={handleShare}
-				>
-					<Icon name="share" size={24} />
-				</button>
-			</div>
-
-			<div className="bg-white mt-[-10px] relative z-10 rounded-t-[20px] pb-6">
-				<div className="px-4.5 pt-6.5">
-					{/* 식당 정보 */}
-					<div className="mb-[3px] flex gap-2 items-center justify-center">
-						<Typography variant={FONT_VARIANT.header01} fontColor={PALETTE.gray10} className="font-semibold">
-							{restaurantInfo?.name}
-						</Typography>
-						<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray07}>
-							{/* {restaurantInfo?.category} */}
-							한식
-						</Typography>
-					</div>
-
-					{/* 설명 */}
-					<div className="mb-2 text-center">
-						<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray08}>
-							{restaurantInfo?.summary}
-						</Typography>
-					</div>
-
-					{/* 별점 */}
-					<div className="flex items-center mb-6 justify-center">
-						<div className="flex items-center mr-1">
-							<img src={starIcon} alt="star" className="w-3.5 h-3.5" />
-						</div>
-						<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray08}>
-							{restaurantInfo?.score}
-						</Typography>
-						<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray08}>
-							· 리뷰 {restaurantInfo?.reviewCount}
-						</Typography>
-					</div>
-
-					{/* 정보 아이콘들 */}
-					<div className="flex flex-col rounded-[20px] border border-gray-03 bg-gray-01 px-4.5 py-6.5 mb-3.75">
-						<div className="flex justify-between ">
-							<div className="flex flex-col items-center">
-								<Icon name="persons" size={24} className="mb-2" />
-								<Typography variant={FONT_VARIANT.label02} fontColor={PALETTE.gray08} className="mb-1">
-									입장 대기시간
-								</Typography>
-								<Typography variant={FONT_VARIANT.header04} fontColor={PALETTE.gray09} className="font-semibold">
-									{restaurantInfo?.waitingTime}
-								</Typography>
-							</div>
-							<div className="flex flex-col items-center">
-								<Icon name="prepareHour" size={24} className="mb-2" />
-								<Typography variant={FONT_VARIANT.label02} fontColor={PALETTE.gray08} className="mb-1">
-									음식 준비시간
-								</Typography>
-								<Typography variant={FONT_VARIANT.header04} fontColor={PALETTE.gray09} className="font-semibold">
-									{restaurantInfo?.servingTime}
-								</Typography>
-							</div>
-							<div className="flex flex-col items-center" onClick={() => window.open(restaurantInfo?.placeUrl, '_blank')}>
-								<Icon name="link" size={24} className="mb-2" />
-								<Typography variant={FONT_VARIANT.label02} fontColor={PALETTE.gray08} className="mb-1">
-									외부링크
-								</Typography>
-								<Typography variant={FONT_VARIANT.header04} fontColor={PALETTE.gray09} className="font-semibold">
-									Click!
-								</Typography>
-							</div>
-						</div>
-						<button
-							className="w-full rounded-[20px] bg-[#1F2511] h-[46px] text-[#BEEE05] mt-5.5 text-body02 font-semibold leading-[24px]"
-							onClick={handleReviewWrite}
-						>
-							리뷰쓰기
-						</button>
-					</div>
-
-					{/* 탭 */}
-					<div className="flex border-b border-gray-04 mb-7.5 ml-[-18px] mr-[-18px]">
-						<button onClick={() => setActiveTab('reviews')} className={`flex-1 py-3 ${activeTab === 'reviews' ? 'border-b-2 border-gray-10' : ''}`}>
-							<Typography variant={FONT_VARIANT.body01} fontColor={activeTab === 'reviews' ? PALETTE.gray10 : PALETTE.gray07}>
-								팀원들의 리뷰
-							</Typography>
-						</button>
-						<button onClick={() => setActiveTab('photos')} className={`flex-1 py-3 ${activeTab === 'photos' ? 'border-b-2 border-gray-10' : ''}`}>
-							<Typography variant={FONT_VARIANT.body01} fontColor={activeTab === 'photos' ? PALETTE.gray10 : PALETTE.gray07}>
-								팀원들의 사진
-							</Typography>
-						</button>
-					</div>
-
-					{/* 리뷰 섹션 */}
-					{activeTab === 'reviews' && <ReviewInfo />}
-
-					{/* 사진 섹션 */}
-					{activeTab === 'photos' && (
-						<div>
-							{(() => {
-								const reviewsWithPhotos = reviewPhotos?.data?.filter((photo) => photo.path.length > 0) || [];
-								const totalPhotos = reviewsWithPhotos.length;
-
-								return (
-									<>
-										<div className="flex items-center gap-1.5 mb-5">
-											<Typography variant={FONT_VARIANT.header02} fontColor={PALETTE.gray10} className="font-semibold">
-												사진
-											</Typography>
-											<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.gray08}>
-												{totalPhotos}개
-											</Typography>
-										</div>
-
-										{reviewPhotos?.data && reviewPhotos.data.length > 0 ? (
-											<div className="grid grid-cols-2 gap-1.75">
-												{reviewPhotos.data.map((photo, index) => (
-													<div
-														key={`photo-${index}`}
-														className="aspect-square bg-gray-03 rounded-[6px] cursor-pointer overflow-hidden"
-														onClick={() => openGallery(index)}
-													>
-														<img src={photo.path} alt={`리뷰 사진 ${index + 1}`} className="w-full h-full object-cover" />
-													</div>
-												))}
-											</div>
-										) : (
-											<div className="flex flex-col items-center justify-center mt-12">
-												<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07} className="text-center mb-3.25">
-													등록된 사진이 없어요
-													<br />
-													첫번째 사진을 남겨주세요!
-												</Typography>
-												<img src={noGallery} alt="noGallery" className="w-[215px] h-[128px]" />
-											</div>
-										)}
-									</>
-								);
-							})()}
-						</div>
-					)}
-				</div>
-			</div>
-
-			{isGalleryOpen && (
+		<>
+			{isGalleryOpen ? (
 				<div className="fixed inset-0 z-50 flex flex-col">
 					{/* 헤더 */}
 					<div className="bg-gray-10 h-55">
@@ -313,8 +145,10 @@ const RestaurantDetail = () => {
 						</div>
 					</div>
 
-					<div className="flex-1 flex items-center justify-center bg-black relative">
+					<div className="flex-1 flex items-center justify-center relative">
 						<div className="w-full h-full bg-gray-03" />
+
+						<img src={allImages[currentImageIndex]} alt="galleryImage" className="w-full h-full object-cover" />
 
 						<button
 							onClick={goToPrevImage}
@@ -337,8 +171,178 @@ const RestaurantDetail = () => {
 						</Typography>
 					</div>
 				</div>
+			) : (
+				<div className="bg-gray-02 min-h-screen">
+					<div className="relative">
+						<div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-gray-10/80 to-transparent ">
+							<div>
+								<nav className="flex items-center gap-5 h-15 px-5">
+									<Icon name="restaurantBack" size={24} onClick={() => navigate(-1)} />
+									<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.white} className="font-semibold">
+										{restaurantInfo?.name}
+									</Typography>
+								</nav>
+							</div>
+						</div>
+						{imageUrl ? (
+							<img src="/src/assets/restaurantTest.jpg" alt="restaurantTest" className="w-full object-cover" />
+						) : (
+							<div className="w-full h-[280px] bg-gray-03 flex flex-col items-center justify-center">
+								<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
+									등록된 사진이 아직 없어요..
+								</Typography>
+								<img src="/src/assets/noImage.png" alt="noImage" className="w-[157px] h-[109px] absolute top-46" />
+								<img src="/src/assets/noImagePlus.png" alt="noImagePlus" className="absolute top-63 left-27 w-35 h-7.5 z-999" />
+							</div>
+						)}
+
+						<button
+							className="absolute bottom-6 right-4 w-[50px] h-[50px] bg-white/80 rounded-[30px] backdrop-blur-sm flex items-center justify-center"
+							onClick={handleShare}
+						>
+							<Icon name="share" size={24} />
+						</button>
+					</div>
+
+					<div className="bg-white mt-[-10px] relative z-10 rounded-t-[20px] pb-6">
+						<div className="px-4.5 pt-6.5">
+							{/* 식당 정보 */}
+							<div className="mb-[3px] flex gap-2 items-center justify-center">
+								<Typography variant={FONT_VARIANT.header01} fontColor={PALETTE.gray10} className="font-semibold">
+									{restaurantInfo?.name}
+								</Typography>
+								<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray07}>
+									{/* {restaurantInfo?.category} */}
+									한식
+								</Typography>
+							</div>
+
+							{/* 설명 */}
+							<div className="mb-2 text-center">
+								<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray08}>
+									{restaurantInfo?.summary}
+								</Typography>
+							</div>
+
+							{/* 별점 */}
+							<div className="flex items-center mb-6 justify-center">
+								<div className="flex items-center mr-1">
+									<img src={starIcon} alt="star" className="w-3.5 h-3.5" />
+								</div>
+								<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray08}>
+									{restaurantInfo?.score}
+								</Typography>
+								<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray08}>
+									· 리뷰 {restaurantInfo?.reviewCount}
+								</Typography>
+							</div>
+
+							{/* 정보 아이콘들 */}
+							<div className="flex flex-col rounded-[20px] border border-gray-03 bg-gray-01 px-4.5 py-6.5 mb-3.75">
+								<div className="flex justify-between ">
+									<div className="flex flex-col items-center">
+										<Icon name="persons" size={24} className="mb-2" />
+										<Typography variant={FONT_VARIANT.label02} fontColor={PALETTE.gray08} className="mb-1">
+											입장 대기시간
+										</Typography>
+										<Typography variant={FONT_VARIANT.header04} fontColor={PALETTE.gray09} className="font-semibold">
+											{restaurantInfo?.waitingTime}
+										</Typography>
+									</div>
+									<div className="flex flex-col items-center">
+										<Icon name="prepareHour" size={24} className="mb-2" />
+										<Typography variant={FONT_VARIANT.label02} fontColor={PALETTE.gray08} className="mb-1">
+											음식 준비시간
+										</Typography>
+										<Typography variant={FONT_VARIANT.header04} fontColor={PALETTE.gray09} className="font-semibold">
+											{restaurantInfo?.servingTime}
+										</Typography>
+									</div>
+									<div className="flex flex-col items-center" onClick={() => window.open(restaurantInfo?.placeUrl, '_blank')}>
+										<Icon name="link" size={24} className="mb-2" />
+										<Typography variant={FONT_VARIANT.label02} fontColor={PALETTE.gray08} className="mb-1">
+											외부링크
+										</Typography>
+										<Typography variant={FONT_VARIANT.header04} fontColor={PALETTE.gray09} className="font-semibold">
+											Click!
+										</Typography>
+									</div>
+								</div>
+								<button
+									className="w-full rounded-[20px] bg-[#1F2511] h-[46px] text-[#BEEE05] mt-5.5 text-body02 font-semibold leading-[24px]"
+									onClick={handleReviewWrite}
+								>
+									리뷰쓰기
+								</button>
+							</div>
+
+							{/* 탭 */}
+							<div className="flex border-b border-gray-04 mb-7.5 ml-[-18px] mr-[-18px]">
+								<button onClick={() => setActiveTab('reviews')} className={`flex-1 py-3 ${activeTab === 'reviews' ? 'border-b-2 border-gray-10' : ''}`}>
+									<Typography variant={FONT_VARIANT.body01} fontColor={activeTab === 'reviews' ? PALETTE.gray10 : PALETTE.gray07}>
+										팀원들의 리뷰
+									</Typography>
+								</button>
+								<button onClick={() => setActiveTab('photos')} className={`flex-1 py-3 ${activeTab === 'photos' ? 'border-b-2 border-gray-10' : ''}`}>
+									<Typography variant={FONT_VARIANT.body01} fontColor={activeTab === 'photos' ? PALETTE.gray10 : PALETTE.gray07}>
+										팀원들의 사진
+									</Typography>
+								</button>
+							</div>
+
+							{/* 리뷰 섹션 */}
+							{activeTab === 'reviews' && <ReviewInfo />}
+
+							{/* 사진 섹션 */}
+							{activeTab === 'photos' && (
+								<div>
+									{(() => {
+										const reviewsWithPhotos = reviewPhotos?.data?.filter((photo) => photo.path.length > 0) || [];
+										const totalPhotos = reviewsWithPhotos.length;
+
+										return (
+											<>
+												<div className="flex items-center gap-1.5 mb-5">
+													<Typography variant={FONT_VARIANT.header02} fontColor={PALETTE.gray10} className="font-semibold">
+														사진
+													</Typography>
+													<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.gray08}>
+														{totalPhotos}개
+													</Typography>
+												</div>
+
+												{reviewPhotos?.data && reviewPhotos.data.length > 0 ? (
+													<div className="grid grid-cols-2 gap-1.75">
+														{reviewPhotos.data.map((photo, index) => (
+															<div
+																key={`photo-${index}`}
+																className="aspect-square bg-gray-03 rounded-[6px] cursor-pointer overflow-hidden"
+																onClick={() => openGallery(index)}
+															>
+																<img src={photo.path} alt={`리뷰 사진 ${index + 1}`} className="w-full h-full object-cover" />
+															</div>
+														))}
+													</div>
+												) : (
+													<div className="flex flex-col items-center justify-center mt-12">
+														<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07} className="text-center mb-3.25">
+															등록된 사진이 없어요
+															<br />
+															첫번째 사진을 남겨주세요!
+														</Typography>
+														<img src={noGallery} alt="noGallery" className="w-[215px] h-[128px]" />
+													</div>
+												)}
+											</>
+										);
+									})()}
+								</div>
+							)}
+						</div>
+					</div>
+				</div>
 			)}
-		</div>
+		</>
 	);
 };
 

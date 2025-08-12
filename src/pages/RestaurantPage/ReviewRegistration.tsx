@@ -14,6 +14,7 @@ import NavBar from '@/components/NavBar/NavBar';
 import Typography from '@/components/Typography/Typography';
 import { FOOD_PREP_TIME_OPTIONS, SATISFACTION_OPTIONS, WAITING_TIME_OPTIONS } from '@/constants/data.constant';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
+import { uploadMultipleImages, validateImageFiles } from '@/utils/imageUpload';
 
 interface IReviewRegistrationRequest {
 	userId: number;
@@ -22,11 +23,6 @@ interface IReviewRegistrationRequest {
 	score: number;
 	photoPaths: string[];
 	extraText: string;
-}
-
-interface IImageUploadResponse {
-	url: string;
-	path: string;
 }
 
 const ReviewRegistration = () => {
@@ -38,7 +34,7 @@ const ReviewRegistration = () => {
 	const [satisfaction, setSatisfaction] = useState(0);
 	const [review, setReview] = useState('');
 	const [images, setImages] = useState<File[]>([]);
-	const [imageUrls, setImageUrls] = useState<string[]>([]); // 업로드된 이미지 URL들
+	const [imageUrls, setImageUrls] = useState<string[]>([]);
 	const [isUploading, setIsUploading] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
 	const location = useLocation();
@@ -48,145 +44,23 @@ const ReviewRegistration = () => {
 
 	console.log(teamId, teamRestaurantId, name);
 
-	// 파일 확장자 추출 함수
-	const getFileExtension = (file: File): string => {
-		// 파일명에서 확장자 추출
-		const fileName = file.name;
-		const lastDotIndex = fileName.lastIndexOf('.');
-		let extension = '';
-
-		if (lastDotIndex !== -1) {
-			extension = fileName.substring(lastDotIndex + 1).toLowerCase();
-		}
-
-		// HEIC/HEIF 같은 모바일 포맷은 JPG로 변환
-		if (extension === 'heic' || extension === 'heif') {
-			console.log(`${extension} 포맷을 JPG로 변환합니다.`);
-			return 'jpg';
-		}
-
-		// MIME 타입에서 확장자 추출
-		const mimeType = file.type;
-		switch (mimeType) {
-			case 'image/jpeg':
-				return 'jpg';
-			case 'image/png':
-				return 'png';
-			case 'image/gif':
-				return 'gif';
-			case 'image/webp':
-				return 'webp';
-			case 'image/svg+xml':
-				return 'svg';
-			case 'image/bmp':
-				return 'bmp';
-			case 'image/heic':
-			case 'image/heif':
-				console.log('HEIC/HEIF MIME 타입을 JPG로 변환합니다.');
-				return 'jpg';
-			default:
-				return 'jpg';
-		}
-	};
-
-	// 단일 이미지 업로드 함수
-	const uploadSingleImage = async (file: File): Promise<string> => {
-		const extension = getFileExtension(file);
-
-		try {
-			console.log('업로드 요청:', { extension, fileName: file.name });
-
-			const response = await post<IImageUploadResponse>('/images', {
-				extensionName: extension,
-			});
-
-			let imageUrl = '';
-
-			if (response && typeof response === 'object' && 'path' in response) {
-				imageUrl = (response as { path: string }).path;
-			}
-
-			if (!imageUrl) {
-				console.error('응답에서 path를 찾을 수 없습니다:', response);
-				throw new Error('서버 응답에서 이미지 path를 찾을 수 없습니다.');
-			}
-
-			return imageUrl;
-		} catch (error) {
-			console.error('이미지 업로드 실패:', error);
-			throw new Error('이미지 업로드에 실패했습니다.');
-		}
-	};
-
-	// 이미지 파일 선택 시 즉시 업로드
 	const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (!e.target.files) return;
 
 		const fileArr = Array.from(e.target.files).slice(0, 5 - images.length);
 		if (fileArr.length === 0) return;
 
-		// 지원하는 이미지 형식 체크 (HEIC/HEIF 포함)
-		const supportedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/heic', 'image/heif'];
-
-		const validFiles = fileArr.filter((file) => {
-			// MIME 타입 체크
-			const isValidMimeType = supportedTypes.includes(file.type);
-
-			// 파일 확장자 체크 (MIME 타입이 없거나 잘못된 경우 대비)
-			const fileName = file.name.toLowerCase();
-			const hasValidExtension =
-				fileName.endsWith('.jpg') ||
-				fileName.endsWith('.jpeg') ||
-				fileName.endsWith('.png') ||
-				fileName.endsWith('.gif') ||
-				fileName.endsWith('.webp') ||
-				fileName.endsWith('.bmp') ||
-				fileName.endsWith('.heic') ||
-				fileName.endsWith('.heif');
-
-			if (!isValidMimeType && !hasValidExtension) {
-				alert(`${file.name}은(는) 지원하지 않는 파일 형식입니다. JPG, PNG, GIF, WEBP, BMP, HEIC, HEIF 파일만 업로드 가능합니다.`);
-				return false;
-			}
-
-			return true;
-		});
-
+		const validFiles = validateImageFiles(fileArr);
 		if (validFiles.length === 0) return;
 
-		setIsUploading(true);
-
 		try {
-			console.log(
-				'업로드 시작:',
-				validFiles.map((f) => `${f.name} (${f.type})`)
-			);
+			const { successUrls, uploadedFiles } = await uploadMultipleImages(validFiles, 5, setIsUploading);
 
-			const uploadedUrls: string[] = [];
-
-			for (const file of validFiles) {
-				try {
-					const url = await uploadSingleImage(file);
-					uploadedUrls.push(url);
-					console.log(`${file.name} 업로드 성공:`, url);
-				} catch (error) {
-					console.error(`${file.name} 업로드 실패:`, error);
-				}
-			}
-
-			if (uploadedUrls.length === 0) {
-				throw new Error('모든 이미지 업로드에 실패했습니다.');
-			}
-
-			setImages((prev) => [...prev, ...validFiles.slice(0, uploadedUrls.length)].slice(0, 5));
-			setImageUrls((prev) => [...prev, ...uploadedUrls].slice(0, 5));
-
-			console.log('업로드 완료:', uploadedUrls);
+			setImages((prev) => [...prev, ...uploadedFiles].slice(0, 5));
+			setImageUrls((prev) => [...prev, ...successUrls].slice(0, 5));
 		} catch (error) {
 			alert('이미지 업로드에 실패했습니다.');
 			console.error('이미지 업로드 에러:', error);
-		} finally {
-			setIsUploading(false);
 		}
 	};
 
@@ -203,6 +77,15 @@ const ReviewRegistration = () => {
 
 	const postReview = async () => {
 		try {
+			console.log('리뷰 등록 요청 데이터:', {
+				userId: 5,
+				servingTimeId: Number(foodPrepTime),
+				waitingTimeId: Number(waitingTime),
+				score: satisfaction,
+				photoPaths: imageUrls,
+				extraText: review,
+			});
+
 			await post<IReviewRegistrationRequest>(`/teams/${teamId}/restaurants/${teamRestaurantId}/reviews`, {
 				userId: 5,
 				servingTimeId: Number(foodPrepTime),
