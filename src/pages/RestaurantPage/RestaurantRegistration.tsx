@@ -14,6 +14,7 @@ import NavBar from '@/components/NavBar/NavBar';
 import Typography from '@/components/Typography/Typography';
 import { FOOD_PREP_TIME_OPTIONS, SATISFACTION_OPTIONS, WAITING_TIME_OPTIONS } from '@/constants/data.constant';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
+import { uploadMultipleImages, validateImageFiles } from '@/utils/imageUpload';
 
 interface IRestaurantRegistrationRequest {
 	restaurantId: number;
@@ -33,6 +34,8 @@ const RestaurantRegistration = () => {
 	const [satisfaction, setSatisfaction] = useState<number>(0);
 	const [review, setReview] = useState<string>('');
 	const [images, setImages] = useState<File[]>([]);
+	const [imageUrls, setImageUrls] = useState<string[]>([]);
+	const [isUploading, setIsUploading] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
 	const [restaurantName, setRestaurantName] = useState('');
 	const teamId = 1;
@@ -43,8 +46,44 @@ const RestaurantRegistration = () => {
 
 	const [teamRestaurantId, setTeamRestaurantId] = useState<number>(0);
 
+	const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (!e.target.files) return;
+
+		const fileArr = Array.from(e.target.files).slice(0, 5 - images.length);
+		if (fileArr.length === 0) return;
+
+		const validFiles = validateImageFiles(fileArr);
+		if (validFiles.length === 0) return;
+
+		try {
+			const { successUrls, uploadedFiles } = await uploadMultipleImages(validFiles, 5, setIsUploading);
+
+			setImages((prev) => [...prev, ...uploadedFiles].slice(0, 5));
+			setImageUrls((prev) => [...prev, ...successUrls].slice(0, 5));
+		} catch (error) {
+			alert('이미지 업로드에 실패했습니다.');
+			console.error('이미지 업로드 에러:', error);
+		}
+	};
+
+	const removeImage = (index: number) => {
+		setImages((prev) => prev.filter((_, i) => i !== index));
+		setImageUrls((prev) => prev.filter((_, i) => i !== index));
+	};
+
 	const registerRestaurant = async () => {
 		try {
+			console.log('식당 등록 요청 데이터:', {
+				restaurantId: Number(restaurant?.id),
+				summary: restaurantDescription,
+				userId: 5,
+				servingTimeId: Number(foodPrepTime),
+				waitingTimeId: Number(waitingTime),
+				score: satisfaction,
+				photoPaths: imageUrls,
+				extraText: review,
+			});
+
 			const response = await post<IRestaurantRegistrationRequest>(`/teams/${teamId}/restaurants`, {
 				restaurantId: Number(restaurant?.id),
 				summary: restaurantDescription,
@@ -52,7 +91,7 @@ const RestaurantRegistration = () => {
 				servingTimeId: Number(foodPrepTime),
 				waitingTimeId: Number(waitingTime),
 				score: satisfaction,
-				photoPaths: images.map((img) => URL.createObjectURL(img)),
+				photoPaths: imageUrls, // 업로드된 URL들 사용
 				extraText: review,
 			} as IRestaurantRegistrationRequest);
 			setTeamRestaurantId(Number((response as { teamRestaurantId: string }).teamRestaurantId));
@@ -81,7 +120,8 @@ const RestaurantRegistration = () => {
 		foodPrepTime.length > 0 &&
 		satisfaction > 0 &&
 		review.length > 0 &&
-		images.length > 0;
+		images.length > 0 &&
+		!isUploading; // 업로드 중이 아닐 때만 활성화
 
 	const handleRestaurantSearch = () => {
 		navigate('/restaurant-search');
@@ -211,29 +251,38 @@ const RestaurantRegistration = () => {
 							<FormLabel label="자세한 리뷰를 남겨주세요" isEssential id="satisfaction" className="font-semibold" />
 							<div className="flex gap-2 flex-wrap">
 								<label
-									className={`w-[80px] h-[80px] flex flex-col items-center justify-center border border-gray-05 rounded-[12px] bg-white cursor-pointer relative ${images.length >= 5 ? 'opacity-50 pointer-events-none' : ''}`}
+									className={`w-[80px] h-[80px] flex flex-col items-center justify-center border border-gray-05 rounded-[12px] bg-white cursor-pointer relative ${
+										images.length >= 5 || isUploading ? 'opacity-50 pointer-events-none' : ''
+									}`}
 								>
 									<input
 										type="file"
-										accept="image/*"
+										accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/bmp,image/heic,image/heif,.heic,.heif"
 										multiple
 										hidden
-										disabled={images.length >= 5}
-										onChange={(e) => {
-											if (!e.target.files) return;
-											const fileArr = Array.from(e.target.files).slice(0, 5 - images.length);
-											setImages((prev) => [...prev, ...fileArr].slice(0, 5));
-										}}
+										disabled={images.length >= 5 || isUploading}
+										onChange={handleImageChange}
 									/>
-									<Icon name="camera" size={24} />
-									<div className="flex items-center">
-										<Typography variant={FONT_VARIANT.label01} fontColor={images.length > 0 ? PALETTE.gray10 : PALETTE.gray07}>
-											{images.length}
-										</Typography>
-										<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray07}>
-											/5
-										</Typography>
-									</div>
+									{isUploading ? (
+										<div className="flex flex-col items-center">
+											<div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900" />
+											<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray07} className="mt-1">
+												업로드중...
+											</Typography>
+										</div>
+									) : (
+										<>
+											<Icon name="camera" size={24} />
+											<div className="flex items-center">
+												<Typography variant={FONT_VARIANT.label01} fontColor={images.length > 0 ? PALETTE.gray10 : PALETTE.gray07}>
+													{images.length}
+												</Typography>
+												<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray07}>
+													/5
+												</Typography>
+											</div>
+										</>
+									)}
 								</label>
 
 								{images.map((img, idx) => (
@@ -245,7 +294,7 @@ const RestaurantRegistration = () => {
 										<button
 											type="button"
 											className="absolute top-1 right-1 w-5.5 h-5.5 bg-[#666] bg-opacity-80 rounded-full flex items-center justify-center text-white"
-											onClick={() => setImages(images.filter((_, i) => i !== idx))}
+											onClick={() => removeImage(idx)}
 											aria-label="이미지 삭제"
 										>
 											<Icon name="close" size={16} />
@@ -271,8 +320,8 @@ const RestaurantRegistration = () => {
 						</div>
 					</div>
 
-					<Button variant={isButtonActive ? 'active' : 'disabled'} onClick={registerRestaurant}>
-						등록하기
+					<Button variant={isButtonActive ? 'active' : 'disabled'} onClick={registerRestaurant} disabled={!isButtonActive}>
+						{isUploading ? '이미지 업로드 중...' : '등록하기'}
 					</Button>
 				</form>
 				<CustomDialog headerText={{ title: '식당 등록이 완료되었어요' }} onOpen={isOpen} onOpenChange={setIsOpen} className="w-[271px]">
