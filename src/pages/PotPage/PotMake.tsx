@@ -12,13 +12,15 @@ import Switch from '@/components/Switch';
 import TimePicker from '@/components/TimePicker/TimePicker';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
-import SelectRestaurantPopup from '@/pages/PotPage/components/SelectRestaurantPopup';
+
+import SelectRestaurantPopup from './components/SelectRestaurantPopup';
 
 const MOCK_TEAM_MEMBER = [
 	{
 		id: 1,
 		name: '홍길동',
 		team: '팀1',
+		isHonbapMode: true,
 	},
 	{
 		id: 2,
@@ -33,6 +35,11 @@ const MOCK_TEAM_MEMBER = [
 	{
 		id: 4,
 		name: '유관순',
+		team: '팀1',
+	},
+	{
+		id: 5,
+		name: '유관순1',
 		team: '팀1',
 	},
 ];
@@ -168,19 +175,22 @@ const PotMake = () => {
 							{/* 방식 선택 */}
 							<div className="py-6 px-4 rounded-[20px] bg-white ">
 								<FormLabel id="potMethod" label="방식 선택" isEssential />
-								<div className="flex flex-col gap-2.5 mt-[15px]">
+								<div className="flex flex-col mt-[15px]">
 									<Radio label="일반 투표" checked={potMethod === 'normal'} onChange={() => setPotMethod('normal')} value="normal" name="potMethod" />
+									<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray07} className="mt-0.25 mb-3 ml-7">
+										팀원과 함께 투표로 식당을 결정해요
+									</Typography>
 									{potMethod === 'normal' && (
-										<div className="rounded-[12px] border border-gray-04 px-5 py-4.25 flex flex-col my-1.25">
+										<div className="rounded-[12px] border border-gray-04 px-5 py-4.25 flex flex-col my-1.25 mb-3.75">
 											<div className="flex justify-between items-center border-b border-gray-02 pb-2.5">
 												<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray08}>
-													시작 시간
+													투표 시작 시간
 												</Typography>
 												<TimePicker value={startTime} onChange={setStartTime} displayValue={getDisplayTime(startTime)} />
 											</div>
 											<div className="flex justify-between items-center border-b border-gray-02 pb-2.5 pt-2.5">
 												<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray08}>
-													발표 시간
+													투표 발표 시간
 												</Typography>
 												<TimePicker value={announceTime} onChange={setAnnounceTime} displayValue={getDisplayTime(announceTime)} />
 											</div>
@@ -193,11 +203,14 @@ const PotMake = () => {
 										</div>
 									)}
 									<Radio label="랜덤 추첨" checked={potMethod === 'random'} onChange={() => setPotMethod('random')} value="random" name="potMethod" />
+									<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray07} className="mt-0.25 mb-3 ml-7">
+										랜덤으로 식당을 추첨해줘요
+									</Typography>
 									{potMethod === 'random' && (
 										<div className="rounded-[12px] border border-gray-04 px-5 py-4.25 flex flex-col gap-2">
 											<div className="flex justify-between items-center border-b border-gray-02 pb-2.5">
 												<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray08}>
-													발표 시간
+													랜덤 발표 시간
 												</Typography>
 												<TimePicker value={announceTime} onChange={setAnnounceTime} displayValue={getDisplayTime(announceTime)} />
 											</div>

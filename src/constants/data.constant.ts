@@ -13,40 +13,6 @@ export const CATEGORY_API_MAPPING: Record<TCategoryDisplay, string> = {
 	기타: 'ETC',
 } as const;
 
-export const POT_TITLE = '오늘 같이 점심 드실 분 구해요!!';
-export const POT_PARTICIPANTS = [
-	{
-		name: '육지로 간 고래',
-		category: '한식',
-		rating: 5.0,
-		reviewCount: 50,
-	},
-	{
-		name: '육지로 간 고래',
-		category: '한식',
-		rating: 5.0,
-		reviewCount: 50,
-	},
-	{
-		name: '육지로 간 고래',
-		category: '한식',
-		rating: 5.0,
-		reviewCount: 50,
-	},
-];
-
-export const POT_PARTICIPANTS_IMAGE = [
-	{
-		image: 'https://picsum.photos/200/300',
-	},
-	{
-		image: 'https://picsum.photos/200/300',
-	},
-	{
-		image: 'https://picsum.photos/200/300',
-	},
-];
-
 export const WAITING_TIME_OPTIONS = [
 	{ label: '웨이팅 없음', value: '1' },
 	{ label: '5분 이내', value: '2' },

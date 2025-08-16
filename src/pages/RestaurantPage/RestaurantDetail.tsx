@@ -6,10 +6,10 @@ import { get } from '@/apis';
 import noGallery from '@/assets/noGallery.png';
 import starIcon from '@/assets/star.png';
 import Icon from '@/components/Icon';
+import ReviewInfo from '@/components/ReviewInfo/ReviewInfo';
 import { CustomToast } from '@/components/Toast/BaseToaster';
 import Typography from '@/components/Typography/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
-import ReviewInfo from '@/pages/RestaurantPage/components/ReviewInfo';
 
 interface IRestaurantInfoResponse {
 	name: string;

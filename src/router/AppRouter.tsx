@@ -9,6 +9,7 @@ import NewRestaurantRegistration from '@/pages/NewRestaurantPage/NewRestaurantRe
 import NewRestaurantSelect from '@/pages/NewRestaurantPage/NewRestaurantSelect';
 import NotFound from '@/pages/NotFound';
 import Pot from '@/pages/PotPage/Pot';
+import PotDetail from '@/pages/PotPage/potDetail';
 import PotMake from '@/pages/PotPage/PotMake';
 import PotMakeSuccess from '@/pages/PotPage/PotMakeSuccess';
 import RestaurantDetail from '@/pages/RestaurantPage/RestaurantDetail';
@@ -32,6 +33,7 @@ const AppRouter = () => {
 			<Route path="/pot" element={<Pot />} />
 			<Route path="/pot-make" element={<PotMake />} />
 			<Route path="/pot-make-success" element={<PotMakeSuccess />} />
+			<Route path="/pot-detail" element={<PotDetail />} />
 			<Route path="/developer" element={<Developer />} />
 			<Route path="/restaurant-registration" element={<RestaurantRegistration />} />
 			<Route path="/restaurant-search" element={<RestaurantSearch />} />
