@@ -8,7 +8,6 @@ import FormLabel from '@/components/Input/FormLabel';
 import Input from '@/components/Input/Input';
 import NavBar from '@/components/NavBar/NavBar';
 import Radio from '@/components/Radio/Radio';
-import Switch from '@/components/Switch';
 import TimePicker from '@/components/TimePicker/TimePicker';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
@@ -63,7 +62,6 @@ const PotMake = () => {
 	const [potTitle, setPotTitle] = useState('');
 	const [potMember, setPotMember] = useState('');
 	const [potMethod, setPotMethod] = useState('');
-	const [isToggle, setIsToggle] = useState(false);
 	const [potDesc, setPotDesc] = useState('');
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedMembers, setSelectedMembers] = useState<ITeamMember[]>([]);
@@ -81,10 +79,6 @@ const PotMake = () => {
 
 	const handleChangeMembers = (value: ITeamMember[]) => {
 		setSelectedMembers(value);
-	};
-
-	const handleToggleChange = (checked: boolean) => {
-		setIsToggle(checked);
 	};
 
 	const handlePotTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -138,23 +132,14 @@ const PotMake = () => {
 								</div>
 
 								{potMember === 'select' && (
-									<>
-										<div className="flex justify-between">
-											<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray07} className="mt-0.5 mb-5 ml-7">
-												선택 인원 외 자율참여 허용하기
-											</Typography>
-											<Switch size="S" checked={isToggle} onCheckedChange={handleToggleChange} />
-										</div>
-
-										<PotDropdown
-											isOpen={isOpen}
-											selectedMembers={selectedMembers}
-											onChangeOpen={handleChangeOpen}
-											onChange={handleChangeMembers}
-											optionList={optionList}
-											placeholder="팀에서 팀원 선택하기"
-										/>
-									</>
+									<PotDropdown
+										isOpen={isOpen}
+										selectedMembers={selectedMembers}
+										onChangeOpen={handleChangeOpen}
+										onChange={handleChangeMembers}
+										optionList={optionList}
+										placeholder="팀에서 팀원 선택하기"
+									/>
 								)}
 							</div>
 

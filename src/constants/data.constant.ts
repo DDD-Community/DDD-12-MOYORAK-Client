@@ -58,3 +58,11 @@ export const REVIEW_LIST = [
 		images: [],
 	},
 ];
+
+export const BUTTON_TEXT = {
+	participate: '참여하기',
+	participated: '아직 투표가 시작되지 않았어요!',
+	vote: '투표하기',
+	voteAgain: '다시 투표하기',
+	voteEnded: '투표가 종료되었어요',
+};

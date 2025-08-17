@@ -13,6 +13,7 @@ import FilterButton from '@/components/FilterButton/FilterButton';
 import Icon from '@/components/Icon';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
+import { useCategoryMapping } from '@/hooks/useCategoryMapping';
 
 interface IPotResponse {
 	size: number;
@@ -39,12 +40,17 @@ interface IPotResponse {
 
 const Pot = () => {
 	const navigate = useNavigate();
-
 	const [potList, setPotList] = useState<IPotResponse | null>(null);
+	const currentTime = new Date();
+	const { getCategoryDisplay } = useCategoryMapping();
+
+	const teamId = 1;
+	const size = 10;
+	const currentPage = 1;
 
 	const getPotList = async () => {
 		try {
-			const response = await get<IPotResponse>('/teams/1/parties?size=10&currentPage=1');
+			const response = await get<IPotResponse>(`/teams/${teamId}/parties?size=${size}&currentPage=${currentPage}`);
 			setPotList(response as IPotResponse);
 		} catch (error) {
 			console.error('팟 목록 조회 실패:', error);
@@ -55,26 +61,54 @@ const Pot = () => {
 		getPotList();
 	}, []);
 
-	const getCategoryDisplay = (apiCategory: string): string => {
-		const categoryMapping: Record<string, string> = {
-			KOREAN: '한식',
-			WESTERN: '양식',
-			CHINESE: '중식',
-			JAPANESE: '일식',
-			ASIAN: '아시안',
-			SNACK: '분식',
-			FAST_FOOD: '패스트푸드',
-			CHICKEN_PIZZA: '치킨&피자',
-			ETC: '기타',
-		};
-		return categoryMapping[apiCategory] || apiCategory;
+	// 남은 시간 계산 함수
+	const getTimeRemaining = (targetTime: Date) => {
+		const diff = targetTime.getTime() - currentTime.getTime();
+
+		if (diff <= 0) return null;
+
+		const minutes = Math.floor(diff / (1000 * 60));
+		const hours = Math.floor(minutes / 60);
+		const remainingMinutes = minutes % 60;
+
+		if (hours > 0) {
+			return `${hours}시간 ${remainingMinutes}분`;
+		}
+		return `${remainingMinutes}분`;
+	};
+
+	// 실시간 투표 상태 판단 함수
+	const getRealTimeVoteStatus = (startDate: string, endDate: string) => {
+		const start = new Date(startDate);
+		const end = new Date(endDate);
+		const now = currentTime;
+
+		if (now < start) {
+			// 투표 시작 전
+			return {
+				status: 'READY',
+				timeRemaining: getTimeRemaining(start),
+			};
+		} else if (now >= start && now < end) {
+			// 투표 진행 중
+			return {
+				status: 'VOTING',
+				timeRemaining: getTimeRemaining(end),
+			};
+		} else {
+			// 투표 종료
+			return {
+				status: 'DONE',
+				timeRemaining: null,
+			};
+		}
 	};
 
 	// 투표 상태에 따른 텍스트 반환
-	const getVoteStatusText = (voteType: string, voteStatus: string): string => {
+	const getVoteStatusText = (voteType: string, realTimeStatus: string): string => {
 		if (voteType === 'SELECT') {
 			// 일반 투표
-			switch (voteStatus) {
+			switch (realTimeStatus) {
 				case 'READY':
 					return '투표 전';
 				case 'VOTING':
@@ -86,7 +120,7 @@ const Pot = () => {
 			}
 		} else {
 			// 랜덤 추첨
-			switch (voteStatus) {
+			switch (realTimeStatus) {
 				case 'READY':
 					return '랜덤 발표 전';
 				case 'DONE':
@@ -98,10 +132,10 @@ const Pot = () => {
 	};
 
 	// 투표 상태에 따른 스타일 클래스 반환
-	const getVoteStatusStyle = (voteType: string, voteStatus: string): string => {
+	const getVoteStatusStyle = (voteType: string, realTimeStatus: string): string => {
 		if (voteType === 'SELECT') {
 			// 일반 투표
-			switch (voteStatus) {
+			switch (realTimeStatus) {
 				case 'READY':
 					return 'bg-[rgba(190,238,5,0.30)] text-[#70CE13] border-primary-200';
 				case 'VOTING':
@@ -113,7 +147,7 @@ const Pot = () => {
 			}
 		} else {
 			// 랜덤 추첨
-			switch (voteStatus) {
+			switch (realTimeStatus) {
 				case 'READY':
 					return 'bg-[rgba(255,107,107,0.15)] text-danger-02 border-danger-02';
 				case 'DONE':
@@ -125,41 +159,35 @@ const Pot = () => {
 	};
 
 	// 투표 상태에 따른 설명 텍스트 반환
-	const getVoteStatusDescription = (voteType: string, voteStatus: string) => {
+	const getVoteStatusDescription = (voteType: string, realTimeStatus: string, timeRemaining: string | null) => {
+		if (!timeRemaining) return '';
+
 		if (voteType === 'SELECT') {
 			// 일반 투표
-			switch (voteStatus) {
+			switch (realTimeStatus) {
 				case 'READY':
-					return '뒤 투표가 시작돼요';
+					return `${timeRemaining} 뒤 투표가 시작돼요`;
 				case 'VOTING':
-					return '뒤 투표가 종료돼요';
+					return `${timeRemaining} 뒤 투표가 종료돼요`;
 				case 'DONE':
 					return '';
 			}
 		} else {
 			// 랜덤 추첨
-			switch (voteStatus) {
+			switch (realTimeStatus) {
 				case 'READY':
-					return '뒤 랜덤으로 발표돼요';
+					return `${timeRemaining} 뒤 랜덤으로 발표돼요`;
 				case 'DONE':
 					return '';
 			}
 		}
 	};
 
-	// 첫 번째 팟 데이터 가져오기
-	const firstPot = potList?.data?.[0];
-
-	const startDate = firstPot?.startDate ? new Date(firstPot.startDate).getTime() : undefined;
-	console.log(startDate);
-
-	// const endDate = firstPot?.endDate ? new Date(firstPot.endDate).getTime() : undefined;
-
 	return (
-		<div className="px-4.5 bg-gray-02 h-screen">
-			<div className="flex justify-center mt-29">
-				<img src={potIcon} alt="팟아이콘 이미지" className="w-[177px] absolute top-10" />
-				<img src={potIconFinger} alt="팟아이콘 손가락 이미지" className="w-[177px] absolute top-20.5 z-10" />
+		<div className="px-4.5 bg-gray-02 h-screen overflow-y-auto mb-20">
+			<div className="flex justify-center mt-29 relative">
+				<img src={potIcon} alt="팟아이콘 이미지" className="w-[177px] absolute top-[-80px]" />
+				<img src={potIconFinger} alt="팟아이콘 손가락 이미지" className="w-[194px] absolute top-[-36px] z-10" />
 			</div>
 
 			<div
@@ -180,72 +208,92 @@ const Pot = () => {
 				</Button>
 			</div>
 
-			{firstPot ? (
-				<div className={`p-[22px] rounded-[30px] bg-[#FFF] relative border ${firstPot.isParticipating === true ? 'border-[#BEEE0540]' : 'border-gray-04'}`}>
-					{firstPot.isParticipating === true && (
-						<div className="absolute top-[-16px] right-[20px]">
-							<img src={voting} alt="voting" className="w-[86px] h-[38.323px]" />
-						</div>
-					)}
-					<div className="flex items-center mb-2">
-						<FilterButton variant="clicked" borderRadius="20" className={getVoteStatusStyle(firstPot.voteType, firstPot.voteStatus)}>
-							{getVoteStatusText(firstPot.voteType, firstPot.voteStatus)}
-						</FilterButton>
-						<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray08} className="font-medium ml-1">
-							{getVoteStatusDescription(firstPot.voteType, firstPot.voteStatus)}
-						</Typography>
-					</div>
-					<Typography variant={FONT_VARIANT.header02} fontColor={PALETTE.gray10} className="font-semibold mb-6">
-						{firstPot.title}
-					</Typography>
-					<div className="flex flex-col gap-2">
-						{firstPot.partyRestaurantResponseList.map((restaurant, idx) => (
-							<div key={idx} className="flex items-center justify-between rounded-[15px] border border-gray-03 bg-gray-01 px-4 py-2.5">
-								<div className="flex items-center gap-1">
-									<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray10} className="font-semibold max-w-[100px]">
-										{restaurant.name}
+			{potList?.data && potList.data.length > 0 ? (
+				<div className="mb-6">
+					<div className="space-y-5.5">
+						{potList.data.map((pot) => {
+							const realTimeVoteInfo = getRealTimeVoteStatus(pot.startDate, pot.endDate);
+							return (
+								<div
+									key={pot.id}
+									className={`p-[22px] rounded-[30px] bg-[#FFF] relative border ${pot.isParticipating === true ? 'border-[#BEEE0540] stroke-primary-200' : 'border-gray-04'}`}
+									onClick={() => navigate(`/pot-detail/${pot.id}`)}
+								>
+									{pot.isParticipating === true && (
+										<div className="absolute top-[-16px] right-[20px]">
+											<img src={voting} alt="voting" className="w-[86px] h-[38.323px]" />
+										</div>
+									)}
+									<div className="flex items-center mb-2">
+										<FilterButton variant="clicked" borderRadius="20" className={getVoteStatusStyle(pot.voteType, realTimeVoteInfo.status)}>
+											{getVoteStatusText(pot.voteType, realTimeVoteInfo.status)}
+										</FilterButton>
+										<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray08} className="font-medium ml-1">
+											{getVoteStatusDescription(pot.voteType, realTimeVoteInfo.status, realTimeVoteInfo.timeRemaining)}
+										</Typography>
+									</div>
+									<Typography variant={FONT_VARIANT.header02} fontColor={PALETTE.gray10} className="font-semibold mb-6">
+										{pot.title}
 									</Typography>
-									<Typography variant={FONT_VARIANT.caption02} fontColor={PALETTE.gray07} className="font-medium">
-										{getCategoryDisplay(restaurant.restaurantCategory)}
-									</Typography>
-								</div>
-								<div className="flex items-center">
-									<Icon name="star" width={11} className="mr-0.5 mt-0.5" />
-									<Typography variant={FONT_VARIANT.caption02} fontColor={PALETTE.gray08} className="font-medium">
-										{restaurant.reviewScore}
-									</Typography>
-									<Typography variant={FONT_VARIANT.caption02} fontColor={PALETTE.gray08} className="font-medium">
-										· 리뷰 {restaurant.reviewCount}
-									</Typography>
-								</div>
-							</div>
-						))}
-					</div>
+									<div className="flex flex-col gap-2">
+										{pot.partyRestaurantResponseList.map((restaurant, restaurantIdx) => (
+											<div key={restaurantIdx} className="flex items-center justify-between rounded-[15px] border border-gray-03 bg-gray-01 px-4 py-2.5">
+												<div className="flex items-center gap-1">
+													<Typography
+														variant={FONT_VARIANT.body02}
+														fontColor={PALETTE.gray10}
+														className="font-semibold max-w-[40vw] text-ellipsis overflow-hidden whitespace-nowrap"
+													>
+														{restaurant.name}
+													</Typography>
+													<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray07} className="font-medium">
+														{getCategoryDisplay(restaurant.restaurantCategory)}
+													</Typography>
+												</div>
+												<div className="flex items-center">
+													<Icon name="star" width={11} className="mr-0.5 mb-0.5" />
+													<Typography variant={FONT_VARIANT.caption02} fontColor={PALETTE.gray08} className="font-medium">
+														{restaurant.reviewScore}
+													</Typography>
+													<Typography variant={FONT_VARIANT.caption02} fontColor={PALETTE.gray08} className="font-medium mx-1">
+														·
+													</Typography>
+													<Typography variant={FONT_VARIANT.caption02} fontColor={PALETTE.gray08} className="font-medium">
+														리뷰 {restaurant.reviewCount}
+													</Typography>
+												</div>
+											</div>
+										))}
+									</div>
 
-					<div className="relative">
-						<div className="absolute top-[77%] left-0 w-8 h-8 bg-gray-02 rounded-r-full transform -translate-y-1/2 -translate-x-9" />
-						<div className="absolute top-[77%] right-0 w-8 h-8 bg-gray-02 rounded-l-full transform -translate-y-1/2 translate-x-9" />
-						<div className="flex items-center mt-7 mb-6 ">
-							<img src={divider} alt="divider" className="w-full" />
-						</div>
-					</div>
+									<div className="relative">
+										<div className="absolute top-[77%] left-0 w-8 h-8 bg-gray-02 rounded-r-full transform -translate-y-1/2 -translate-x-9" />
+										<div className="absolute top-[77%] right-0 w-8 h-8 bg-gray-02 rounded-l-full transform -translate-y-1/2 translate-x-9" />
+										<div className="flex items-center mt-7 mb-6 ">
+											<img src={divider} alt="divider" className="w-full" />
+										</div>
+									</div>
 
-					<div className="flex items-center gap-2 mt-7">
-						<div className="flex">
-							<Typography variant={FONT_VARIANT.label02} fontColor={PALETTE.gray09} className="font-semibold">
-								{firstPot.attendeeCount}
-							</Typography>
-							<Typography variant={FONT_VARIANT.label02} fontColor={PALETTE.gray08} className="font-semibold">
-								명이 참가중이에요!
-							</Typography>
-						</div>
-						<div className="flex -space-x-2">
-							{firstPot.userProfileList.map((profileImage, idx) => (
-								<div key={idx} className="w-9 h-9 rounded-full border-[1px] border-solid border-gray-04 bg-gray-02">
-									<img src={profileImage} alt="팟 참가자 이미지" className="w-full h-full rounded-full" />
+									<div className="flex items-center gap-2 mt-7">
+										<div className="flex">
+											<Typography variant={FONT_VARIANT.label02} fontColor={PALETTE.gray09} className="font-semibold">
+												{pot.attendeeCount}
+											</Typography>
+											<Typography variant={FONT_VARIANT.label02} fontColor={PALETTE.gray08} className="font-semibold">
+												명이 참가중이에요!
+											</Typography>
+										</div>
+										<div className="flex -space-x-2">
+											{pot.userProfileList.map((profileImage, profileIdx) => (
+												<div key={profileIdx} className="w-9 h-9 rounded-full border-[1px] border-solid border-gray-04 bg-gray-02">
+													<img src={profileImage} alt="팟 참가자 이미지" className="w-full h-full rounded-full" />
+												</div>
+											))}
+										</div>
+									</div>
 								</div>
-							))}
-						</div>
+							);
+						})}
 					</div>
 				</div>
 			) : (
@@ -261,4 +309,5 @@ const Pot = () => {
 		</div>
 	);
 };
+
 export default Pot;

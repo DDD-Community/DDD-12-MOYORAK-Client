@@ -116,6 +116,8 @@
 	body {
 		line-height: 1;
 		font-family: 'Pretendard', sans-serif;
+		max-width: 480px;
+		margin: 0 auto;
 	}
 
 	/* Input/Button 스타일 리셋 */

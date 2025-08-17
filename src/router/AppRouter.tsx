@@ -33,7 +33,7 @@ const AppRouter = () => {
 			<Route path="/pot" element={<Pot />} />
 			<Route path="/pot-make" element={<PotMake />} />
 			<Route path="/pot-make-success" element={<PotMakeSuccess />} />
-			<Route path="/pot-detail" element={<PotDetail />} />
+			<Route path="/pot-detail/:id" element={<PotDetail />} />
 			<Route path="/developer" element={<Developer />} />
 			<Route path="/restaurant-registration" element={<RestaurantRegistration />} />
 			<Route path="/restaurant-search" element={<RestaurantSearch />} />
