@@ -1,6 +1,8 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 
 import RestaurantReview from './RestaurantReview';
+import { useQueryTeamRestaurantList } from '@/apis/useQueryTeamRestaurantList';
+import Empty from '../Empty';
 
 const BASIC_HEIGHT = 300;
 const MIN_HEIGHT = 120;
@@ -8,32 +10,17 @@ const MIN_HEIGHT = 120;
 const UP_THRESHOLD = 8;
 const DOWN_THRESHOLD = 8;
 
-const REVIEW_LIST = [
-	{
-		id: 1,
-		name: '식당이름',
-		score: 3,
-		review: 30,
-	},
-	{
-		id: 2,
-		name: '식당이름',
-		score: 3,
-		review: 30,
-	},
-	{
-		id: 3,
-		name: '식당이름',
-		score: 3,
-		review: 30,
-	},
-];
-
 interface ICustomDrawerProps {
 	header: ReactNode;
 }
 
 const CustomDrawer = ({ header }: ICustomDrawerProps) => {
+	const { data: restaurantList } = useQueryTeamRestaurantList(8, {
+		size: 10,
+		currentPage: 1,
+		sortOption: 'DISTANCE',
+	});
+
 	const [height, setHeight] = useState(BASIC_HEIGHT);
 	const dragging = useRef(false);
 	const startY = useRef(0);
@@ -197,11 +184,15 @@ const CustomDrawer = ({ header }: ICustomDrawerProps) => {
 
 			{/* 내용 */}
 			<div className={`flex-1 p-4 ${isDragging ? 'overflow-hidden' : 'overflow-auto'}`}>
-				<ul className="px-[18px]">
-					{REVIEW_LIST.map((item, id) => (
-						<RestaurantReview key={id} item={item} />
-					))}
-				</ul>
+				{restaurantList?.data.length === 0 ? (
+					<Empty />
+				) : (
+					<ul className="px-[18px]">
+						{restaurantList?.data.map((item, id) => (
+							<RestaurantReview key={id} item={item} />
+						))}
+					</ul>
+				)}
 			</div>
 		</div>
 	);

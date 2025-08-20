@@ -5,31 +5,23 @@ import NavBar from '@/components/NavBar/NavBar';
 
 import MainBottomSheet from './components/MainBottomSheet';
 import MainIntro from './components/MainIntro';
+import { useQueryTeamRestaurantsLocations } from '@/apis/useQueryTeamRestaurantsLocations';
 
 const COMPANY_LOCATION = {
 	center: { lat: 37.5665, lng: 126.978 },
 	placeName: '서울특별시청',
 };
 
-const MOCK_MARKER_OPTIONS = [
-	{
-		center: { lat: 37.57, lng: 126.9768 },
-		placeName: '덕수궁',
-	},
-	{
-		center: { lat: 37.5658, lng: 126.9753 },
-		placeName: '서울광장',
-	},
-];
-
 const MainPage = () => {
 	const { state } = useLocation() as { state?: { login: boolean } };
+
+	const { data } = useQueryTeamRestaurantsLocations(8);
 
 	if (state?.login) {
 		return (
 			<>
 				<NavBar variant="iconWithTextAndRightIcon" leftIcon="company" leftText="WEB 2팀" rightIcon="menu" />
-				<KakaoMap companyLocation={COMPANY_LOCATION} optionsList={MOCK_MARKER_OPTIONS} />
+				<KakaoMap companyLocation={COMPANY_LOCATION} optionsList={data?.locations || []} />
 				<MainBottomSheet />
 			</>
 		);
@@ -37,7 +29,7 @@ const MainPage = () => {
 
 	return (
 		<>
-			<KakaoMap companyLocation={COMPANY_LOCATION} optionsList={MOCK_MARKER_OPTIONS} />
+			<KakaoMap companyLocation={COMPANY_LOCATION} optionsList={data?.locations || []} />
 			<MainIntro />
 		</>
 	);
