@@ -38,10 +38,9 @@ const NewRestaurantSelect = () => {
 			);
 			setNewRestaurantSelect(response as INewRestaurantSelectResponse);
 		} catch (error) {
-			console.error('식당 정보를 불러오는데 실패했습니다:', error);
+			console.error(error);
 		}
 	};
-	console.log(newRestaurantSelect);
 
 	useEffect(() => {
 		getNewRestaurantSelect();

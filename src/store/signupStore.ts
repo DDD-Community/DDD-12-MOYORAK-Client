@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type TGender = 'MALE' | 'FEMALE' | null;
+export type TGender = 'MALE' | 'FEMALE';
 
 interface SignupState {
 	step: number | 'success';
@@ -41,7 +41,7 @@ export const useSignupStore = create<SignupState>((set) => ({
 	company: '',
 	team: '',
 	baseAddress: '',
-	detailAddress: '',
+	detailAddress: undefined,
 
 	setUsername: (username) => set({ username }),
 	setBirth: (birth) => set({ birth }),

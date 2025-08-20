@@ -2,12 +2,14 @@ import { useQuery } from '@tanstack/react-query';
 
 import { get } from '.';
 
-interface ISearchTeamResponse {
-	teams: string[];
+interface ITeamRestaurantListRequest {
+	size: number;
+	currentPage: number;
+	sort;
 }
 
-const getSearchTeam = async (companyId: number, team: string): Promise<ISearchTeamResponse> => {
-	return await get<ISearchTeamResponse>(`/companies/${companyId}`, { name: team });
+const getSearchTeam = async (teamId: number, team: string): Promise<ITeamRestaurantListRequest> => {
+	return await get<ITeamRestaurantListRequest>(`/teams/${teamId}/restaurants`);
 };
 
 export const useQuerySearchTeam = (companyId: number, team: string, enabled = true) => {

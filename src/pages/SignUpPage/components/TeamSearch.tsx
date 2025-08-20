@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import Button from '@/components/Button/Button';
 import FilterButton from '@/components/FilterButton/FilterButton';
@@ -7,6 +7,8 @@ import Input from '@/components/Input/Input';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 import { useSignupStore } from '@/store/signupStore';
+import { useQuerySearchTeam } from '@/apis/useQuerySearchTeam';
+import { useMutationAddTeam } from '@/apis/useMutationAddTeam';
 
 const TeamSearch = () => {
 	const { team, setTeam, nextStep } = useSignupStore();
@@ -16,40 +18,27 @@ const TeamSearch = () => {
 	// 신규 등록 버튼 클릭 여부
 	const [isRegisterTeam, setIsRegisterTeam] = useState<boolean>(false);
 
+	const companyId = localStorage.getItem('companyId');
+
+	const { mutate, isSuccess } = useMutationAddTeam();
+
 	const onRegisterTeam = () => {
 		setIsRegisterTeam(true);
 		setIsSearchEnabled(false);
+		mutate({
+			company: Number(companyId),
+			team: team,
+		});
 	};
 
-	// 👉 임시 훅 (팀 이름 기준으로 상태 판단)
-	const useQuerySearchCompany = (team: string, enabled: boolean, isRegisterTeam: boolean) => {
-		if (!enabled || !team) {
-			return { isSuccess: false, isError: false };
-		}
+	const { isError, data: teamList } = useQuerySearchTeam(Number(companyId), team, isSearchEnabled && Boolean(companyId));
 
-		// 신규 등록을 눌렀다면 성공으로 간주
-		if (isRegisterTeam) {
-			return { isSuccess: true, isError: false };
-		}
+	const validMessage = useMemo(() => {
+		if (!isSearchEnabled) return '';
 
-		if (team === '개발3팀') {
-			return { isSuccess: true, isError: false };
-		}
-
-		if (team === '개발1팀') {
-			return { isSuccess: false, isError: true };
-		}
-
-		return { isSuccess: false, isError: false };
-	};
-
-	const { isSuccess, isError } = useQuerySearchCompany(team, isSearchEnabled, isRegisterTeam);
-
-	const getValidMessage = () => {
-		if (isSuccess || isRegisterTeam) return `${team}이 우리 회사에 등록 되었습니다.`;
-		if (isError) return `${team}이 아직 등록되어 있지 않습니다.`;
-		return '';
-	};
+		if (teamList && teamList.teams.length === 0) return `${team}는 아직 등록되어 있지 않습니다.`;
+		if (isSuccess) return `${team}이 우리 회사에 등록되었습니다.`;
+	}, [isSearchEnabled, teamList, isSuccess]);
 
 	return (
 		<section className="px-5">
@@ -69,13 +58,13 @@ const TeamSearch = () => {
 					setTeam(e.target.value);
 					setIsSearchEnabled(false);
 				}}
-				isSuccess={isSuccess || isRegisterTeam}
-				isError={isError}
-				message={getValidMessage()}
+				isSuccess={isRegisterTeam}
+				isError={teamList?.teams.length === 0}
+				message={validMessage}
 				rightButton={
 					team &&
 					!isError &&
-					!isRegisterTeam && (
+					!teamList && (
 						<button type="button" className="absolute right-2 top-1/2 -translate-y-1/2" onClick={() => setIsSearchEnabled(true)}>
 							<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.primary200}>
 								입력
@@ -85,7 +74,7 @@ const TeamSearch = () => {
 				}
 			/>
 
-			{isError && !isRegisterTeam && (
+			{teamList && teamList.teams.length === 0 && (
 				<FilterButton variant="general" className="rounded-[17px] py-1.5 flex items-center gap-0.5 mt-4" onClick={onRegisterTeam}>
 					신규 등록하기
 					<Icon name="plus" width={18} height={18} />
