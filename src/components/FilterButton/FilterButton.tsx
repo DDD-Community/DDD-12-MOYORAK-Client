@@ -13,7 +13,7 @@ interface IFilterButtonProps {
 
 const FilterButton = ({ children, variant = 'general', onClick, className, borderRadius, type = 'button' }: IFilterButtonProps) => {
 	const getFilterButtonClasses = () => {
-		const baseClasses = `rounded-[${borderRadius}px] h-[32px] w-auto font-[Pretendard] text-sm not-italic font-medium leading-[143%] tracking-[0.14px]; px-[14px]`;
+		const baseClasses = `h-[32px] w-auto font-[Pretendard] text-sm not-italic font-medium leading-[143%] tracking-[0.14px]; px-[14px]`;
 
 		switch (variant) {
 			case 'general':
@@ -26,7 +26,13 @@ const FilterButton = ({ children, variant = 'general', onClick, className, borde
 	};
 
 	return (
-		<button className={cn(getFilterButtonClasses(), className)} onClick={onClick} type={type} tabIndex={-1}>
+		<button
+			className={cn(getFilterButtonClasses(), className)}
+			onClick={onClick}
+			type={type}
+			tabIndex={-1}
+			style={{ borderRadius: borderRadius ? `${borderRadius}px` : undefined }}
+		>
 			{children}
 		</button>
 	);
