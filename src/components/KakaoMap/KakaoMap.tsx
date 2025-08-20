@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 import KakaoMapCore from '@/utils/KakaoMapCore';
+import type { ITeamRestaurantLocationItem } from '@/apis/useQueryTeamRestaurantsLocations';
 
 interface IKakaoMapOptions {
 	center?: { lat: number; lng: number };
@@ -10,7 +11,7 @@ interface IKakaoMapOptions {
 
 interface IKakaoMapProps {
 	companyLocation: IKakaoMapOptions;
-	optionsList?: IKakaoMapOptions[];
+	optionsList?: ITeamRestaurantLocationItem[];
 }
 
 const KakaoMap = ({ companyLocation, optionsList = [] }: IKakaoMapProps) => {
