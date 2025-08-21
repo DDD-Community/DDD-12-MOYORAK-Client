@@ -14,7 +14,7 @@ const RedirectPage = () => {
 		if (accessToken && refreshToken) {
 			localStorage.setItem('accessToken', accessToken);
 			localStorage.setItem('refreshToken', refreshToken);
-			navigate('');
+			navigate('/');
 
 			return;
 		}
