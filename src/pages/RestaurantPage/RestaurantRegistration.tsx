@@ -94,7 +94,7 @@ const RestaurantRegistration = () => {
 				photoPaths: imageUrls, // 업로드된 URL들 사용
 				extraText: review,
 			} as IRestaurantRegistrationRequest);
-			setTeamRestaurantId(Number((response as { teamRestaurantId: string }).teamRestaurantId));
+			setTeamRestaurantId(Number((response as unknown as { teamRestaurantId: string }).teamRestaurantId));
 			setIsOpen(true);
 		} catch (error) {
 			console.error('식당 등록에 실패했습니다:', error);

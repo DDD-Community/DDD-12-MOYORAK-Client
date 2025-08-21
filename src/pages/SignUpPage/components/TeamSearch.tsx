@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import Button from '@/components/Button/Button';
 import FilterButton from '@/components/FilterButton/FilterButton';

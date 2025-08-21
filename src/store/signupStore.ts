@@ -6,7 +6,7 @@ interface SignupState {
 	step: number | 'success';
 	username: string;
 	birth: string;
-	gender: TGender;
+	gender: TGender | null;
 
 	allergyFoods?: string[];
 	dislikedFoods?: string[];
