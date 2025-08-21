@@ -10,7 +10,7 @@ interface IRegisterCompanyRequest {
 }
 
 const postCompany = async (request: IRegisterCompanyRequest) => {
-	return await post('/api/companies', request);
+	return await post('/companies', request);
 };
 
 export const useMutationCompany = () =>

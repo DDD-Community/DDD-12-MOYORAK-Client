@@ -3,7 +3,10 @@ import { useQuery } from '@tanstack/react-query';
 import { get } from '.';
 
 interface ISearchCompanyResponse {
-	searchResponses: string[];
+	searchResponses: {
+		companyId: number;
+		name: string;
+	}[];
 }
 
 const getSearchCompany = async (company: string): Promise<ISearchCompanyResponse> => {
