@@ -133,7 +133,7 @@ const FoodPreference = () => {
 						placeholder="알러지가 있는 음식을 입력해주세요."
 						value={allergyInput}
 						onChange={(e: ChangeEvent<HTMLInputElement>) => setAllergyInput(e.target.value)}
-						onKeyDown={(e) => handleKeyDown(e, 'ALLERGY')}
+						onKeyDown={(e) => handleKeyDown(e as KeyboardEvent<HTMLInputElement>, 'ALLERGY')}
 						rightButton={
 							allergyInput && (
 								<button type="button" className="absolute right-2 top-1/2 -translate-y-1/2" onClick={() => addFood('ALLERGY')}>
@@ -156,7 +156,7 @@ const FoodPreference = () => {
 						placeholder="선호하지 않는 음식을 입력해주세요."
 						value={dislikeInput}
 						onChange={(e: ChangeEvent<HTMLInputElement>) => setDislikeInput(e.target.value)}
-						onKeyDown={(e) => handleKeyDown(e, 'DISLIKE')}
+						onKeyDown={(e) => handleKeyDown(e as KeyboardEvent<HTMLInputElement>, 'DISLIKE')}
 						rightButton={
 							dislikeInput && (
 								<button type="button" className="absolute right-2 top-1/2 -translate-y-1/2" onClick={() => addFood('DISLIKE')}>
