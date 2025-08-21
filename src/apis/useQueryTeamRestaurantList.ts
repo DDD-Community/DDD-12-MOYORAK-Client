@@ -2,20 +2,46 @@ import { useQuery } from '@tanstack/react-query';
 
 import { get } from '.';
 
+export const SORTING_TYPE = {
+	DISTANCE: 'DISTANCE',
+	RATING: 'RATING',
+	RECENT: 'RECENT',
+	NAME: 'NAME',
+} as const;
+
+type TSortingType = keyof typeof SORTING_TYPE;
+
 interface ITeamRestaurantListRequest {
 	size: number;
 	currentPage: number;
-	sort;
+	sortOption: TSortingType;
 }
 
-const getSearchTeam = async (teamId: number, team: string): Promise<ITeamRestaurantListRequest> => {
-	return await get<ITeamRestaurantListRequest>(`/teams/${teamId}/restaurants`);
+export interface ITeamRestaurantItem {
+	teamRestaurantId: number;
+	restaurantName: string;
+	restaurantCategory: string;
+	averageReviewScore: number;
+	reviewCount: number;
+	reviewImagePath: string;
+}
+
+interface ITeamRestaurantListResponse {
+	size: number;
+	currentPage: number;
+	totalCount: number;
+	data: ITeamRestaurantItem[];
+}
+
+const getSearchTeam = async (teamId: number, teamRestaurantListRequest: ITeamRestaurantListRequest): Promise<ITeamRestaurantListResponse> => {
+	return await get<ITeamRestaurantListResponse>(`/teams/${teamId}/restaurants`, teamRestaurantListRequest);
 };
 
-export const useQuerySearchTeam = (companyId: number, team: string, enabled = true) => {
+export const useQueryTeamRestaurantList = (teamId: number, teamRestaurantListRequest: ITeamRestaurantListRequest, enabled = true) => {
 	return useQuery({
-		queryKey: ['companies'],
+		queryKey: ['teams', teamId, 'restaurants'],
 		enabled,
-		queryFn: () => getSearchTeam(companyId, team),
+		queryFn: () => getSearchTeam(teamId, teamRestaurantListRequest),
 	});
 };
+``;

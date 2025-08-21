@@ -47,7 +47,7 @@ const NewRestaurantRegistration = () => {
 			navigate('/restaurant-registration', {
 				state: {
 					restaurant: {
-						id: (response as { restaurantId: string }).restaurantId,
+						id: (response as unknown as { restaurantId: string }).restaurantId,
 						name: newRestaurantRegistration.name,
 					},
 				},

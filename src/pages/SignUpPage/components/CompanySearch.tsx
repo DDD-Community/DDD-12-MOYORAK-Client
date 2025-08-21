@@ -69,7 +69,7 @@ const CompanySearch = () => {
 			}
 
 			const geocoder = new kakaoLoaded.maps.services.Geocoder();
-			geocoder.addressSearch(address, (result, status) => {
+			geocoder.addressSearch(address, (result: { x: any; y: any }[], status: any) => {
 				if (status === kakaoLoaded.maps.services.Status.OK) {
 					const { x, y } = result[0];
 					resolve({ longitude: parseFloat(x), latitude: parseFloat(y) });

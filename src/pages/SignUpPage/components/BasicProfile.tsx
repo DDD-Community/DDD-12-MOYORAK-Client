@@ -17,6 +17,8 @@ const BasicProfile = () => {
 	const { mutate: signIn } = useMutationAuthSignIn();
 
 	const onSignup = () => {
+		if (!gender) return;
+
 		mutate(
 			{
 				email: state.email,
@@ -35,6 +37,7 @@ const BasicProfile = () => {
 					nextStep();
 				},
 				onError: (error) => {
+					nextStep();
 					console.error('Signup failed:', error);
 				},
 			}
