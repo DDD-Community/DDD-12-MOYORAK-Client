@@ -112,15 +112,11 @@ const Participant = ({ timeStatus, isParticipated, onParticipateClick }: Partici
 						return (
 							<div key={participant.userId} className="bg-white rounded-[10px] border border-gray-03 px-3.75 py-5">
 								<button
-									onClick={(e) => {
-										e.preventDefault();
-										e.stopPropagation();
-										toggleParticipantExpansion(participant.userId);
-									}}
+									onClick={() => toggleParticipantExpansion(participant.userId)}
 									className="w-full flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors"
 									type="button"
 								>
-									<div className="flex items-center gap-2.5">
+									<div className="flex items-center gap-2.5 pointer-events-none">
 										<div className="w-7 h-7 border border-gray-04 bg-gray-02 rounded-full flex items-center justify-center">
 											{participant.profileImage ? (
 												<img src={participant.profileImage} alt={participant.userName} className="w-full h-full object-cover rounded-full" />
@@ -132,7 +128,11 @@ const Participant = ({ timeStatus, isParticipated, onParticipateClick }: Partici
 											{participant.userName}
 										</Typography>
 									</div>
-									<Icon name="selectOpen" size={14} className={`transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
+									<Icon
+										name="selectOpen"
+										size={14}
+										className={`transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''} pointer-events-none`}
+									/>
 								</button>
 
 								{isExpanded && (

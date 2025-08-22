@@ -13,7 +13,7 @@ type TApiResponse<T = unknown> = T | IApiErrorResponse;
 const api = axios.create({
 	baseURL: import.meta.env.VITE_API_URL,
 	headers: {
-		Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1IiwiZW1haWwiOiJhbnRqZGdrQGdtYWlsLmNvbSIsIm5hbWUiOiLsnbTrrLTshLEiLCJpYXQiOjE3NTU0MjM3NjcsImV4cCI6MTc1NTUxMDE2N30.WLYJQZN5JIJl3aDCnIzFC0o6UCUf-cMXPkXPTJk-mTs8tpGNijf2mIOYQBEVtOozZYx3O-8uwSzwHXsl1h9wzA`,
+		Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1IiwiZW1haWwiOiJhbnRqZGdrQGdtYWlsLmNvbSIsIm5hbWUiOiLsnbTrrLTshLEiLCJpYXQiOjE3NTU4NDY5OTQsImV4cCI6MTc1NTkzMzM5NH0.kA4Os2nLJNY1qjhlSqH2ZoUA4cAFeE3btOJqUFq29Zb4aJ4oJcKbRy2ugDDimq_qobQNxbLWq805AC68kbwMmg`,
 	},
 });
 
