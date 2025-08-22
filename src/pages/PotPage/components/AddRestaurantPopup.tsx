@@ -18,9 +18,9 @@ const FILTER_TYPES = {
 
 type FilterType = (typeof FILTER_TYPES)[keyof typeof FILTER_TYPES];
 
-interface ISelectRestaurantPopupProps {
+interface IAddRestaurantPopupProps {
 	onClose: (
-		selectedRestaurants?: Array<{
+		newRestaurants?: Array<{
 			teamRestaurantId: number;
 			restaurantName: string;
 			restaurantCategory: string;
@@ -29,10 +29,10 @@ interface ISelectRestaurantPopupProps {
 			reviewImagePath: string;
 		}>
 	) => void;
-	initialSelectedIds?: number[];
+	existingRestaurantIds: number[]; // 이미 추가된 식당 ID들
 }
 
-const MAX_SELECTED_RESTAURANTS = 5;
+const MAX_TOTAL_RESTAURANTS = 5;
 
 interface ITeamRestaurantResponse {
 	size: number;
@@ -48,20 +48,24 @@ interface ITeamRestaurantResponse {
 	}>;
 }
 
-const SelectRestaurantPopup = ({ onClose, initialSelectedIds = [] }: ISelectRestaurantPopupProps) => {
+const AddRestaurantPopup = ({ onClose, existingRestaurantIds }: IAddRestaurantPopupProps) => {
 	const [sortOption, setSortOption] = useState<FilterType>(FILTER_TYPES.DISTANCE);
 	const [searchValue, setSearchValue] = useState<string>('');
-	const [selectedIds, setSelectedIds] = useState<number[]>(initialSelectedIds);
+	const [newSelectedIds, setNewSelectedIds] = useState<number[]>([]);
 	const [selectedOpen, setSelectedOpen] = useState<boolean>(false);
 	const [teamRestaurantList, setTeamRestaurantList] = useState<ITeamRestaurantResponse>();
 	const { getCategoryDisplay } = useCategoryMapping();
-	const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setSearchValue(e.target.value);
-	};
 
 	const teamId = 1;
 	const size = 100;
 	const currentPage = 1;
+
+	// 추가 가능한 식당 개수
+	const remainingSlots = MAX_TOTAL_RESTAURANTS - existingRestaurantIds.length;
+
+	const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setSearchValue(e.target.value);
+	};
 
 	const getSortOptionForAPI = (filterType: FilterType): string => {
 		switch (filterType) {
@@ -84,50 +88,59 @@ const SelectRestaurantPopup = ({ onClose, initialSelectedIds = [] }: ISelectRest
 
 	useEffect(() => {
 		getTeamRestaurantList();
-	}, [sortOption]); // sortOption이 변경될 때마다 API 호출
+	}, [sortOption]);
 
-	console.log(teamRestaurantList);
+	// 새로운 식당 선택/해제
+	const handleNewSelect = (id: number) => {
+		// 이미 추가된 식당은 선택 불가
+		if (existingRestaurantIds.includes(id)) return;
 
-	// 선택/해제
-	const handleSelect = (id: number) => {
-		if (selectedIds.length >= MAX_SELECTED_RESTAURANTS && !selectedIds.includes(id)) return;
+		// 새로 선택할 수 있는 개수 제한
+		if (newSelectedIds.length >= remainingSlots && !newSelectedIds.includes(id)) return;
 
-		if (selectedIds.includes(id)) {
-			setSelectedIds(selectedIds.filter((sid) => sid !== id));
+		if (newSelectedIds.includes(id)) {
+			setNewSelectedIds(newSelectedIds.filter((sid) => sid !== id));
 			return;
 		}
 
-		setSelectedIds([...selectedIds, id]);
-	};
-	// 선택된 식당 삭제
-	const handleRemoveSelected = (id: number) => {
-		setSelectedIds(selectedIds.filter((sid) => sid !== id));
+		setNewSelectedIds([...newSelectedIds, id]);
 	};
 
-	// 검색 필터링 + 선택된 식당 제외 (API 데이터 사용)
+	// 새로 선택된 식당 삭제
+	const handleRemoveNewSelected = (id: number) => {
+		setNewSelectedIds(newSelectedIds.filter((sid) => sid !== id));
+	};
+
+	// 필터링: 검색어에 맞고, 선택되지 않은 식당들
 	const filteredRestaurants =
-		teamRestaurantList?.data?.filter((r) => r.restaurantName.includes(searchValue) && !selectedIds.includes(r.teamRestaurantId)) || [];
+		teamRestaurantList?.data?.filter(
+			(r) => r.restaurantName.includes(searchValue) && !existingRestaurantIds.includes(r.teamRestaurantId) && !newSelectedIds.includes(r.teamRestaurantId)
+		) || [];
 
-	// 선택된 식당 정보 (API 데이터 사용)
-	const selectedRestaurants = teamRestaurantList?.data?.filter((r) => selectedIds.includes(r.teamRestaurantId)) || [];
+	// 모든 선택된 식당 정보 (기존 + 새로 선택된)
+	const allSelectedIds = [...existingRestaurantIds, ...newSelectedIds];
+	const selectedRestaurants = teamRestaurantList?.data?.filter((r) => allSelectedIds.includes(r.teamRestaurantId)) || [];
 
-	// 선택 완료 버튼 클릭 시 선택된 식당 데이터를 전달
+	// 새로 선택된 식당 정보
+	const newSelectedRestaurants = teamRestaurantList?.data?.filter((r) => newSelectedIds.includes(r.teamRestaurantId)) || [];
+
+	// 완료 버튼 클릭 시 새로 선택된 식당들만 전달
 	const handleComplete = () => {
-		onClose(selectedRestaurants);
+		onClose(newSelectedRestaurants);
 	};
 
 	return (
-		<div className="bg-gray-02 min-h-screen ">
+		<div className="bg-gray-02 min-h-screen">
 			<NavBar
 				variant="iconWithText"
-				leftText="식당 선택하기"
+				leftText="식당 추가하기"
 				onLeftIconClick={() => {
 					onClose();
 				}}
 			/>
 
 			<div className="px-4.5 py-6.25">
-				<SearchInput placeholder="찾으려는 식당을 image.png검색해 주세요" id="restaurantName" onChange={handleSearch} value={searchValue} />
+				<SearchInput placeholder="찾으려는 식당을 검색해 주세요" id="restaurantName" onChange={handleSearch} value={searchValue} />
 
 				<div className={`bg-white rounded-[20px] mt-5.5 mb-5.5 px-4.5 ${selectedOpen && selectedRestaurants.length > 0 ? 'py-5' : 'py-2.5'}`}>
 					<div
@@ -136,7 +149,7 @@ const SelectRestaurantPopup = ({ onClose, initialSelectedIds = [] }: ISelectRest
 					>
 						<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray10} className="font-semibold">
 							선택된 식당
-							<span className="font-medium ml-1">{selectedIds.length}</span>
+							<span className="font-medium ml-1">{allSelectedIds.length}</span>
 						</Typography>
 						<Icon name={selectedOpen ? 'selectClose' : 'selectOpen'} width={16} />
 					</div>
@@ -164,7 +177,14 @@ const SelectRestaurantPopup = ({ onClose, initialSelectedIds = [] }: ISelectRest
 											</Typography>
 										</div>
 									</div>
-									<Icon name="validInput" size={22} className="cursor-pointer" onClick={() => handleRemoveSelected(r.teamRestaurantId)} />
+									{/* 기존 식당은 삭제 불가, 새로 선택된 식당만 삭제 가능 */}
+									{existingRestaurantIds.includes(r.teamRestaurantId) ? (
+										<div className="w-[22px] h-[22px] bg-gray-04 rounded-full flex items-center justify-center">
+											<Icon name="close" size={12} className="text-gray-06" />
+										</div>
+									) : (
+										<Icon name="validInput" size={22} className="cursor-pointer" onClick={() => handleRemoveNewSelected(r.teamRestaurantId)} />
+									)}
 								</div>
 							))}
 						</div>
@@ -197,12 +217,12 @@ const SelectRestaurantPopup = ({ onClose, initialSelectedIds = [] }: ISelectRest
 						</FilterButton>
 					</div>
 
-					<div className="flex flex-col gap-5 ">
+					<div className="flex flex-col gap-5">
 						{filteredRestaurants.map((r) => (
 							<div
 								key={r.teamRestaurantId}
 								className="flex items-center gap-[15px] cursor-pointer border-b border-gray-03 pb-[15px]"
-								onClick={() => handleSelect(r.teamRestaurantId)}
+								onClick={() => handleNewSelect(r.teamRestaurantId)}
 							>
 								<div className="w-[71px] h-[71px] bg-gray-04 rounded-[6.656px]">
 									{r.reviewImagePath && <img src={r.reviewImagePath} alt={r.restaurantName} className="w-full h-full object-cover rounded-[6.656px]" />}
@@ -224,19 +244,14 @@ const SelectRestaurantPopup = ({ onClose, initialSelectedIds = [] }: ISelectRest
 										</Typography>
 									</div>
 								</div>
-								{/* 체크표시 - 이미 선택된 식당도 체크 표시 */}
-								{selectedIds.includes(r.teamRestaurantId) ? (
-									<Icon name="validInput" width={22} className="text-primary-200" />
-								) : (
-									<div className="w-[22px] h-[22px] border border-gray-05 rounded-full" />
-								)}
+								<div className="w-[22px] h-[22px] border border-gray-05 rounded-full" />
 							</div>
 						))}
 					</div>
 				</div>
 
 				<div className="fixed bottom-[30px] left-0 w-full px-4.5">
-					<Button variant={selectedIds.length > 0 ? 'active' : 'disabled'} onClick={handleComplete}>
+					<Button variant={newSelectedIds.length > 0 ? 'active' : 'disabled'} onClick={handleComplete}>
 						선택 완료
 					</Button>
 				</div>
@@ -245,4 +260,4 @@ const SelectRestaurantPopup = ({ onClose, initialSelectedIds = [] }: ISelectRest
 	);
 };
 
-export default SelectRestaurantPopup;
+export default AddRestaurantPopup;

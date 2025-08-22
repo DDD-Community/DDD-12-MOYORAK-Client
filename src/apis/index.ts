@@ -1,17 +1,20 @@
 import axios from 'axios';
 
-interface IApiErrorResponse {
-	type: string;
-	title: string;
-	status: number;
-	detail: string;
-	instance: string;
-}
+// interface IApiErrorResponse {
+// 	type: string;
+// 	title: string;
+// 	status: number;
+// 	detail: string;
+// 	instance: string;
+// }
 
 type TApiResponse<T = unknown> = T;
 
 const api = axios.create({
 	baseURL: import.meta.env.VITE_API_URL,
+	headers: {
+		Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1IiwiZW1haWwiOiJhbnRqZGdrQGdtYWlsLmNvbSIsIm5hbWUiOiLsnbTrrLTshLEiLCJpYXQiOjE3NTU4NzA1NTEsImV4cCI6MTc1NTk1Njk1MX0.tDLe3uiOxi1eKI3_3vRJh9pglvFJnrQmqNwdE5AkqF0b7GS4U8XZgotPzJE3vKRijhTjiTGNQWo_TAwkD0gFcQ`,
+	},
 });
 
 export const get = async <T = unknown>(url: string, params?: object): Promise<TApiResponse<T>> => {
@@ -34,30 +37,30 @@ export const del = async <T = unknown>(url: string, params?: object): Promise<TA
 	return data;
 };
 
-// 요청 인터셉터 추가: localStorage에서 토큰을 가져와 Authorization 헤더에 추가
-api.interceptors.request.use(
-	(config) => {
-		const accessToken = localStorage.getItem('accessToken');
-		if (accessToken) {
-			config.headers.Authorization = `Bearer ${accessToken}`;
-		}
-		return config;
-	},
-	(error) => {
-		return Promise.reject(error);
-	}
-);
+// // 요청 인터셉터 추가: localStorage에서 토큰을 가져와 Authorization 헤더에 추가
+// api.interceptors.request.use(
+// 	(config) => {
+// 		const accessToken = localStorage.getItem('accessToken');
+// 		if (accessToken) {
+// 			config.headers.Authorization = `Bearer ${accessToken}`;
+// 		}
+// 		return config;
+// 	},
+// 	(error) => {
+// 		return Promise.reject(error);
+// 	}
+// );
 
-api.interceptors.response.use(
-	(response) => response,
-	(error) => {
-		// AxiosError 타입으로 캐스팅하여 detail 필드에 접근 가능
-		if (axios.isAxiosError(error) && error.response) {
-			const apiError: IApiErrorResponse = error.response.data;
-			console.error('API Error:', apiError);
-			// 에러를 다시 던져서 호출하는 곳에서 catch 할 수 있도록 합니다.
-			return Promise.reject(apiError); // 또는 new Error(apiError.detail) 등
-		}
-		return Promise.reject(error);
-	}
-);
+// api.interceptors.response.use(
+// 	(response) => response,
+// 	(error) => {
+// 		// AxiosError 타입으로 캐스팅하여 detail 필드에 접근 가능
+// 		if (axios.isAxiosError(error) && error.response) {
+// 			const apiError: IApiErrorResponse = error.response.data;
+// 			console.error('API Error:', apiError);
+// 			// 에러를 다시 던져서 호출하는 곳에서 catch 할 수 있도록 합니다.
+// 			return Promise.reject(apiError); // 또는 new Error(apiError.detail) 등
+// 		}
+// 		return Promise.reject(error);
+// 	}
+// );

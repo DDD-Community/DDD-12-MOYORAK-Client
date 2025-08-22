@@ -45,7 +45,7 @@ const Pot = () => {
 	const { getCategoryDisplay } = useCategoryMapping();
 
 	const teamId = 1;
-	const size = 10;
+	const size = 100;
 	const currentPage = 1;
 
 	const getPotList = async () => {
@@ -209,7 +209,7 @@ const Pot = () => {
 			</div>
 
 			{potList?.data && potList.data.length > 0 ? (
-				<div className="mb-6">
+				<div className="mb-20">
 					<div className="space-y-5.5">
 						{potList.data.map((pot) => {
 							const realTimeVoteInfo = getRealTimeVoteStatus(pot.startDate, pot.endDate);

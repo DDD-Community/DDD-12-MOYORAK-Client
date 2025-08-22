@@ -69,7 +69,7 @@ const RestaurantDetail = () => {
 	const getRestaurantReviewPhotos = async () => {
 		if (!teamRestaurantId) return;
 
-		const response = await get(`/teams/${teamId}/restaurants/${teamRestaurantId}/reviews/photos?currentPage=1&size=10`);
+		const response = await get(`/teams/${teamId}/restaurants/${teamRestaurantId}/reviews/photos?currentPage=1&size=100`);
 		setReviewPhotos(response as IReviewPhotosResponse);
 	};
 

@@ -2,10 +2,8 @@ import { useEffect, useState } from 'react';
 
 import { get } from '@/apis';
 import noParticipant from '@/assets/noParticipant.png';
-import Button from '@/components/Button/Button';
 import Icon from '@/components/Icon';
 import Typography from '@/components/Typography';
-import { BUTTON_TEXT } from '@/constants/data.constant';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 
 interface IParticipantResponse {
@@ -18,13 +16,7 @@ interface IParticipantResponse {
 	};
 }
 
-interface ParticipantProps {
-	timeStatus: 'before_start' | 'voting_active' | 'after_end';
-	isParticipated: boolean;
-	onParticipateClick: () => void;
-}
-
-const Participant = ({ timeStatus, isParticipated, onParticipateClick }: ParticipantProps) => {
+const Participant = () => {
 	const [expandedParticipant, setExpandedParticipant] = useState<number | null>(null);
 	const [participantList, setParticipantList] = useState<IParticipantResponse[]>([]);
 
@@ -33,36 +25,6 @@ const Participant = ({ timeStatus, isParticipated, onParticipateClick }: Partici
 			const newValue = prev === participantId ? null : participantId;
 			return newValue;
 		});
-	};
-
-	// 투표 상태에 따른 버튼 텍스트
-	const getButtonText = (): string => {
-		if (timeStatus === 'after_end') {
-			return BUTTON_TEXT.voteEnded;
-		}
-
-		if (!isParticipated) {
-			return BUTTON_TEXT.participate;
-		}
-
-		const buttonTextMap = {
-			before_start: BUTTON_TEXT.participated,
-			voting_active: BUTTON_TEXT.vote,
-		};
-
-		return buttonTextMap[timeStatus] || BUTTON_TEXT.participate;
-	};
-
-	// 버튼 비활성화 여부
-	const isButtonDisabled = (): boolean => {
-		if (timeStatus === 'after_end') return true;
-		if (isParticipated && timeStatus === 'before_start') return true;
-		return false;
-	};
-
-	// 버튼 스타일 클래스
-	const getButtonClassName = (): string => {
-		return isButtonDisabled() ? 'bg-gray-03 text-gray-08' : 'bg-[#BEEE05] text-gray-10';
 	};
 
 	const partyId = 1;
@@ -202,17 +164,6 @@ const Participant = ({ timeStatus, isParticipated, onParticipateClick }: Partici
 					<img src={noParticipant} alt="noParticipant" className="w-30 h-30.75" />
 				</div>
 			)}
-
-			<div className="fixed bottom-7.5 w-full left-0 px-4.5">
-				<Button
-					variant={isButtonDisabled() ? 'disabled' : 'active'}
-					onClick={onParticipateClick}
-					disabled={isButtonDisabled()}
-					className={getButtonClassName()}
-				>
-					{getButtonText()}
-				</Button>
-			</div>
 		</div>
 	);
 };

@@ -41,7 +41,7 @@ const RestaurantSearch = () => {
 	const getRestaurants = async (keyword: string) => {
 		if (!keyword.trim()) return;
 		try {
-			const response = await get<IRestaurantResponse>(`/restaurants/search?keyword=${keyword}&size=10&currentPage=1`);
+			const response = await get<IRestaurantResponse>(`/restaurants/search?keyword=${keyword}&size=100&currentPage=1`);
 			setRestaurants((response as IRestaurantResponse).data || []);
 			setSearchPerformed(true);
 		} catch (error) {

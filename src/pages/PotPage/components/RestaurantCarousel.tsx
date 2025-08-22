@@ -166,9 +166,9 @@ const RestaurantCarousel = ({
 
 	const slickSettings = {
 		dots: false,
-		infinite: restaurants.length > 2,
+		infinite: restaurants.length > 1,
 		speed: 500,
-		slidesToShow: restaurants.length <= 2 ? restaurants.length : 1,
+		slidesToShow: restaurants.length <= 1 ? restaurants.length : 1,
 		slidesToScroll: 1,
 		centerMode: restaurants.length > 2,
 		arrows: restaurants.length > 2,

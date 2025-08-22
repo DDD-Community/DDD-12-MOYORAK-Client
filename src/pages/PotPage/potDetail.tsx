@@ -2,15 +2,17 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { get, post } from '@/apis';
-import Button from '@/components/Button/Button';
+import { useMutationAddRestaurantToParty } from '@/apis/useMutationAddRestaurantToParty';
+import { useMutationVote } from '@/apis/useMutationVote';
 import FilterButton from '@/components/FilterButton/FilterButton';
 import Icon from '@/components/Icon';
 import NavBar from '@/components/NavBar/NavBar';
 import Typography from '@/components/Typography';
-import { BUTTON_TEXT } from '@/constants/data.constant';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 import { useCategoryMapping } from '@/hooks/useCategoryMapping';
+import ParticipationButton from '@/pages/PotPage/components/ParticipationButton';
 
+import AddRestaurantPopup from './components/AddRestaurantPopup';
 import Participant from './components/Participant';
 import RestaurantCarousel from './components/RestaurantCarousel';
 
@@ -23,6 +25,8 @@ interface IPotDetailResponse {
 	id: number;
 	title: string;
 	content: string;
+	attendable: boolean;
+	attended: boolean;
 	vote: {
 		id: number;
 		voteType: string;
@@ -53,15 +57,17 @@ const PotDetail = () => {
 	const navigate = useNavigate();
 	const [potDetail, setPotDetail] = useState<IPotDetailResponse | null>(null);
 	const { getCategoryDisplay } = useCategoryMapping();
+	const { mutate: voteRestaurant, isPending: isVoting } = useMutationVote();
+	const { mutate: addRestaurantToParty, isPending: isAddingRestaurant } = useMutationAddRestaurantToParty();
 
 	// 상태 관리
 	const [activeTab, setActiveTab] = useState<TabType>('restaurant');
 	const [showToast, setShowToast] = useState(false);
 	const [viewType, setViewType] = useState<ViewType>('carousel');
-	const [isParticipated, setIsParticipated] = useState(false);
 	const [isVoted, setIsVoted] = useState(false);
 	const [selectedRestaurantId, setSelectedRestaurantId] = useState<number | null>(null);
 	const [hoveredRestaurantId, setHoveredRestaurantId] = useState<number | null>(null);
+	const [showAddRestaurantPopup, setShowAddRestaurantPopup] = useState(false);
 
 	const teamId = 1;
 	const { id } = useParams();
@@ -104,47 +110,12 @@ const PotDetail = () => {
 		return statusMap[timeStatus];
 	};
 
-	const getButtonText = (): string => {
-		if (!potDetail) return '로딩 중...';
-
-		const timeStatus = getCurrentTimeStatus();
-
-		if (timeStatus === 'after_end') {
-			return BUTTON_TEXT.voteEnded;
-		}
-
-		if (!isParticipated) {
-			return BUTTON_TEXT.participate;
-		}
-
-		const buttonTextMap = {
-			before_start: BUTTON_TEXT.participated,
-			voting_active: isVoted ? BUTTON_TEXT.voteAgain : BUTTON_TEXT.vote,
-		};
-
-		return buttonTextMap[timeStatus] || BUTTON_TEXT.participate;
-	};
-
-	const isButtonDisabled = (): boolean => {
-		if (!potDetail) return true;
-
-		const timeStatus = getCurrentTimeStatus();
-
-		if (timeStatus === 'after_end') return true;
-		if (!isParticipated) return false;
-		if (timeStatus === 'before_start') return true;
-		if (timeStatus === 'voting_active') {
-			if (isVoted) return false;
-			return selectedRestaurantId === null;
-		}
-		return true;
-	};
-
 	const shouldShowAddRestaurantButton = (): boolean => {
 		if (!potDetail) return false;
 
 		const timeStatus = getCurrentTimeStatus();
-		return isParticipated && timeStatus === 'before_start';
+		// 참여했고, 투표 전 또는 투표 중일 때 식당 추가 가능
+		return potDetail.attended && (timeStatus === 'before_start' || timeStatus === 'voting_active');
 	};
 
 	const partyAttendance = async () => {
@@ -158,29 +129,45 @@ const PotDetail = () => {
 
 	// 이벤트 핸들러들
 	const handleParticipateClick = (): void => {
-		partyAttendance();
-		if (isButtonDisabled()) return;
-
-		const timeStatus = getCurrentTimeStatus();
-
-		if (!isParticipated) {
+		if (!potDetail?.attended) {
+			// 참여하지 않은 경우 참여 API 호출
+			partyAttendance();
 			handleParticipate();
-		} else if (timeStatus === 'voting_active') {
+		} else if (getCurrentTimeStatus() === 'voting_active') {
+			// 이미 참여한 경우 투표 액션
 			handleVoteAction();
 		}
 	};
 
 	const handleParticipate = (): void => {
 		setShowToast(true);
-		setIsParticipated(true);
+		// API 성공 후 데이터를 다시 가져오므로 상태는 업데이트하지 않음
 		setTimeout(() => setShowToast(false), 3000);
+		// 팟 상세 정보 다시 가져오기
+		getPotDetail();
 	};
 
 	const handleVoteAction = (): void => {
 		if (!isVoted) {
-			if (selectedRestaurantId) {
-				setIsVoted(true);
-				// TODO: 실제 투표 API 호출 로직 추가
+			if (selectedRestaurantId && potDetail) {
+				// 투표 API 호출
+				voteRestaurant(
+					{
+						teamId,
+						partyId: Number(id),
+						voteId: potDetail.vote.id,
+						candidateId: selectedRestaurantId,
+					},
+					{
+						onSuccess: () => {
+							setIsVoted(true);
+							getPotDetail();
+						},
+						onError: (error) => {
+							console.error('투표 실패:', error);
+						},
+					}
+				);
 			}
 		} else {
 			resetVote();
@@ -203,7 +190,42 @@ const PotDetail = () => {
 	};
 
 	const canSelectRestaurant = (): boolean => {
-		return isParticipated && getCurrentTimeStatus() === 'voting_active' && !isVoted;
+		return potDetail?.attended === true && getCurrentTimeStatus() === 'voting_active' && !isVoted;
+	};
+
+	// 식당 추가 핸들러
+	const handleAddRestaurant = (
+		selectedRestaurants?: Array<{
+			teamRestaurantId: number;
+			restaurantName: string;
+			restaurantCategory: string;
+			averageReviewScore: number;
+			reviewCount: number;
+			reviewImagePath: string;
+		}>
+	) => {
+		if (selectedRestaurants && selectedRestaurants.length > 0 && potDetail) {
+			addRestaurantToParty(
+				{
+					teamId,
+					partyId: Number(id),
+					teamRestaurantId: selectedRestaurants[0].teamRestaurantId,
+					voteId: potDetail.vote.id,
+				},
+				{
+					onSuccess: () => {
+						// 식당 추가 성공 시 팟 상세 정보 다시 가져오기
+						getPotDetail();
+						setShowToast(true);
+						setTimeout(() => setShowToast(false), 3000);
+					},
+					onError: (error) => {
+						console.error('식당 추가 실패:', error);
+					},
+				}
+			);
+		}
+		setShowAddRestaurantPopup(false);
 	};
 
 	// UI 스타일 관련 함수들
@@ -219,10 +241,6 @@ const PotDetail = () => {
 		}
 
 		return 'bg-white';
-	};
-
-	const getButtonClassName = (): string => {
-		return isButtonDisabled() ? 'bg-gray-03 text-gray-08' : 'bg-[#BEEE05] text-gray-10';
 	};
 
 	// 시간 포맷팅 함수
@@ -363,7 +381,7 @@ const PotDetail = () => {
 				<div className="px-5 py-2.5 rounded-[10px] bg-black/70 backdrop-blur-2px shadow-md flex items-center gap-1.25">
 					<Icon name="check" size={14} />
 					<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.white} className="font-medium">
-						팟에 참여하였습니다.
+						{isAddingRestaurant ? '식당을 추가하였습니다.' : '팟에 참여하였습니다.'}
 					</Typography>
 				</div>
 			</div>
@@ -385,156 +403,174 @@ const PotDetail = () => {
 
 	return (
 		<>
-			<NavBar variant="iconWithText" leftText="팟 상세보기" leftIcon="back" onLeftIconClick={() => navigate('/pot')} />
+			{showAddRestaurantPopup ? (
+				<AddRestaurantPopup onClose={handleAddRestaurant} existingRestaurantIds={potDetail.candidates.map((candidate) => candidate.teamRestaurantId)} />
+			) : (
+				<>
+					<NavBar variant="iconWithText" leftText="팟 상세보기" leftIcon="back" onLeftIconClick={() => navigate('/pot')} />
 
-			<div className="h-full bg-white pt-6.25">
-				{/* 헤더 섹션 */}
-				<div className="flex flex-col items-center mb-5">
-					<FilterButton
-						variant="clicked"
-						borderRadius="20"
-						className={
-							getCurrentTimeStatus() === 'after_end'
-								? 'bg-gray-03 text-gray-07 border-gray-06'
-								: getCurrentTimeStatus() === 'before_start'
-									? 'bg-[rgba(190,238,5,0.30)] text-[#70CE13] border-primary-200'
-									: 'bg-[rgba(255,107,107,0.15)] text-danger-02 border-danger-02'
-						}
-					>
-						{getVoteStatusText()}
-					</FilterButton>
-					<Typography variant={FONT_VARIANT.header02} fontColor={PALETTE.gray10} className="font-semibold mt-2.25 mb-1.25">
-						{potDetail.title}
-					</Typography>
-					<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray07}>
-						{potDetail.content}
-					</Typography>
-				</div>
-
-				{/* 시간 정보 섹션 */}
-				<div className="px-4.5 mb-5.5">
-					<div className="px-11.25 py-2.75 rounded-[20px] border border-gray-03 bg-gray-01 flex justify-between">
-						<div className="flex flex-col">
-							<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray08}>
-								투표시작
-							</Typography>
-							<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray09} className="font-semibold">
-								{formatTime(potDetail.vote.startDate)}
-							</Typography>
-						</div>
-						<div className="flex flex-col">
-							<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray08}>
-								투표마감
-							</Typography>
-							<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray09} className="font-semibold">
-								{formatTime(potDetail.vote.expiredDate)}
-							</Typography>
-						</div>
-						<div className="flex flex-col">
-							<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray08}>
-								식사시간
-							</Typography>
-							<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray09} className="font-semibold">
-								{formatTime(potDetail.vote.mealDate)}
-							</Typography>
-						</div>
-					</div>
-				</div>
-
-				{/* 탭 네비게이션 */}
-				<div className="flex border-b border-gray-03">
-					<button
-						onClick={() => setActiveTab('restaurant')}
-						className={`flex-1 py-2.5 transition-all ${activeTab === 'restaurant' ? 'border-b-2 border-gray-10' : ''}`}
-					>
-						<Typography
-							variant={FONT_VARIANT.body01}
-							fontColor={activeTab === 'restaurant' ? PALETTE.gray10 : PALETTE.gray08}
-							className={activeTab === 'restaurant' ? 'font-semibold' : 'font-normal'}
-						>
-							식당 정보
-						</Typography>
-					</button>
-					<button
-						onClick={() => setActiveTab('participant')}
-						className={`flex-1 pb-3 transition-all ${activeTab === 'participant' ? 'border-b-2 border-gray-10' : ''}`}
-					>
-						<Typography
-							variant={FONT_VARIANT.body01}
-							fontColor={activeTab === 'participant' ? PALETTE.gray10 : PALETTE.gray08}
-							className={activeTab === 'participant' ? 'font-semibold' : 'font-normal'}
-						>
-							참여자
-						</Typography>
-					</button>
-				</div>
-
-				{/* 식당 정보 탭 */}
-				{activeTab === 'restaurant' && (
-					<div className="bg-[#f5f5f5] pt-5 h-screen">
-						{/* 상단 컨트롤 */}
-						<div className="flex justify-between items-center mb-5 px-4.5 ">
-							<div className="flex items-center">
-								<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray08} className="font-medium mr-0.75">
-									식당
-								</Typography>
-								<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray10} className="font-semibold">
-									{potDetail.candidates.length}개
-								</Typography>
-								<Icon
-									name={viewType === 'carousel' ? 'activeCard' : 'card'}
-									size={18}
-									className="ml-2.5 mr-2.25"
-									onClick={() => setViewType(viewType === 'carousel' ? 'list' : 'carousel')}
-								/>
-								<Icon name={viewType === 'list' ? 'activeList' : 'list'} size={18} onClick={() => setViewType(viewType === 'list' ? 'carousel' : 'list')} />
-							</div>
-							{shouldShowAddRestaurantButton() && (
-								<button className="flex items-center gap-1 px-3 py-1.5 rounded-[17px] bg-gray-01 border border-gray-03">
-									<Icon name="restaurantPlus" size={16} className="text-gray-08" />
-									<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray08} className="font-semibold">
-										식당 추가
-									</Typography>
-								</button>
-							)}
-						</div>
-
-						{/* 식당 목록 */}
-						{viewType === 'carousel' && (
-							<RestaurantCarousel
-								restaurants={potDetail.candidates}
-								selectedRestaurantId={selectedRestaurantId}
-								canSelectRestaurant={canSelectRestaurant()}
-								timeStatus={getCurrentTimeStatus()}
-								onCardClick={(candidate) => handleRestaurantSelect(candidate.candidateId)}
-								isVoted={isVoted}
-								voters={potDetail.voters}
-							/>
-						)}
-						{viewType === 'list' && renderRestaurantList()}
-
-						{/* 하단 버튼 */}
-						<div className="fixed bottom-7.5 w-full left-0 px-4.5">
-							<Button
-								variant={isButtonDisabled() ? 'disabled' : 'active'}
-								onClick={handleParticipateClick}
-								disabled={isButtonDisabled()}
-								className={getButtonClassName()}
+					<div className="h-full bg-white pt-6.25">
+						{/* 헤더 섹션 */}
+						<div className="flex flex-col items-center mb-5">
+							<FilterButton
+								variant="clicked"
+								borderRadius="20"
+								className={
+									getCurrentTimeStatus() === 'after_end'
+										? 'bg-gray-03 text-gray-07 border-gray-06'
+										: getCurrentTimeStatus() === 'before_start'
+											? 'bg-[rgba(190,238,5,0.30)] text-[#70CE13] border-primary-200'
+											: 'bg-[rgba(255,107,107,0.15)] text-danger-02 border-danger-02'
+								}
 							>
-								{getButtonText()}
-							</Button>
+								{getVoteStatusText()}
+							</FilterButton>
+							<Typography variant={FONT_VARIANT.header02} fontColor={PALETTE.gray10} className="font-semibold mt-2.25 mb-1.25">
+								{potDetail.title}
+							</Typography>
+							<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray07}>
+								{potDetail.content}
+							</Typography>
 						</div>
 
-						{/* 토스트 메시지 */}
-						{renderToast()}
-					</div>
-				)}
+						{/* 시간 정보 섹션 */}
+						<div className="px-4.5 mb-5.5">
+							<div className="px-11.25 py-2.75 rounded-[20px] border border-gray-03 bg-gray-01 flex justify-between">
+								<div className="flex flex-col">
+									<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray08}>
+										투표시작
+									</Typography>
+									<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray09} className="font-semibold">
+										{formatTime(potDetail.vote.startDate)}
+									</Typography>
+								</div>
+								<div className="flex flex-col">
+									<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray08}>
+										투표마감
+									</Typography>
+									<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray09} className="font-semibold">
+										{formatTime(potDetail.vote.expiredDate)}
+									</Typography>
+								</div>
+								<div className="flex flex-col">
+									<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray08}>
+										식사시간
+									</Typography>
+									<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray09} className="font-semibold">
+										{formatTime(potDetail.vote.mealDate)}
+									</Typography>
+								</div>
+							</div>
+						</div>
 
-				{/* 참여자 탭 */}
-				{activeTab === 'participant' && (
-					<Participant timeStatus={getCurrentTimeStatus()} isParticipated={isParticipated} onParticipateClick={handleParticipateClick} />
-				)}
-			</div>
+						{/* 탭 네비게이션 */}
+						<div className="flex border-b border-gray-03">
+							<button
+								onClick={() => setActiveTab('restaurant')}
+								className={`flex-1 py-2.5 transition-all ${activeTab === 'restaurant' ? 'border-b-2 border-gray-10' : ''}`}
+							>
+								<Typography
+									variant={FONT_VARIANT.body01}
+									fontColor={activeTab === 'restaurant' ? PALETTE.gray10 : PALETTE.gray08}
+									className={activeTab === 'restaurant' ? 'font-semibold' : 'font-normal'}
+								>
+									식당 정보
+								</Typography>
+							</button>
+							<button
+								onClick={() => setActiveTab('participant')}
+								className={`flex-1 pb-3 transition-all ${activeTab === 'participant' ? 'border-b-2 border-gray-10' : ''}`}
+							>
+								<Typography
+									variant={FONT_VARIANT.body01}
+									fontColor={activeTab === 'participant' ? PALETTE.gray10 : PALETTE.gray08}
+									className={activeTab === 'participant' ? 'font-semibold' : 'font-normal'}
+								>
+									참여자
+								</Typography>
+							</button>
+						</div>
+
+						{/* 식당 정보 탭 */}
+						{activeTab === 'restaurant' && (
+							<div className="bg-[#f5f5f5] pt-5 h-screen">
+								{/* 상단 컨트롤 */}
+								<div className="flex justify-between items-center mb-5 px-4.5 ">
+									<div className="flex items-center">
+										<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray08} className="font-medium mr-0.75">
+											식당
+										</Typography>
+										<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray10} className="font-semibold">
+											{potDetail.candidates.length}개
+										</Typography>
+										<Icon
+											name={viewType === 'carousel' ? 'activeCard' : 'card'}
+											size={18}
+											className="ml-2.5 mr-2.25"
+											onClick={() => setViewType(viewType === 'carousel' ? 'list' : 'carousel')}
+										/>
+										<Icon name={viewType === 'list' ? 'activeList' : 'list'} size={18} onClick={() => setViewType(viewType === 'list' ? 'carousel' : 'list')} />
+									</div>
+									{shouldShowAddRestaurantButton() && (
+										<button
+											className="flex items-center gap-1 px-3 py-1.5 rounded-[17px] bg-gray-01 border border-gray-03"
+											onClick={() => setShowAddRestaurantPopup(true)}
+											disabled={isAddingRestaurant}
+										>
+											<Icon name="restaurantPlus" size={16} className="text-gray-08" />
+											<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray08} className="font-semibold">
+												{isAddingRestaurant ? '추가 중...' : '식당 추가'}
+											</Typography>
+										</button>
+									)}
+								</div>
+
+								{/* 식당 목록 */}
+								{viewType === 'carousel' && (
+									<RestaurantCarousel
+										restaurants={potDetail.candidates}
+										selectedRestaurantId={selectedRestaurantId}
+										canSelectRestaurant={canSelectRestaurant()}
+										timeStatus={getCurrentTimeStatus()}
+										onCardClick={(candidate) => handleRestaurantSelect(candidate.candidateId)}
+										isVoted={isVoted}
+										voters={potDetail.voters}
+									/>
+								)}
+								{viewType === 'list' && renderRestaurantList()}
+
+								{/* 하단 버튼 */}
+								<ParticipationButton
+									timeStatus={getCurrentTimeStatus()}
+									attended={potDetail.attended}
+									attendable={potDetail.attendable}
+									isVoted={isVoted}
+									selectedRestaurantId={selectedRestaurantId}
+									isLoading={isVoting}
+									onParticipateClick={handleParticipateClick}
+								/>
+
+								{/* 토스트 메시지 */}
+								{renderToast()}
+							</div>
+						)}
+
+						{/* 참여자 탭 */}
+						{activeTab === 'participant' && (
+							<div className="bg-[#f5f5f5] pt-5 h-screen">
+								<Participant />
+								<ParticipationButton
+									timeStatus={getCurrentTimeStatus()}
+									attended={potDetail.attended}
+									attendable={potDetail.attendable}
+									isLoading={isVoting}
+									onParticipateClick={handleParticipateClick}
+								/>
+							</div>
+						)}
+					</div>
+				</>
+			)}
 		</>
 	);
 };
