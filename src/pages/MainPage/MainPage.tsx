@@ -1,10 +1,12 @@
+import { useLocation } from 'react-router-dom';
+
+import { useQueryCompanyPosition } from '@/apis/useQueryCompanyPosition';
+import { useQueryTeamRestaurantsLocations } from '@/apis/useQueryTeamRestaurantsLocations';
 import KakaoMap from '@/components/KakaoMap';
 import NavBar from '@/components/NavBar/NavBar';
 
 import MainBottomSheet from './components/MainBottomSheet';
 import MainIntro from './components/MainIntro';
-import { useQueryTeamRestaurantsLocations } from '@/apis/useQueryTeamRestaurantsLocations';
-import { useQueryCompanyPosition } from '@/apis/useQueryCompanyPosition';
 
 const COMPANY_LOCATION = {
 	center: { lat: 37.5665, lng: 126.978 },
@@ -12,7 +14,7 @@ const COMPANY_LOCATION = {
 };
 
 const MainPage = () => {
-	const isLogin = localStorage.getItem('accessToken');
+	const isLogin = useLocation().state?.isLogin || Boolean(localStorage.getItem('accessToken'));
 	const companyId = localStorage.getItem('companyId');
 
 	const { data } = useQueryTeamRestaurantsLocations(8);
