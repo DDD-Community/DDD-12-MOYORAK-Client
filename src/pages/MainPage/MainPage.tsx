@@ -16,8 +16,9 @@ const COMPANY_LOCATION = {
 const MainPage = () => {
 	const isLogin = useLocation().state?.isLogin || Boolean(localStorage.getItem('accessToken'));
 	const companyId = localStorage.getItem('companyId');
+	const teamId = localStorage.getItem('teamId');
 
-	const { data } = useQueryTeamRestaurantsLocations(8);
+	const { data } = useQueryTeamRestaurantsLocations(Number(teamId));
 	const { data: company } = useQueryCompanyPosition(Number(companyId));
 
 	if (isLogin) {
