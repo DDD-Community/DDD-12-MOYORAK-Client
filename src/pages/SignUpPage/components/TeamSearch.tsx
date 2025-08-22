@@ -58,7 +58,7 @@ const TeamSearch = () => {
 					setTeam(e.target.value);
 					setIsSearchEnabled(false);
 				}}
-				isSuccess={isRegisterTeam}
+				isSuccess={isRegisterTeam && teamList?.teams.length === 1}
 				isError={teamList?.teams.length === 0}
 				message={validMessage}
 				rightButton={

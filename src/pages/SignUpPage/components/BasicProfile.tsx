@@ -15,17 +15,18 @@ const BasicProfile = () => {
 
 	const { mutate } = useMutationAuthSignUp();
 	const { mutate: signIn } = useMutationAuthSignIn();
+	console.log(username, birth, gender);
 
 	const onSignup = () => {
 		if (!gender) return;
-
+		console.log('?');
 		mutate(
 			{
-				email: state.email,
-				name: username,
+				email: 'testets@testestest.com',
+				name: '7YGs66Gx',
 				gender: gender,
 				birthday: birth.replace(/\//g, '-'),
-				profileImage: state.profileImage,
+				profileImage: 'https://lh3.googleusercontent.com/a/ACg8ocLMpAt_hH173E0VqR68U6Gc6DSripu7dTYr1fEEpMGXGpZOcZA=s96-c',
 			},
 			{
 				onSuccess: (data) => {

@@ -1,28 +1,38 @@
-import { useLocation } from 'react-router-dom';
-
 import KakaoMap from '@/components/KakaoMap';
 import NavBar from '@/components/NavBar/NavBar';
 
 import MainBottomSheet from './components/MainBottomSheet';
 import MainIntro from './components/MainIntro';
 import { useQueryTeamRestaurantsLocations } from '@/apis/useQueryTeamRestaurantsLocations';
+import { useQueryCompanyPosition } from '@/apis/useQueryCompanyPosition';
 
 const COMPANY_LOCATION = {
 	center: { lat: 37.5665, lng: 126.978 },
-	placeName: '서울특별시청',
+	placeName: '디폴트 회사',
 };
 
 const MainPage = () => {
-	const { state } = useLocation() as { state?: { login: boolean } };
+	const isLogin = localStorage.getItem('accessToken');
+	const companyId = localStorage.getItem('companyId');
 
 	const { data } = useQueryTeamRestaurantsLocations(8);
+	const { data: company } = useQueryCompanyPosition(Number(companyId));
 
-	if (state?.login) {
+	if (isLogin) {
 		return (
 			<>
-				<NavBar variant="iconWithTextAndRightIcon" leftIcon="company" leftText="WEB 2팀" rightIcon="menu" />
-				<KakaoMap companyLocation={COMPANY_LOCATION} optionsList={data?.locations || []} />
-				<MainBottomSheet />
+				<div className="flex flex-col h-screen">
+					<NavBar variant="iconWithTextAndRightIcon" leftIcon="company" leftText="WEB 2팀" rightIcon="menu" onRightIconClick={() => console.log('')} />
+					<KakaoMap
+						companyLocation={{
+							center: { lat: company?.latitude || 37.5665, lng: company?.longtitude || 126.978 },
+							level: 2,
+							placeName: '회사',
+						}}
+						optionsList={data?.locations || []}
+					/>
+					<MainBottomSheet />
+				</div>
 			</>
 		);
 	}
