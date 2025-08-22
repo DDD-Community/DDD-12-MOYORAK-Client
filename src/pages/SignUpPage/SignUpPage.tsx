@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import NavBar from '@/components/NavBar/NavBar';
 import Typography from '@/components/Typography';
@@ -15,9 +15,8 @@ import TeamSearch from './components/TeamSearch';
 const TOTAL_STEPS = 4;
 
 const SignUpPage = () => {
-	const { state } = useLocation();
+	const navigate = useNavigate();
 
-	console.log(state);
 	const [searchParams, setSearchParams] = useSearchParams();
 
 	const step = useSignupStore((state) => state.step);
@@ -46,8 +45,7 @@ const SignUpPage = () => {
 
 	const handlePrevStep = () => {
 		if (step === 1) {
-			// TODO) 뒤로가기 막기 추가
-			alert('못가요');
+			navigate('/auth', { replace: true });
 		} else {
 			prevStep();
 		}
@@ -62,7 +60,7 @@ const SignUpPage = () => {
 			<NavBar variant="iconOnly" onLeftIconClick={handlePrevStep} />
 			{step === 2 && (
 				<div className="flex justify-end mt-5 mr-5 mb-[23px]">
-					<button onClick={nextStep} disabled={allergyFoods?.length === 0 || dislikedFoods?.length === 0}>
+					<button onClick={nextStep} disabled={allergyFoods?.length === 0 || dislikedFoods?.length === 0 ? true : false}>
 						<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray09}>
 							건너뛰기
 						</Typography>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useQuerySearchCompany } from '@/apis/useQuerySearchCompany';
 import Button from '@/components/Button/Button';
@@ -9,6 +9,8 @@ import Input from '@/components/Input/Input';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 import { useSignupStore } from '@/store/signupStore';
+import { useMutationAddCompany } from '@/apis/useMutationAddCompany';
+import useKakaoMapSdk from '@/hooks/useKakaoMapSdk';
 
 const CompanySearch = () => {
 	const { nextStep, company, setCompany, baseAddress, setBaseAddress, detailAddress, setDetailAddress } = useSignupStore();
@@ -18,14 +20,22 @@ const CompanySearch = () => {
 	// 신규 등록 버튼 클릭 여부
 	const [isRegisterCompany, setIsRegisterCompany] = useState<boolean>(false);
 
-	const { isSuccess, isError } = useQuerySearchCompany(company, isSearchEnabled && !isRegisterCompany);
+	// 회사 검색
+	const { isSuccess, isError, data: companyList } = useQuerySearchCompany(company, isSearchEnabled && !isRegisterCompany);
 
-	const getValidMessage = () => {
-		if (isRegisterCompany) return '';
-		if (isSuccess) return '입력한 회사 이름이 초대받은 회사 이름과 일치합니다.';
-		if (isError) return 'Dynamic Developer Designer는 아직 등록되어 있지 않습니다.';
-		return '';
-	};
+	// 회사 저장
+	const { mutate } = useMutationAddCompany({
+		onSuccess: (data) => {
+			(localStorage.setItem('companyId', String(data.companyId)), nextStep());
+		},
+	});
+
+	const validMessage = useMemo(() => {
+		if (!isSearchEnabled) return '';
+
+		if (companyList && companyList.searchResponses.length === 1) return '입력한 회사 이름이 초대받은 회사 이름과 일치합니다.';
+		if (companyList && companyList.searchResponses.length === 0) return `${company}는 아직 등록되어 있지 않습니다.`;
+	}, [isSearchEnabled, companyList]);
 
 	const handleOpenPostcodePopup = () => {
 		const popup = window.open('/popup-address', '우편번호 찾기', 'width=500,height=600,scrollbars=yes');
@@ -49,6 +59,54 @@ const CompanySearch = () => {
 		setIsSearchEnabled(false);
 	};
 
+	const kakaoLoaded = useKakaoMapSdk();
+
+	const getCoordinates = (address: string) => {
+		return new Promise<{ longitude: number; latitude: number }>((resolve, reject) => {
+			if (!kakaoLoaded) {
+				reject(new Error('Kakao 지도 SDK가 아직 로드되지 않았습니다.'));
+				return;
+			}
+
+			const geocoder = new kakaoLoaded.maps.services.Geocoder();
+			geocoder.addressSearch(address, (result: { x: any; y: any }[], status: any) => {
+				if (status === kakaoLoaded.maps.services.Status.OK) {
+					const { x, y } = result[0];
+					resolve({ longitude: parseFloat(x), latitude: parseFloat(y) });
+				} else {
+					reject(new Error('주소로 좌표를 찾을 수 없습니다.'));
+				}
+			});
+		});
+	};
+
+	const onSaveCompany = async () => {
+		if (!company || !baseAddress) {
+			alert('회사 이름과 주소를 입력해주세요.');
+			return;
+		}
+
+		try {
+			const { longitude, latitude } = await getCoordinates(baseAddress);
+
+			mutate({
+				name: company,
+				address: baseAddress,
+				addressDetail: detailAddress ?? '',
+				longitude,
+				latitude,
+			});
+
+			nextStep();
+		} catch (error: unknown) {
+			if (error instanceof Error) {
+				alert(error.message);
+			} else {
+				alert('알 수 없는 오류가 발생했습니다.');
+			}
+			console.error(error);
+		}
+	};
 
 	return (
 		<section className="px-5 relative">
@@ -68,7 +126,8 @@ const CompanySearch = () => {
 				onChange={(e) => setCompany(e.target.value)}
 				rightButton={
 					company &&
-					!isError && (
+					!isError &&
+					!companyList && (
 						<button type="button" className="absolute right-2 top-1/2 -translate-y-1/2" onClick={() => setIsSearchEnabled(true)}>
 							<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.primary200}>
 								입력
@@ -76,12 +135,12 @@ const CompanySearch = () => {
 						</button>
 					)
 				}
-				isSuccess={!isRegisterCompany && isSuccess}
-				isError={!isRegisterCompany && isError}
-				message={getValidMessage()}
+				isSuccess={!isRegisterCompany && isSuccess && companyList?.searchResponses.length === 1}
+				isError={!isRegisterCompany && companyList?.searchResponses.length === 0}
+				message={validMessage}
 			/>
 
-			{isError && !isRegisterCompany && (
+			{companyList && companyList.searchResponses.length === 0 && (
 				<FilterButton variant="general" className="rounded-[17px] py-1.5 flex items-center gap-0.5 mt-5" onClick={onRegisterCompany}>
 					신규 등록하기
 					<Icon name="plus" width={18} height={18} />
@@ -110,7 +169,7 @@ const CompanySearch = () => {
 			)}
 
 			<div className="fixed bottom-[30px] left-0 w-full px-5">
-				<Button variant={isSuccess || (company && baseAddress) ? 'active' : 'disabled'} onClick={nextStep}>
+				<Button variant={isSuccess || (company && baseAddress) ? 'active' : 'disabled'} onClick={onSaveCompany}>
 					<Typography variant={FONT_VARIANT.header04} fontColor={isSuccess || (company && baseAddress) ? PALETTE.primary600 : PALETTE.gray06}>
 						{isRegisterCompany ? '등록하기' : '다음'}
 					</Typography>

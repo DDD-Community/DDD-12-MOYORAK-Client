@@ -1,19 +1,13 @@
+import type { ITeamRestaurantItem } from '@/apis/useQueryTeamRestaurantList';
 import IconButton from '@/components/Button/IconButton';
 import Icon from '@/components/Icon';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 
-interface IRestaurantProps {
-	id: number;
-	name: string;
-	score: number;
-	review: number;
-}
-
-const RestaurantReview = ({ item }: { item: IRestaurantProps }) => {
+const RestaurantReview = ({ item }: { item: ITeamRestaurantItem }) => {
 	return (
 		<li className="flex items-start gap-3">
-			<img src="" alt="식당 사진" className="w-[71px] h-[71px] object-cover rounded-md" />
+			<img src={item.reviewImagePath} alt="식당 사진" className="w-[71px] h-[71px] object-cover rounded-md" />
 
 			<div className="flex flex-1 flex-col justify-between">
 				<div className="flex justify-between items-center mb-1">
@@ -28,17 +22,16 @@ const RestaurantReview = ({ item }: { item: IRestaurantProps }) => {
 				</div>
 
 				<Typography variant={FONT_VARIANT.header03} className="font-semibold mb-[3px]">
-					{item.name}
+					{item.restaurantName}
 				</Typography>
 
-				{/* 별점과 리뷰는 하단 한 줄 */}
 				<div className="flex items-center gap-1 text-gray-600">
 					<Icon name="star" width={14} height={14} />
 					<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray08}>
-						{item.score}
+						{item.averageReviewScore}
 					</Typography>
 					<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray08}>
-						{`· 리뷰 ${item.review}`}
+						{`· 리뷰 ${item.reviewCount}`}
 					</Typography>
 				</div>
 			</div>

@@ -1,12 +1,12 @@
 import { create } from 'zustand';
 
-type TGender = 'MALE' | 'FEMALE' | null;
+export type TGender = 'MALE' | 'FEMALE';
 
 interface SignupState {
 	step: number | 'success';
 	username: string;
 	birth: string;
-	gender: TGender;
+	gender: TGender | null;
 
 	allergyFoods?: string[];
 	dislikedFoods?: string[];
@@ -41,7 +41,7 @@ export const useSignupStore = create<SignupState>((set) => ({
 	company: '',
 	team: '',
 	baseAddress: '',
-	detailAddress: '',
+	detailAddress: undefined,
 
 	setUsername: (username) => set({ username }),
 	setBirth: (birth) => set({ birth }),

@@ -2,13 +2,18 @@ import { useQuery } from '@tanstack/react-query';
 
 import { get } from '.';
 
-const getSearchTeam = async (companyId: number) => {
-	return await get(`/companies/${companyId}`);
+interface ISearchTeamResponse {
+	teams: string[];
+}
+
+const getSearchTeam = async (companyId: number, team: string): Promise<ISearchTeamResponse> => {
+	return await get<ISearchTeamResponse>(`/companies/${companyId}`, { name: team });
 };
 
-export const useQuerySearchTeam = (companyId: number) => {
+export const useQuerySearchTeam = (companyId: number, team: string, enabled = true) => {
 	return useQuery({
 		queryKey: ['companies'],
-		queryFn: () => getSearchTeam(companyId),
+		enabled,
+		queryFn: () => getSearchTeam(companyId, team),
 	});
 };
