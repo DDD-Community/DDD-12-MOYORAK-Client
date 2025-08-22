@@ -1,4 +1,5 @@
 import { useMutation, type UseMutationOptions } from '@tanstack/react-query';
+
 import { post } from '.';
 
 export interface IAddTeamRequest {
@@ -7,7 +8,7 @@ export interface IAddTeamRequest {
 }
 
 export interface IAddCompanyResponse {
-	companyId: number;
+	teamId: number;
 }
 
 const postAddTeam = async ({ company, team }: IAddTeamRequest): Promise<IAddCompanyResponse> => {
