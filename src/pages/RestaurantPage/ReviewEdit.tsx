@@ -1,25 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
-import { post } from '@/apis';
+import { put } from '@/apis';
 import emptyStarIcon from '@/assets/emptyStar.png';
 import starIcon from '@/assets/star.png';
 import Button from '@/components/Button/Button';
-import { CustomDialog } from '@/components/Dialog/CustomDialog';
+import CustomDialog from '@/components/Dialog/CustomDialog';
 import FilterButton from '@/components/FilterButton/FilterButton';
 import Icon from '@/components/Icon';
 import FormLabel from '@/components/Input/FormLabel';
-import Input from '@/components/Input/Input';
 import NavBar from '@/components/NavBar/NavBar';
 import Typography from '@/components/Typography/Typography';
 import { FOOD_PREP_TIME_OPTIONS, SATISFACTION_OPTIONS, WAITING_TIME_OPTIONS } from '@/constants/data.constant';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
-import { uploadMultipleImages, validateImageFiles } from '@/utils/imageUpload';
+import { extractPathFromUrl, uploadMultipleImages, validateImageFiles } from '@/utils/imageUpload';
 
-interface IRestaurantRegistrationRequest {
-	restaurantId: number;
-	summary: string;
-	userId: number;
+interface IReviewEditRequest {
 	servingTimeId: number;
 	waitingTimeId: number;
 	score: number;
@@ -27,159 +23,122 @@ interface IRestaurantRegistrationRequest {
 	extraText: string;
 }
 
-const RestaurantRegistration = () => {
-	const [restaurantDescription, setRestaurantDescription] = useState('');
-	const [waitingTime, setWaitingTime] = useState<string>('');
-	const [foodPrepTime, setFoodPrepTime] = useState<string>('');
-	const [satisfaction, setSatisfaction] = useState<number>(0);
-	const [review, setReview] = useState<string>('');
+const ReviewEdit = () => {
+	const { id } = useParams();
+	const navigate = useNavigate();
+	const location = useLocation();
+	const reviewData = location.state;
+
+	const [waitingTime, setWaitingTime] = useState('');
+	const [foodPrepTime, setFoodPrepTime] = useState('');
+	const [satisfaction, setSatisfaction] = useState(0);
+	const [review, setReview] = useState('');
 	const [images, setImages] = useState<File[]>([]);
 	const [imageUrls, setImageUrls] = useState<string[]>([]);
+	const [existingImageUrls, setExistingImageUrls] = useState<string[]>([]);
+	const [existingImagePaths, setExistingImagePaths] = useState<string[]>([]);
 	const [isUploading, setIsUploading] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
-	const [restaurantName, setRestaurantName] = useState('');
-	const teamId = 1;
 
-	const location = useLocation();
-	const { restaurant } = (location.state as { restaurant?: { id: string; name: string } } | undefined) ?? {};
-	const navigate = useNavigate();
+	const teamId = reviewData?.teamId;
+	const teamRestaurantId = reviewData?.teamRestaurantId;
+	const name = reviewData?.name;
 
-	const [teamRestaurantId, setTeamRestaurantId] = useState<number>(0);
+	const getValueFromLabel = (label: string, options: typeof WAITING_TIME_OPTIONS) => {
+		if (!label) return '';
+
+		const normalizedLabel = label.replace(/\s/g, '');
+		const found = options.find((option) => option.label.replace(/\s/g, '') === normalizedLabel);
+
+		return found ? found.value : '';
+	};
+
+	useEffect(() => {
+		if (reviewData) {
+			const waitingTimeValue = getValueFromLabel(reviewData.waitingTime || '', WAITING_TIME_OPTIONS);
+			const foodPrepTimeValue = getValueFromLabel(reviewData.foodPrepTime || '', FOOD_PREP_TIME_OPTIONS);
+
+			setWaitingTime(waitingTimeValue);
+			setFoodPrepTime(foodPrepTimeValue);
+			setSatisfaction(reviewData.score || 0);
+			setReview(reviewData.extraText || '');
+
+			if (reviewData.photoUrls && reviewData.photoUrls.length > 0) {
+				const imagePaths = reviewData.photoUrls.map((url: string) => extractPathFromUrl(url));
+				setExistingImageUrls(reviewData.photoUrls);
+				setExistingImagePaths(imagePaths);
+			}
+		}
+	}, [reviewData]);
 
 	const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (!e.target.files) return;
 
-		const fileArr = Array.from(e.target.files).slice(0, 5 - images.length);
+		const totalImages = images.length + existingImageUrls.length;
+		const fileArr = Array.from(e.target.files).slice(0, 5 - totalImages);
 		if (fileArr.length === 0) return;
 
 		const validFiles = validateImageFiles(fileArr);
 		if (validFiles.length === 0) return;
 
 		try {
-			const { successUrls, uploadedFiles } = await uploadMultipleImages(validFiles, 5, setIsUploading);
+			const { successUrls, uploadedFiles } = await uploadMultipleImages(validFiles, 5 - totalImages, setIsUploading);
 
-			setImages((prev) => [...prev, ...uploadedFiles].slice(0, 5));
-			setImageUrls((prev) => [...prev, ...successUrls].slice(0, 5));
+			setImages((prev) => [...prev, ...uploadedFiles]);
+			setImageUrls((prev) => [...prev, ...successUrls]);
 		} catch (error) {
 			alert('이미지 업로드에 실패했습니다.');
 			console.error('이미지 업로드 에러:', error);
 		}
 	};
 
-	const removeImage = (index: number) => {
+	const removeNewImage = (index: number) => {
 		setImages((prev) => prev.filter((_, i) => i !== index));
 		setImageUrls((prev) => prev.filter((_, i) => i !== index));
 	};
 
-	const registerRestaurant = async () => {
-		try {
-			const response = await post<IRestaurantRegistrationRequest>(`/teams/${teamId}/restaurants`, {
-				restaurantId: Number(restaurant?.id),
-				summary: restaurantDescription,
-				userId: 5,
-				servingTimeId: Number(foodPrepTime),
-				waitingTimeId: Number(waitingTime),
-				score: satisfaction,
-				photoPaths: imageUrls, // 업로드된 URL들 사용
-				extraText: review,
-			} as IRestaurantRegistrationRequest);
-			setTeamRestaurantId(Number((response as unknown as { teamRestaurantId: string }).teamRestaurantId));
-			setIsOpen(true);
-		} catch (error) {
-			console.error('식당 등록에 실패했습니다:', error);
-			alert('식당 등록 실패');
-		}
+	const removeExistingImage = (index: number) => {
+		setExistingImageUrls((prev) => prev.filter((_, i) => i !== index));
+		setExistingImagePaths((prev) => prev.filter((_, i) => i !== index));
 	};
-
-	useEffect(() => {
-		if (restaurant?.name) {
-			setRestaurantName(restaurant.name);
-		}
-	}, [restaurant]);
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		registerRestaurant();
+		updateReview();
 	};
 
-	const isButtonActive =
-		restaurantName.length > 0 &&
-		restaurantDescription.length > 0 &&
-		waitingTime.length > 0 &&
-		foodPrepTime.length > 0 &&
-		satisfaction > 0 &&
-		review.length > 0 &&
-		images.length > 0 &&
-		!isUploading; // 업로드 중이 아닐 때만 활성화
+	const updateReview = async () => {
+		try {
+			const allImagePaths = [...existingImagePaths, ...imageUrls];
 
-	const handleRestaurantSearch = () => {
-		navigate('/restaurant-search');
+			await put<IReviewEditRequest>(`/teams/${teamId}/restaurants/${teamRestaurantId}/reviews/${id}`, {
+				servingTimeId: Number(foodPrepTime),
+				waitingTimeId: Number(waitingTime),
+				score: satisfaction,
+				photoPaths: allImagePaths,
+				extraText: review,
+			});
+			setIsOpen(true);
+		} catch (error) {
+			console.error('리뷰 수정에 실패했습니다:', error);
+			alert('리뷰 수정 실패');
+		}
 	};
+
+	const totalImages = images.length + existingImageUrls.length;
+	const isButtonActive = waitingTime.length > 0 && foodPrepTime.length > 0 && satisfaction > 0 && review.length > 0 && totalImages > 0 && !isUploading;
 
 	return (
 		<>
 			<NavBar
 				variant="iconWithText"
-				leftText="식당 등록"
+				leftText={name}
 				onLeftIconClick={() => {
 					navigate(-1);
 				}}
 			/>
-			<div className="bg-gray-02 min-h-screen ">
-				<form className="p-4.5 flex flex-col gap-6 " onSubmit={handleSubmit}>
-					<div className="py-6 px-4 rounded-[20px] bg-white flex flex-col gap-6.25">
-						<div className="flex flex-col gap-1.25">
-							<FormLabel label="식당 이름" isEssential id="restaurant" className="font-semibold" />
-							<div className="relative">
-								<div
-									className={`
-										w-full ${FONT_VARIANT.header02} py-[7px] pr-[48px] mb-[10px]
-										flex items-center cursor-pointer
-										transition-colors duration-200
-										border-b-[1px] ${restaurantName ? 'border-b-primary-200' : 'border-b-gray-04'}
-										hover:border-b-primary-500 focus:border-b-primary-500
-									`}
-									onClick={handleRestaurantSearch}
-									onKeyDown={(e) => {
-										if (e.key === 'Enter' || e.key === ' ') {
-											e.preventDefault();
-											handleRestaurantSearch();
-										}
-									}}
-									tabIndex={0}
-									role="button"
-									aria-label="식당 검색하기"
-								>
-									<Typography
-										variant={FONT_VARIANT.header02}
-										fontColor={restaurantName ? PALETTE.gray10 : PALETTE.gray05}
-										className={!restaurantName ? 'text-xl font-medium' : ''}
-									>
-										{restaurantName || '식당을 검색해 주세요'}
-									</Typography>
-								</div>
-								<Icon
-									name={restaurantName ? 'inputValueSearch' : 'inputSearch'}
-									size={22}
-									className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-gray-06"
-								/>
-							</div>
-						</div>
-						<div className="flex flex-col gap-1.25">
-							<Input
-								label="한줄 소개"
-								isEssential
-								id="potTitle"
-								placeholder="식당을 간단하게 소개해 주세요"
-								value={restaurantDescription}
-								onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRestaurantDescription(e.target.value)}
-							/>
-							<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray06}>
-								간단한 설명을 함께 적어주시면, 팀원들이 식당에 대해 빠르게 파악할 수 있어요.
-							</Typography>
-						</div>
-					</div>
-
+			<div className="bg-gray-02 min-h-screen">
+				<form className="p-4.5 flex flex-col gap-6" onSubmit={handleSubmit}>
 					<div className="py-6 px-4 rounded-[20px] bg-white flex flex-col gap-8.75">
 						<div className="flex flex-col gap-3.75">
 							<FormLabel label="웨이팅이 있었나요?" isEssential id="waiting" className="font-semibold" />
@@ -199,7 +158,7 @@ const RestaurantRegistration = () => {
 						</div>
 
 						<div className="flex flex-col gap-3.75">
-							<FormLabel label="음식 준비 시간은 얼마나 걸렸나요?" isEssential id="waiting" className="font-semibold" />
+							<FormLabel label="음식 준비 시간은 얼마나 걸렸나요?" isEssential id="food-prep" className="font-semibold" />
 							<div className="flex gap-2 flex-wrap">
 								{FOOD_PREP_TIME_OPTIONS.map((option) => (
 									<FilterButton
@@ -237,11 +196,11 @@ const RestaurantRegistration = () => {
 						</div>
 
 						<div className="flex flex-col gap-3.75 relative">
-							<FormLabel label="자세한 리뷰를 남겨주세요" isEssential id="satisfaction" className="font-semibold" />
+							<FormLabel label="자세한 리뷰를 남겨주세요" isEssential id="review" className="font-semibold" />
 							<div className="flex gap-2 flex-wrap">
 								<label
 									className={`w-[80px] h-[80px] flex flex-col items-center justify-center border border-gray-05 rounded-[12px] bg-white cursor-pointer relative ${
-										images.length >= 5 || isUploading ? 'opacity-50 pointer-events-none' : ''
+										totalImages >= 5 || isUploading ? 'opacity-50 pointer-events-none' : ''
 									}`}
 								>
 									<input
@@ -249,7 +208,7 @@ const RestaurantRegistration = () => {
 										accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/bmp,image/heic,image/heif,.heic,.heif"
 										multiple
 										hidden
-										disabled={images.length >= 5 || isUploading}
+										disabled={totalImages >= 5 || isUploading}
 										onChange={handleImageChange}
 									/>
 									{isUploading ? (
@@ -263,8 +222,8 @@ const RestaurantRegistration = () => {
 										<>
 											<Icon name="camera" size={24} />
 											<div className="flex items-center">
-												<Typography variant={FONT_VARIANT.label01} fontColor={images.length > 0 ? PALETTE.gray10 : PALETTE.gray07}>
-													{images.length}
+												<Typography variant={FONT_VARIANT.label01} fontColor={totalImages > 0 ? PALETTE.gray10 : PALETTE.gray07}>
+													{totalImages}
 												</Typography>
 												<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray07}>
 													/5
@@ -274,16 +233,33 @@ const RestaurantRegistration = () => {
 									)}
 								</label>
 
-								{images.map((img, idx) => (
+								{existingImageUrls.map((url, idx) => (
 									<div
-										key={idx}
+										key={`existing-${idx}`}
 										className="border border-gray-05 w-[80px] h-[80px] rounded-[12px] relative flex-shrink-0 overflow-hidden flex items-center justify-center"
 									>
-										<img src={URL.createObjectURL(img)} alt={`업로드 이미지 ${idx + 1}`} className="object-cover w-full h-full rounded-[12px]" />
+										<img src={url} alt={`기존 이미지 ${idx + 1}`} className="object-cover w-full h-full rounded-[12px]" />
 										<button
 											type="button"
 											className="absolute top-1 right-1 w-5.5 h-5.5 bg-[#666] bg-opacity-80 rounded-full flex items-center justify-center text-white"
-											onClick={() => removeImage(idx)}
+											onClick={() => removeExistingImage(idx)}
+											aria-label="이미지 삭제"
+										>
+											<Icon name="close" size={16} />
+										</button>
+									</div>
+								))}
+
+								{images.map((img, idx) => (
+									<div
+										key={`new-${idx}`}
+										className="border border-gray-05 w-[80px] h-[80px] rounded-[12px] relative flex-shrink-0 overflow-hidden flex items-center justify-center"
+									>
+										<img src={URL.createObjectURL(img)} alt={`새 이미지 ${idx + 1}`} className="object-cover w-full h-full rounded-[12px]" />
+										<button
+											type="button"
+											className="absolute top-1 right-1 w-5.5 h-5.5 bg-[#666] bg-opacity-80 rounded-full flex items-center justify-center text-white"
+											onClick={() => removeNewImage(idx)}
 											aria-label="이미지 삭제"
 										>
 											<Icon name="close" size={16} />
@@ -309,12 +285,21 @@ const RestaurantRegistration = () => {
 						</div>
 					</div>
 
-					<Button variant={isButtonActive ? 'active' : 'disabled'} onClick={registerRestaurant} disabled={!isButtonActive}>
+					<Button variant={isButtonActive ? 'active' : 'disabled'} disabled={!isButtonActive}>
 						{isUploading ? '이미지 업로드 중...' : '등록하기'}
 					</Button>
 				</form>
-				<CustomDialog headerText={{ title: '식당 등록이 완료되었어요' }} onOpen={isOpen} onOpenChange={setIsOpen} className="w-[271px]">
-					<Button variant="active" onClick={() => navigate(`/restaurant-detail/${teamRestaurantId}`)} className="mt-[17px]">
+
+				<CustomDialog
+					headerText={{
+						title: '리뷰 수정이 완료되었어요',
+						description: '수정된 리뷰가 팀원들에게 공유됩니다!',
+					}}
+					onOpen={isOpen}
+					onOpenChange={setIsOpen}
+					className="w-[271px]"
+				>
+					<Button variant="active" onClick={() => navigate(`/restaurant-detail/${teamRestaurantId}`)} className="mt-[24px]">
 						확인
 					</Button>
 				</CustomDialog>
@@ -323,4 +308,4 @@ const RestaurantRegistration = () => {
 	);
 };
 
-export default RestaurantRegistration;
+export default ReviewEdit;

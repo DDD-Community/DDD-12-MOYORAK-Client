@@ -42,8 +42,6 @@ const ReviewRegistration = () => {
 	const teamRestaurantId = location.state?.teamRestaurantId;
 	const name = location.state?.name;
 
-	console.log(teamId, teamRestaurantId, name);
-
 	const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (!e.target.files) return;
 
@@ -64,7 +62,6 @@ const ReviewRegistration = () => {
 		}
 	};
 
-	// 이미지 삭제
 	const removeImage = (index: number) => {
 		setImages((prev) => prev.filter((_, i) => i !== index));
 		setImageUrls((prev) => prev.filter((_, i) => i !== index));
@@ -77,15 +74,6 @@ const ReviewRegistration = () => {
 
 	const postReview = async () => {
 		try {
-			console.log('리뷰 등록 요청 데이터:', {
-				userId: 5,
-				servingTimeId: Number(foodPrepTime),
-				waitingTimeId: Number(waitingTime),
-				score: satisfaction,
-				photoPaths: imageUrls,
-				extraText: review,
-			});
-
 			await post<IReviewRegistrationRequest>(`/teams/${teamId}/restaurants/${teamRestaurantId}/reviews`, {
 				userId: 5,
 				servingTimeId: Number(foodPrepTime),
@@ -101,7 +89,7 @@ const ReviewRegistration = () => {
 		}
 	};
 
-	const isButtonActive = waitingTime.length > 0 && foodPrepTime.length > 0 && satisfaction > 0 && review.length > 0 && images.length > 0 && !isUploading; // 업로드 중이 아닐 때만 활성화
+	const isButtonActive = waitingTime.length > 0 && foodPrepTime.length > 0 && satisfaction > 0 && review.length > 0 && images.length > 0 && !isUploading;
 
 	return (
 		<>

@@ -4,7 +4,12 @@ import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 
 import Typography from '../Typography';
 
-const PreventingScreenDeparture = () => {
+interface IPreventingScreenDepartureProps {
+	onClose: () => void;
+	onContinueWrite: () => void;
+}
+
+const PreventingScreenDeparture = ({ onClose, onContinueWrite }: IPreventingScreenDepartureProps) => {
 	return (
 		<div className="w-full rounded-t-[30px] bg-white shadow-[0px_-1px_7px_0px_rgba(0,0,0,0.25)] px-6.5 py-9 flex flex-col items-center">
 			<img src={preventingScreenDeparture} alt="preventingScreenDeparture" className="mb-5 w-[80px] h-[76px]" />
@@ -15,10 +20,10 @@ const PreventingScreenDeparture = () => {
 				지금까지 작성한 내용은 저장되지 않아요.
 			</Typography>
 			<div className="w-full flex gap-2">
-				<Button variant="general" className="w-full">
+				<Button variant="general" className="w-full" onClick={onClose}>
 					나중에 작성하기
 				</Button>
-				<Button variant="active" className="w-full">
+				<Button variant="active" className="w-full" onClick={onContinueWrite}>
 					지금 작성하기
 				</Button>
 			</div>

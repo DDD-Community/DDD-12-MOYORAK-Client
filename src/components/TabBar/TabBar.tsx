@@ -47,11 +47,9 @@ const TabBar = () => {
 	};
 
 	return (
-		<div
-			className="
-				fixed
-				w-full
-				bottom-0
+		<div className="fixed bottom-0 w-full px-2">
+			<div
+				className="
 				flex
 				h-[70px]
 				z-[9999]
@@ -63,18 +61,19 @@ const TabBar = () => {
 				items-center
 				rounded-[30px]
 			"
-		>
-			{TAB_ITEMS.map((item) => (
-				<TabItem
-					key={item.path}
-					path={item.path}
-					iconName={item.iconName}
-					activeIconName={item.activeIconName}
-					label={item.label}
-					currentPath={location.pathname}
-					onClick={handleClick}
-				/>
-			))}
+			>
+				{TAB_ITEMS.map((item) => (
+					<TabItem
+						key={item.path}
+						path={item.path}
+						iconName={item.iconName}
+						activeIconName={item.activeIconName}
+						label={item.label}
+						currentPath={location.pathname}
+						onClick={handleClick}
+					/>
+				))}
+			</div>
 		</div>
 	);
 };
