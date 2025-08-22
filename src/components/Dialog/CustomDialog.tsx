@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader } from './BaseDialog'
 interface ICustomDialogProps {
 	headerText: {
 		title: string;
-		description?: string;
+		description?: ReactNode | string;
 	};
 	children?: ReactNode;
 	onOpen: boolean;

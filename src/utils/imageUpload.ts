@@ -5,6 +5,23 @@ interface IImageUploadResponse {
 	path: string;
 }
 
+export const extractPathFromUrl = (url: string): string => {
+	if (!url) return '';
+
+	try {
+		if (!url.startsWith('http')) {
+			return url;
+		}
+
+		const urlObj = new URL(url);
+		return urlObj.pathname.startsWith('/') ? urlObj.pathname.substring(1) : urlObj.pathname;
+	} catch (error) {
+		console.error('URL 파싱 실패:', error);
+		const lastSlashIndex = url.lastIndexOf('/');
+		return lastSlashIndex !== -1 ? url.substring(lastSlashIndex + 1) : url;
+	}
+};
+
 /**
  * 파일 확장자를 추출하고 HEIC/HEIF 포맷을 JPG로 변환
  */
@@ -17,13 +34,11 @@ export const getFileExtension = (file: File): string => {
 		extension = fileName.substring(lastDotIndex + 1).toLowerCase();
 	}
 
-	// HEIC/HEIF 같은 모바일 포맷은 JPG로 변환
 	if (extension === 'heic' || extension === 'heif') {
 		console.log(`${extension} 포맷을 JPG로 변환합니다.`);
 		return 'jpg';
 	}
 
-	// MIME 타입에서 확장자 추출
 	const mimeType = file.type;
 	switch (mimeType) {
 		case 'image/jpeg':
@@ -54,8 +69,6 @@ export const uploadSingleImage = async (file: File): Promise<string> => {
 	const extension = getFileExtension(file);
 
 	try {
-		console.log('1단계 - 업로드 URL 요청:', { extension, fileName: file.name });
-
 		// 1단계: 서버에서 업로드 URL 받기
 		const response = await post<IImageUploadResponse>('/images', {
 			extensionName: extension,
@@ -78,8 +91,6 @@ export const uploadSingleImage = async (file: File): Promise<string> => {
 			throw new Error('서버 응답에서 업로드 URL 또는 path를 찾을 수 없습니다.');
 		}
 
-		console.log('2단계 - S3에 이미지 업로드:', { uploadUrl, imagePath });
-
 		// 2단계: S3에 실제 이미지 업로드
 		const uploadResponse = await fetch(uploadUrl, {
 			method: 'PUT',
@@ -92,7 +103,6 @@ export const uploadSingleImage = async (file: File): Promise<string> => {
 		if (!uploadResponse.ok) {
 			throw new Error(`S3 업로드 실패: ${uploadResponse.status} ${uploadResponse.statusText}`);
 		}
-
 		console.log('3단계 - 업로드 완료:', imagePath);
 		return imagePath; // S3 업로드 후 path 반환
 	} catch (error) {
@@ -153,7 +163,6 @@ export const uploadMultipleImages = async (
 				const url = await uploadSingleImage(file);
 				uploadedUrls.push(url);
 				uploadedFiles.push(file);
-				console.log(`${file.name} 업로드 성공:`, url);
 			} catch (error) {
 				console.error(`${file.name} 업로드 실패:`, error);
 			}
@@ -163,7 +172,6 @@ export const uploadMultipleImages = async (
 			throw new Error('모든 이미지 업로드에 실패했습니다.');
 		}
 
-		console.log('업로드 완료:', uploadedUrls);
 		return { successUrls: uploadedUrls, uploadedFiles };
 	} catch (error) {
 		console.error('이미지 업로드 에러:', error);
