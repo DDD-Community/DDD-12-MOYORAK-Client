@@ -1,3 +1,4 @@
+import type { ITeamRestaurantLocationItem } from '@/apis/useQueryTeamRestaurantsLocations';
 import location from '@/assets/location.png';
 import userCompany from '@/assets/userCompany.png';
 
@@ -59,10 +60,10 @@ export default class KakaoMapCore {
 		this.map = new window.kakao.maps.Map(container, mapOption);
 	}
 
-	addMarker(option: IKakaoMapOptions, index: number) {
-		if (!this.map || !option.center) return;
+	addMarker(option: ITeamRestaurantLocationItem, index: number) {
+		if (!this.map || !option) return;
 
-		const pos = new kakao.maps.LatLng(option.center.lat, option.center.lng);
+		const pos = new kakao.maps.LatLng(option.latitude, option.longitude);
 
 		// 마커로 사용할 HTML 요소 생성
 		const content = document.createElement('div');
@@ -80,7 +81,7 @@ export default class KakaoMapCore {
 
 		// 텍스트 라벨
 		const label = document.createElement('div');
-		label.textContent = option.placeName ?? '';
+		label.textContent = option.name ?? '';
 		label.style.marginTop = '4px';
 		label.style.fontSize = '14px';
 		label.style.padding = '2px 6px';
@@ -118,7 +119,7 @@ export default class KakaoMapCore {
 		};
 	}
 
-	private showInfoOverlay(option: IKakaoMapOptions, position: any) {
+	private showInfoOverlay(option: ITeamRestaurantLocationItem, position: any) {
 		// 기존 팝업 제거
 		if (this.selectedOverlay) {
 			this.selectedOverlay.setMap(null);
@@ -134,9 +135,9 @@ export default class KakaoMapCore {
 		infoContent.style.minWidth = '120px';
 
 		infoContent.innerHTML = `
-			<strong>${option.placeName}</strong><br/>
-			위도: ${option.center?.lat}<br/>
-			경도: ${option.center?.lng}
+			<strong>${option.name}</strong><br/>
+			위도: ${option.latitude}<br/>
+			경도: ${option.longitude}
 		`;
 
 		const infoOverlay = new kakao.maps.CustomOverlay({
