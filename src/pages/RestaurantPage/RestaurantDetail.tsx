@@ -44,9 +44,6 @@ const RestaurantDetail = () => {
 	const imageUrl = restaurantInfo?.photoPath;
 
 	const [reviewPhotos, setReviewPhotos] = useState<IReviewPhotosResponse | null>(null);
-
-	console.log(reviewPhotos);
-
 	const teamId = 1;
 	const { teamRestaurantId } = useParams<{ teamRestaurantId: string }>();
 
@@ -185,7 +182,7 @@ const RestaurantDetail = () => {
 							</div>
 						</div>
 						{imageUrl ? (
-							<img src="/src/assets/restaurantTest.jpg" alt="restaurantTest" className="w-full object-cover" />
+							<img src={imageUrl} alt="restaurantTest" className="w-full h-[300px] object-fill" />
 						) : (
 							<div className="w-full h-[280px] bg-gray-03 flex flex-col items-center justify-center">
 								<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
@@ -291,7 +288,7 @@ const RestaurantDetail = () => {
 							</div>
 
 							{/* 리뷰 섹션 */}
-							{activeTab === 'reviews' && <ReviewInfo />}
+							{activeTab === 'reviews' && <ReviewInfo restaurantName={restaurantInfo?.name || ''} />}
 
 							{/* 사진 섹션 */}
 							{activeTab === 'photos' && (

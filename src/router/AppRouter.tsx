@@ -15,6 +15,7 @@ import PotMakeSuccess from '@/pages/PotPage/PotMakeSuccess';
 import RestaurantDetail from '@/pages/RestaurantPage/RestaurantDetail';
 import RestaurantRegistration from '@/pages/RestaurantPage/RestaurantRegistration';
 import RestaurantSearch from '@/pages/RestaurantPage/RestaurantSearch';
+import ReviewEdit from '@/pages/RestaurantPage/ReviewEdit';
 import ReviewRegistration from '@/pages/RestaurantPage/ReviewRegistration';
 import PopupAddress from '@/pages/SignUpPage/components/PopupAddress';
 import SignUpPage from '@/pages/SignUpPage/SignUpPage';
@@ -41,7 +42,7 @@ const AppRouter = () => {
 			<Route path="/new-restaurant-registration" element={<NewRestaurantRegistration />} />
 			<Route path="/restaurant-detail/:teamRestaurantId" element={<RestaurantDetail />} />
 			<Route path="/review-registration" element={<ReviewRegistration />} />
-			<Route path="/review-registration/:id" element={<ReviewRegistration />} />
+			<Route path="/review-edit/:id" element={<ReviewEdit />} />
 			<Route path="*" element={<NotFound />} />
 		</Routes>
 	);
