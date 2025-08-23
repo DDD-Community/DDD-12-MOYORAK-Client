@@ -1,24 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import { get } from '@/apis';
+import { useQueryParticipantList } from '@/apis/useQueryParticipantList';
 import noParticipant from '@/assets/noParticipant.png';
 import Icon from '@/components/Icon';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 
-interface IParticipantResponse {
-	userId: number;
-	userName: string;
-	profileImage: string;
-	mealTags: {
-		dislikes: string[];
-		allergies: string[];
-	};
-}
-
 const Participant = () => {
 	const [expandedParticipant, setExpandedParticipant] = useState<number | null>(null);
-	const [participantList, setParticipantList] = useState<IParticipantResponse[]>([]);
 
 	const toggleParticipantExpansion = (participantId: number) => {
 		setExpandedParticipant((prev) => {
@@ -30,19 +19,30 @@ const Participant = () => {
 	const partyId = 1;
 	const teamId = 1;
 
-	const getParticipantList = async () => {
-		try {
-			const response = await get<IParticipantResponse[]>(`/teams/${teamId}/parties/${partyId}/party-attendees`);
-			setParticipantList(response as IParticipantResponse[]);
-		} catch (error) {
-			console.error('팟 참여자 목록 조회 실패:', error);
-			setParticipantList([]);
-		}
-	};
+	// TanStack Query 훅 사용
+	const { data: participantList = [], isLoading, error } = useQueryParticipantList(teamId.toString(), partyId.toString());
 
-	useEffect(() => {
-		getParticipantList();
-	}, []);
+	// 로딩 상태 처리
+	if (isLoading) {
+		return (
+			<div className="px-4.5 bg-[#F5F5F5] pt-5 h-screen flex items-center justify-center">
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
+					로딩 중...
+				</Typography>
+			</div>
+		);
+	}
+
+	// 에러 상태 처리
+	if (error) {
+		return (
+			<div className="px-4.5 bg-[#F5F5F5] pt-5 h-screen flex items-center justify-center">
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
+					참여자 목록을 불러오는데 실패했습니다.
+				</Typography>
+			</div>
+		);
+	}
 
 	return (
 		<div className="px-4.5 bg-[#F5F5F5] pt-5 h-screen">

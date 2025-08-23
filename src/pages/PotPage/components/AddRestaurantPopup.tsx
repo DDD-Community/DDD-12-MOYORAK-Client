@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import { get } from '@/apis';
+import { useQueryTeamRestaurantList } from '@/apis/useQueryTeamRestaurantList';
 import Button from '@/components/Button/Button';
 import FilterButton from '@/components/FilterButton/FilterButton';
 import Icon from '@/components/Icon';
@@ -34,38 +34,16 @@ interface IAddRestaurantPopupProps {
 
 const MAX_TOTAL_RESTAURANTS = 5;
 
-interface ITeamRestaurantResponse {
-	size: number;
-	currentPage: number;
-	totalCount: number;
-	data: Array<{
-		teamRestaurantId: number;
-		restaurantName: string;
-		restaurantCategory: string;
-		averageReviewScore: number;
-		reviewCount: number;
-		reviewImagePath: string;
-	}>;
-}
-
 const AddRestaurantPopup = ({ onClose, existingRestaurantIds }: IAddRestaurantPopupProps) => {
 	const [sortOption, setSortOption] = useState<FilterType>(FILTER_TYPES.DISTANCE);
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [newSelectedIds, setNewSelectedIds] = useState<number[]>([]);
 	const [selectedOpen, setSelectedOpen] = useState<boolean>(false);
-	const [teamRestaurantList, setTeamRestaurantList] = useState<ITeamRestaurantResponse>();
 	const { getCategoryDisplay } = useCategoryMapping();
 
 	const teamId = 1;
 	const size = 100;
 	const currentPage = 1;
-
-	// 추가 가능한 식당 개수
-	const remainingSlots = MAX_TOTAL_RESTAURANTS - existingRestaurantIds.length;
-
-	const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setSearchValue(e.target.value);
-	};
 
 	const getSortOptionForAPI = (filterType: FilterType): string => {
 		switch (filterType) {
@@ -80,15 +58,18 @@ const AddRestaurantPopup = ({ onClose, existingRestaurantIds }: IAddRestaurantPo
 		}
 	};
 
-	const getTeamRestaurantList = async () => {
-		const apiSortOption = getSortOptionForAPI(sortOption);
-		const response = await get<ITeamRestaurantResponse>(`/teams/${teamId}/restaurants?size=${size}&currentPage=${currentPage}&sortOption=${apiSortOption}`);
-		setTeamRestaurantList(response as ITeamRestaurantResponse);
+	// TanStack Query 훅 사용
+	const apiSortOption = getSortOptionForAPI(sortOption);
+	const { data: teamRestaurantList, isLoading, error } = useQueryTeamRestaurantList(teamId.toString(), apiSortOption, size, currentPage);
+
+	// 추가 가능한 식당 개수
+	const remainingSlots = MAX_TOTAL_RESTAURANTS - existingRestaurantIds.length;
+
+	const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setSearchValue(e.target.value);
 	};
 
-	useEffect(() => {
-		getTeamRestaurantList();
-	}, [sortOption]);
+	// TanStack Query가 자동으로 데이터를 가져오므로 별도의 함수와 useEffect가 필요 없음
 
 	// 새로운 식당 선택/해제
 	const handleNewSelect = (id: number) => {
@@ -128,6 +109,28 @@ const AddRestaurantPopup = ({ onClose, existingRestaurantIds }: IAddRestaurantPo
 	const handleComplete = () => {
 		onClose(newSelectedRestaurants);
 	};
+
+	// 로딩 상태 처리
+	if (isLoading) {
+		return (
+			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
+					로딩 중...
+				</Typography>
+			</div>
+		);
+	}
+
+	// 에러 상태 처리
+	if (error) {
+		return (
+			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
+					식당 목록을 불러오는데 실패했습니다.
+				</Typography>
+			</div>
+		);
+	}
 
 	return (
 		<div className="bg-gray-02 min-h-screen">

@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { get, post } from '@/apis';
 import { useMutationAddRestaurantToParty } from '@/apis/useMutationAddRestaurantToParty';
+import { useMutationJoinParty } from '@/apis/useMutationJoinParty';
 import { useMutationVote } from '@/apis/useMutationVote';
+import { useQueryPotDetail } from '@/apis/useQueryPotDetail';
 import FilterButton from '@/components/FilterButton/FilterButton';
 import Icon from '@/components/Icon';
 import NavBar from '@/components/NavBar/NavBar';
@@ -21,87 +22,126 @@ type TimeStatus = 'before_start' | 'voting_active' | 'after_end';
 type TabType = 'restaurant' | 'participant';
 type ViewType = 'carousel' | 'list';
 
-interface IPotDetailResponse {
-	id: number;
-	title: string;
-	content: string;
-	attendable: boolean;
-	attended: boolean;
-	vote: {
-		id: number;
-		voteType: string;
-		voteStatus: string;
-		randomSelectedCandidateId: number | null;
-		mealDate: string;
-		startDate: string;
-		expiredDate: string;
-		randomDate: string;
-	};
-	candidates: Array<{
-		candidateId: number;
-		teamRestaurantId: number;
-		restaurantName: string;
-		restaurantCategory: string;
-		averageReviewScore: number;
-		reviewCount: number;
-		reviewImagePath: string;
-	}>;
-	voters: Array<{
-		candidateId: number;
-		name: string;
-		profileImageUrl: string;
-	}>;
-}
-
 const PotDetail = () => {
 	const navigate = useNavigate();
-	const [potDetail, setPotDetail] = useState<IPotDetailResponse | null>(null);
 	const { getCategoryDisplay } = useCategoryMapping();
 	const { mutate: voteRestaurant, isPending: isVoting } = useMutationVote();
 	const { mutate: addRestaurantToParty, isPending: isAddingRestaurant } = useMutationAddRestaurantToParty();
+	const teamId = 1;
+	const { id } = useParams();
 
-	// 상태 관리
+	const { data: potDetail, isLoading: isLoadingPotDetail, error: potDetailError } = useQueryPotDetail(teamId.toString(), id || '');
+	const { mutate: joinParty } = useMutationJoinParty(teamId.toString(), id || '');
+
+	const userId = 5;
 	const [activeTab, setActiveTab] = useState<TabType>('restaurant');
+
+	const isPotCreator = potDetail?.voters.some((voter) => voter.userId === userId);
 	const [showToast, setShowToast] = useState(false);
+	const [toastMessage, setToastMessage] = useState('');
 	const [viewType, setViewType] = useState<ViewType>('carousel');
 	const [isVoted, setIsVoted] = useState(false);
 	const [selectedRestaurantId, setSelectedRestaurantId] = useState<number | null>(null);
 	const [hoveredRestaurantId, setHoveredRestaurantId] = useState<number | null>(null);
 	const [showAddRestaurantPopup, setShowAddRestaurantPopup] = useState(false);
 
-	const teamId = 1;
-	const { id } = useParams();
-
-	const getPotDetail = async () => {
-		try {
-			const response = await get<IPotDetailResponse>(`/teams/${teamId}/parties/${id}`);
-			setPotDetail(response as IPotDetailResponse);
-		} catch (error) {
-			console.error('팟 목록 조회 실패:', error);
-		}
-	};
-
 	useEffect(() => {
-		getPotDetail();
-	}, []);
+		if (potDetail) {
+			const userVote = potDetail.voters.find((voter) => voter.userId === userId);
+			if (userVote) {
+				setIsVoted(true);
+				setSelectedRestaurantId(userVote.candidateId);
+			} else {
+				setIsVoted(false);
+				setSelectedRestaurantId(null);
+			}
+		}
+	}, [potDetail, userId]);
 
-	// 시간 관련 유틸리티 함수들
 	const getCurrentTimeStatus = (): TimeStatus => {
 		if (!potDetail) return 'before_start';
 
 		const now = new Date();
+
+		// 디버깅을 위한 로그 (개발 완료 후 제거)
+		console.log('Current time:', now.toISOString());
+		console.log('Vote type:', potDetail.vote.voteType);
+
+		// RANDOM 타입일 때는 randomDate를 기준으로 상태 판단
+		if (potDetail.vote.voteType === 'RANDOM') {
+			const randomTime = new Date(potDetail.vote.randomDate);
+			console.log('Random time:', randomTime.toISOString());
+
+			if (now < randomTime) return 'before_start';
+			return 'after_end'; // RANDOM 타입에서는 voting_active 상태가 없음
+		}
+
+		// 일반 투표일 때
 		const startTime = new Date(potDetail.vote.startDate);
 		const endTime = new Date(potDetail.vote.expiredDate);
+		console.log('Start time:', startTime.toISOString());
+		console.log('End time:', endTime.toISOString());
 
-		if (now < startTime) return 'before_start';
-		if (now >= startTime && now < endTime) return 'voting_active';
+		// 시간 비교를 더 정확하게 하기 위해 시간을 0으로 설정
+		const nowDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
+		const startDate = new Date(startTime.getFullYear(), startTime.getMonth(), startTime.getDate(), startTime.getHours(), startTime.getMinutes());
+		const endDate = new Date(endTime.getFullYear(), endTime.getMonth(), endTime.getDate(), endTime.getHours(), endTime.getMinutes());
+
+		console.log('Normalized current time:', nowDate.toISOString());
+		console.log('Normalized start time:', startDate.toISOString());
+		console.log('Normalized end time:', endDate.toISOString());
+
+		if (nowDate < startDate) {
+			console.log('Status: before_start');
+			return 'before_start';
+		}
+		if (nowDate >= startDate && nowDate < endDate) {
+			console.log('Status: voting_active');
+			return 'voting_active';
+		}
+		console.log('Status: after_end');
 		return 'after_end';
+	};
+
+	// RANDOM 타입일 때 시간 표시 텍스트 반환
+	const getTimeDisplayText = () => {
+		if (!potDetail) return { start: '', end: '', meal: '', random: '', mealTime: '' };
+
+		if (potDetail.vote.voteType === 'RANDOM') {
+			return {
+				start: '',
+				end: '',
+				meal: '',
+				random: formatTime(potDetail.vote.randomDate),
+				mealTime: formatTime(potDetail.vote.mealDate),
+			};
+		}
+
+		return {
+			start: formatTime(potDetail.vote.startDate),
+			end: formatTime(potDetail.vote.expiredDate),
+			meal: formatTime(potDetail.vote.mealDate),
+			random: '',
+			mealTime: '',
+		};
 	};
 
 	const getVoteStatusText = (): string => {
 		if (!potDetail) return '로딩 중...';
 
 		const timeStatus = getCurrentTimeStatus();
+
+		// RANDOM 타입일 때 다른 텍스트 표시
+		if (potDetail.vote.voteType === 'RANDOM') {
+			const statusMap = {
+				before_start: '랜덤 발표 전',
+				voting_active: '랜덤 발표 전', // 추첨 중 상태는 없음
+				after_end: '랜덤 추첨 종료',
+			};
+			return statusMap[timeStatus];
+		}
+
+		// 일반 투표일 때
 		const statusMap = {
 			before_start: '투표 전',
 			voting_active: '투표 중',
@@ -114,70 +154,109 @@ const PotDetail = () => {
 		if (!potDetail) return false;
 
 		const timeStatus = getCurrentTimeStatus();
-		// 참여했고, 투표 전 또는 투표 중일 때 식당 추가 가능
+
+		if (potDetail.vote.voteType === 'RANDOM') {
+			return potDetail.attended && timeStatus === 'before_start';
+		}
 		return potDetail.attended && (timeStatus === 'before_start' || timeStatus === 'voting_active');
 	};
 
 	const partyAttendance = async () => {
 		try {
-			const response = await post(`/teams/${teamId}/parties/${id}`);
-			console.log(response);
+			joinParty();
 		} catch (error) {
 			console.error('팟 참여자 목록 조회 실패:', error);
 		}
 	};
 
-	// 이벤트 핸들러들
 	const handleParticipateClick = (): void => {
 		if (!potDetail?.attended) {
-			// 참여하지 않은 경우 참여 API 호출
 			partyAttendance();
 			handleParticipate();
 		} else if (getCurrentTimeStatus() === 'voting_active') {
-			// 이미 참여한 경우 투표 액션
-			handleVoteAction();
+			// RANDOM 타입일 때는 투표 불가
+			if (potDetail.vote.voteType === 'RANDOM') {
+				return;
+			}
+
+			// 일반 투표일 때
+			if (isVoted) {
+				// 이미 투표한 경우 -> 다시 투표하기 (로컬 상태만 변경)
+				setIsVoted(false);
+				setSelectedRestaurantId(null);
+			} else {
+				// 아직 투표하지 않은 경우 -> 투표 액션
+				handleVoteAction();
+			}
 		}
 	};
 
 	const handleParticipate = (): void => {
+		setToastMessage('팟에 참여하였습니다.');
 		setShowToast(true);
-		// API 성공 후 데이터를 다시 가져오므로 상태는 업데이트하지 않음
 		setTimeout(() => setShowToast(false), 3000);
-		// 팟 상세 정보 다시 가져오기
-		getPotDetail();
 	};
 
 	const handleVoteAction = (): void => {
-		if (!isVoted) {
-			if (selectedRestaurantId && potDetail) {
-				// 투표 API 호출
-				voteRestaurant(
-					{
-						teamId,
-						partyId: Number(id),
-						voteId: potDetail.vote.id,
-						candidateId: selectedRestaurantId,
+		if (selectedRestaurantId && potDetail) {
+			voteRestaurant(
+				{
+					teamId,
+					partyId: Number(id),
+					voteId: potDetail.vote.id,
+					candidateId: selectedRestaurantId,
+				},
+				{
+					onSuccess: () => {
+						// 투표 성공 시 로컬 상태 즉시 업데이트
+						setIsVoted(true);
+						setToastMessage('투표가 완료되었습니다.');
+						setShowToast(true);
+						setTimeout(() => setShowToast(false), 3000);
 					},
-					{
-						onSuccess: () => {
-							setIsVoted(true);
-							getPotDetail();
-						},
-						onError: (error) => {
-							console.error('투표 실패:', error);
-						},
-					}
-				);
-			}
-		} else {
-			resetVote();
+					onError: (error) => {
+						console.error('투표 실패:', error);
+						setToastMessage('투표에 실패했습니다.');
+						setShowToast(true);
+						setTimeout(() => setShowToast(false), 3000);
+					},
+				}
+			);
 		}
 	};
 
-	const resetVote = (): void => {
-		setIsVoted(false);
-		setSelectedRestaurantId(null);
-	};
+	// 로딩 상태 처리
+	if (isLoadingPotDetail) {
+		return (
+			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
+					로딩 중...
+				</Typography>
+			</div>
+		);
+	}
+
+	// 에러 상태 처리
+	if (potDetailError) {
+		return (
+			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
+					팟 정보를 불러오는데 실패했습니다.
+				</Typography>
+			</div>
+		);
+	}
+
+	// 데이터가 없을 때 처리
+	if (!potDetail) {
+		return (
+			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
+					팟 정보가 없습니다.
+				</Typography>
+			</div>
+		);
+	}
 
 	const handleRestaurantSelect = (restaurantId: number): void => {
 		if (!canSelectRestaurant()) return;
@@ -190,7 +269,11 @@ const PotDetail = () => {
 	};
 
 	const canSelectRestaurant = (): boolean => {
-		return potDetail?.attended === true && getCurrentTimeStatus() === 'voting_active' && !isVoted;
+		// RANDOM 타입일 때는 식당 선택 불가
+		if (potDetail?.vote.voteType === 'RANDOM') {
+			return false;
+		}
+		return potDetail?.attended === true && getCurrentTimeStatus() === 'voting_active';
 	};
 
 	// 식당 추가 핸들러
@@ -214,8 +297,8 @@ const PotDetail = () => {
 				},
 				{
 					onSuccess: () => {
-						// 식당 추가 성공 시 팟 상세 정보 다시 가져오기
-						getPotDetail();
+						// TanStack Query가 자동으로 데이터를 다시 가져옴
+						setToastMessage('식당을 추가하였습니다.');
 						setShowToast(true);
 						setTimeout(() => setShowToast(false), 3000);
 					},
@@ -228,12 +311,38 @@ const PotDetail = () => {
 		setShowAddRestaurantPopup(false);
 	};
 
+	// 우승 식당들 찾기 (동점자 포함)
+	const getWinningRestaurants = () => {
+		if (!potDetail?.candidates || !potDetail?.voters) return [];
+
+		// 각 후보별 투표 수 계산
+		const voteCounts = potDetail.candidates.map((candidate) => ({
+			...candidate,
+			voteCount: potDetail.voters.filter((voter) => voter.candidateId === candidate.candidateId).length,
+		}));
+
+		// 가장 많은 표를 받은 식당 찾기
+		const maxVotes = Math.max(...voteCounts.map((c) => c.voteCount));
+
+		// 최고 득표수가 0이면 모든 식당이 우승자 (모두 검정색)
+		if (maxVotes === 0) return voteCounts;
+
+		// 최고 득표수를 받은 모든 식당들 반환 (동점자 포함)
+		return voteCounts.filter((c) => c.voteCount === maxVotes);
+	};
+
 	// UI 스타일 관련 함수들
 	const getRestaurantCardStyle = (restaurantId: number): string => {
 		const timeStatus = getCurrentTimeStatus();
 
 		if (timeStatus === 'after_end') {
-			return 'bg-[#484848] text-white';
+			// 투표 종료 후 우승자들만 어두운 배경 (동점자 포함, 0표 전부도 포함)
+			const winningRestaurants = getWinningRestaurants();
+			const isWinner = winningRestaurants.some((restaurant) => restaurant.candidateId === restaurantId);
+			if (isWinner) {
+				return 'bg-[#484848] text-white';
+			}
+			return 'bg-white';
 		}
 
 		if (isVoted && selectedRestaurantId === restaurantId) {
@@ -331,37 +440,63 @@ const PotDetail = () => {
 					<div className="flex-1">
 						<Typography
 							variant={FONT_VARIANT.caption01}
-							fontColor={getCurrentTimeStatus() === 'after_end' ? PALETTE.white : PALETTE.gray07}
+							fontColor={
+								getCurrentTimeStatus() === 'after_end' && getWinningRestaurants().some((r) => r.candidateId === candidate.candidateId)
+									? PALETTE.white
+									: PALETTE.gray07
+							}
 							className="font-medium"
 						>
 							{getCategoryDisplay(candidate.restaurantCategory)}
 						</Typography>
 						<Typography
 							variant={FONT_VARIANT.header03}
-							fontColor={getCurrentTimeStatus() === 'after_end' ? PALETTE.white : PALETTE.gray10}
+							fontColor={
+								getCurrentTimeStatus() === 'after_end' && getWinningRestaurants().some((r) => r.candidateId === candidate.candidateId)
+									? PALETTE.white
+									: PALETTE.gray10
+							}
 							className="font-semibold mb-0.75"
 						>
 							{candidate.restaurantName}
 						</Typography>
 						<div className="flex items-center gap-1">
-							<Icon name="star" size={14} />
+							<Icon
+								name="star"
+								size={14}
+								className={
+									getCurrentTimeStatus() === 'after_end' && getWinningRestaurants().some((r) => r.candidateId === candidate.candidateId) ? 'text-white' : ''
+								}
+							/>
 							<Typography
 								variant={FONT_VARIANT.label01}
-								fontColor={getCurrentTimeStatus() === 'after_end' ? PALETTE.white : PALETTE.gray08}
+								fontColor={
+									getCurrentTimeStatus() === 'after_end' && getWinningRestaurants().some((r) => r.candidateId === candidate.candidateId)
+										? PALETTE.white
+										: PALETTE.gray08
+								}
 								className="font-medium"
 							>
 								{candidate.averageReviewScore.toFixed(1)}
 							</Typography>
 							<Typography
 								variant={FONT_VARIANT.label01}
-								fontColor={getCurrentTimeStatus() === 'after_end' ? PALETTE.white : PALETTE.gray08}
+								fontColor={
+									getCurrentTimeStatus() === 'after_end' && getWinningRestaurants().some((r) => r.candidateId === candidate.candidateId)
+										? PALETTE.white
+										: PALETTE.gray08
+								}
 								className="font-medium"
 							>
 								·
 							</Typography>
 							<Typography
 								variant={FONT_VARIANT.label01}
-								fontColor={getCurrentTimeStatus() === 'after_end' ? PALETTE.white : PALETTE.gray08}
+								fontColor={
+									getCurrentTimeStatus() === 'after_end' && getWinningRestaurants().some((r) => r.candidateId === candidate.candidateId)
+										? PALETTE.white
+										: PALETTE.gray08
+								}
 								className="font-medium"
 							>
 								리뷰 {candidate.reviewCount}
@@ -381,7 +516,7 @@ const PotDetail = () => {
 				<div className="px-5 py-2.5 rounded-[10px] bg-black/70 backdrop-blur-2px shadow-md flex items-center gap-1.25">
 					<Icon name="check" size={14} />
 					<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.white} className="font-medium">
-						{isAddingRestaurant ? '식당을 추가하였습니다.' : '팟에 참여하였습니다.'}
+						{toastMessage}
 					</Typography>
 				</div>
 			</div>
@@ -435,31 +570,56 @@ const PotDetail = () => {
 
 						{/* 시간 정보 섹션 */}
 						<div className="px-4.5 mb-5.5">
-							<div className="px-11.25 py-2.75 rounded-[20px] border border-gray-03 bg-gray-01 flex justify-between">
-								<div className="flex flex-col">
-									<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray08}>
-										투표시작
-									</Typography>
-									<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray09} className="font-semibold">
-										{formatTime(potDetail.vote.startDate)}
-									</Typography>
-								</div>
-								<div className="flex flex-col">
-									<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray08}>
-										투표마감
-									</Typography>
-									<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray09} className="font-semibold">
-										{formatTime(potDetail.vote.expiredDate)}
-									</Typography>
-								</div>
-								<div className="flex flex-col">
-									<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray08}>
-										식사시간
-									</Typography>
-									<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray09} className="font-semibold">
-										{formatTime(potDetail.vote.mealDate)}
-									</Typography>
-								</div>
+							<div
+								className={`px-11.25 py-2.75 rounded-[20px] border border-gray-03 bg-gray-01 flex ${potDetail.vote.voteType === 'RANDOM' ? 'justify-center gap-20' : 'justify-between'}`}
+							>
+								{potDetail.vote.voteType === 'RANDOM' ? (
+									<>
+										<div className="flex flex-col">
+											<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray08}>
+												랜덤추첨
+											</Typography>
+											<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray09} className="font-semibold">
+												{getTimeDisplayText().random}
+											</Typography>
+										</div>
+										<div className="flex flex-col">
+											<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray08}>
+												식사시간
+											</Typography>
+											<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray09} className="font-semibold">
+												{getTimeDisplayText().mealTime}
+											</Typography>
+										</div>
+									</>
+								) : (
+									<>
+										<div className="flex flex-col">
+											<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray08}>
+												투표시작
+											</Typography>
+											<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray09} className="font-semibold">
+												{getTimeDisplayText().start}
+											</Typography>
+										</div>
+										<div className="flex flex-col">
+											<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray08}>
+												투표마감
+											</Typography>
+											<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray09} className="font-semibold">
+												{getTimeDisplayText().end}
+											</Typography>
+										</div>
+										<div className="flex flex-col">
+											<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray08}>
+												식사시간
+											</Typography>
+											<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray09} className="font-semibold">
+												{getTimeDisplayText().meal}
+											</Typography>
+										</div>
+									</>
+								)}
 							</div>
 						</div>
 
@@ -548,6 +708,8 @@ const PotDetail = () => {
 									selectedRestaurantId={selectedRestaurantId}
 									isLoading={isVoting}
 									onParticipateClick={handleParticipateClick}
+									voteType={potDetail.vote.voteType}
+									isPotCreator={isPotCreator}
 								/>
 
 								{/* 토스트 메시지 */}
@@ -565,6 +727,8 @@ const PotDetail = () => {
 									attendable={potDetail.attendable}
 									isLoading={isVoting}
 									onParticipateClick={handleParticipateClick}
+									voteType={potDetail.vote.voteType}
+									isPotCreator={isPotCreator}
 								/>
 							</div>
 						)}

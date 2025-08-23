@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { get, post } from '@/apis';
+import { useMutationMakeParty } from '@/apis/useMutationMakeParty';
+import { useQueryTeamMembers } from '@/apis/useQueryTeamMembers';
 import Button from '@/components/Button/Button';
 import PotDropdown, { type ITeamMember } from '@/components/Dropdown/PotDropdown';
 import Icon from '@/components/Icon';
@@ -36,12 +37,6 @@ interface IPotMakeRequest {
 	mealTime: string;
 	content: string;
 	attendable: boolean;
-}
-
-interface ITeamMembersResponse {
-	userId: number;
-	name: string;
-	state: 'OFF' | 'ON';
 }
 
 function formatTo24AMPM(ampm: string, hour: number, minute: number) {
@@ -86,8 +81,11 @@ const PotMake = () => {
 
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedMembers, setSelectedMembers] = useState<ITeamMember[]>([]);
-	const [teamMembers, setTeamMembers] = useState<ITeamMembersResponse[]>([]);
 	const [attendable, setAttendable] = useState(true);
+
+	// TanStack Query 훅 사용
+	const { data: teamMembers = [], isLoading: isLoadingTeamMembers, error: teamMembersError } = useQueryTeamMembers(teamId.toString());
+	const { mutate: makeParty } = useMutationMakeParty(teamId.toString());
 
 	const [startTime, setStartTime] = useState('오전 00:00');
 	const [announceTime, setAnnounceTime] = useState('오전 00:00');
@@ -189,25 +187,7 @@ const PotMake = () => {
 			? !isDefaultTime(startTime) && !isDefaultTime(announceTime) && !isDefaultTime(eatTime)
 			: !isDefaultTime(announceTime) && !isDefaultTime(eatTime));
 
-	// API functions
-	const getTeamMembers = async () => {
-		try {
-			const response = await get<ITeamMembersResponse[]>(`/teams/${teamId}/parties/users`);
-			setTeamMembers(response);
-		} catch (error) {
-			console.error('Failed to fetch team members:', error);
-		}
-	};
-
-	const postMakeParty = async (request: IPotMakeRequest) => {
-		try {
-			const response = await post<IPotMakeRequest>(`/teams/${teamId}/parties`, request);
-			return response;
-		} catch (error) {
-			console.error('Failed to create party:', error);
-			throw error;
-		}
-	};
+	// TanStack Query가 자동으로 데이터를 가져오므로 별도의 함수가 필요 없음
 
 	// Event handlers
 	const handleChangeOpen = () => {
@@ -366,12 +346,14 @@ const PotMake = () => {
 			},
 		};
 
-		try {
-			await postMakeParty(finalRequest);
-			navigate('/pot-make-success');
-		} catch (error) {
-			console.error('Failed to submit form:', error);
-		}
+		makeParty(finalRequest, {
+			onSuccess: () => {
+				navigate('/pot-make-success');
+			},
+			onError: (error) => {
+				console.error('Failed to submit form:', error);
+			},
+		});
 	};
 
 	const getDisplayTime = (value: string) => {
@@ -386,9 +368,29 @@ const PotMake = () => {
 		return formatTo24Hour(ampm, Number(hour), Number(minute));
 	};
 
-	useEffect(() => {
-		getTeamMembers();
-	}, []);
+	// TanStack Query가 자동으로 데이터를 가져오므로 별도의 useEffect가 필요 없음
+
+	// 로딩 상태 처리
+	if (isLoadingTeamMembers) {
+		return (
+			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
+					로딩 중...
+				</Typography>
+			</div>
+		);
+	}
+
+	// 에러 상태 처리
+	if (teamMembersError) {
+		return (
+			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
+					팀 멤버 정보를 불러오는데 실패했습니다.
+				</Typography>
+			</div>
+		);
+	}
 
 	return (
 		<>
