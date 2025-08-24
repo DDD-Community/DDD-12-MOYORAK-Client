@@ -26,7 +26,7 @@ const ReviewInfo = ({ restaurantName }: IReviewInfoProps) => {
 	const teamId = localStorage.getItem('teamId') ?? '';
 	const { teamRestaurantId } = useParams<{ teamRestaurantId: string }>();
 
-	const { data: reviewList, isLoading: isLoadingReviews, error: reviewsError } = useQueryReviewList(teamId.toString(), teamRestaurantId || '');
+	const { data: reviewList, isLoading: isLoadingReviews } = useQueryReviewList(teamId.toString(), teamRestaurantId || '');
 	const { mutate: deleteReview } = useMutationDeleteReview(teamId.toString(), teamRestaurantId || '');
 
 	useEffect(() => {
@@ -105,17 +105,6 @@ const ReviewInfo = ({ restaurantName }: IReviewInfoProps) => {
 			<div className="flex items-center justify-center py-10">
 				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
 					리뷰를 불러오는 중...
-				</Typography>
-			</div>
-		);
-	}
-
-	// 에러 상태 처리
-	if (reviewsError) {
-		return (
-			<div className="flex items-center justify-center py-10">
-				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
-					리뷰를 불러오는데 실패했습니다.
 				</Typography>
 			</div>
 		);
