@@ -37,7 +37,7 @@ const SignUpPage = () => {
 		if (!isNaN(stepParam) && stepParam !== step) {
 			setStep(stepParam);
 		}
-	}, [searchParams, setStep]);
+	}, []);
 
 	useEffect(() => {
 		setSearchParams({ step: step.toString() });
