@@ -63,14 +63,9 @@ const PotDetail = () => {
 
 		const now = new Date();
 
-		// 디버깅을 위한 로그 (개발 완료 후 제거)
-		console.log('Current time:', now.toISOString());
-		console.log('Vote type:', potDetail.vote.voteType);
-
 		// RANDOM 타입일 때는 randomDate를 기준으로 상태 판단
 		if (potDetail.vote.voteType === 'RANDOM') {
 			const randomTime = new Date(potDetail.vote.randomDate);
-			console.log('Random time:', randomTime.toISOString());
 
 			if (now < randomTime) return 'before_start';
 			return 'after_end'; // RANDOM 타입에서는 voting_active 상태가 없음
@@ -79,27 +74,17 @@ const PotDetail = () => {
 		// 일반 투표일 때
 		const startTime = new Date(potDetail.vote.startDate);
 		const endTime = new Date(potDetail.vote.expiredDate);
-		console.log('Start time:', startTime.toISOString());
-		console.log('End time:', endTime.toISOString());
-
-		// 시간 비교를 더 정확하게 하기 위해 시간을 0으로 설정
 		const nowDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
 		const startDate = new Date(startTime.getFullYear(), startTime.getMonth(), startTime.getDate(), startTime.getHours(), startTime.getMinutes());
 		const endDate = new Date(endTime.getFullYear(), endTime.getMonth(), endTime.getDate(), endTime.getHours(), endTime.getMinutes());
 
-		console.log('Normalized current time:', nowDate.toISOString());
-		console.log('Normalized start time:', startDate.toISOString());
-		console.log('Normalized end time:', endDate.toISOString());
-
 		if (nowDate < startDate) {
-			console.log('Status: before_start');
 			return 'before_start';
 		}
 		if (nowDate >= startDate && nowDate < endDate) {
-			console.log('Status: voting_active');
 			return 'voting_active';
 		}
-		console.log('Status: after_end');
+
 		return 'after_end';
 	};
 
@@ -131,7 +116,6 @@ const PotDetail = () => {
 
 		const timeStatus = getCurrentTimeStatus();
 
-		// RANDOM 타입일 때 다른 텍스트 표시
 		if (potDetail.vote.voteType === 'RANDOM') {
 			const statusMap = {
 				before_start: '랜덤 발표 전',
@@ -141,7 +125,6 @@ const PotDetail = () => {
 			return statusMap[timeStatus];
 		}
 
-		// 일반 투표일 때
 		const statusMap = {
 			before_start: '투표 전',
 			voting_active: '투표 중',
@@ -161,31 +144,47 @@ const PotDetail = () => {
 		return potDetail.attended && (timeStatus === 'before_start' || timeStatus === 'voting_active');
 	};
 
-	const partyAttendance = async () => {
+	const partyAttendance = async (): Promise<boolean> => {
 		try {
-			joinParty();
-		} catch (error) {
-			console.error('팟 참여자 목록 조회 실패:', error);
+			await new Promise((resolve, reject) => {
+				joinParty(undefined, {
+					onSuccess: () => {
+						resolve(true);
+					},
+					onError: (error: any) => {
+						console.error('팟 참여 실패:', error);
+						reject(error);
+					},
+				});
+			});
+			return true;
+		} catch (error: any) {
+			if (error?.response?.data?.detail) {
+				alert(error.response.data.detail);
+			} else if (error?.response?.status === 400) {
+				alert('해당 팀의 팀원이 아닙니다.');
+			} else {
+				alert('팟 참여에 실패했습니다.');
+			}
+			return false;
 		}
 	};
 
-	const handleParticipateClick = (): void => {
+	const handleParticipateClick = async (): Promise<void> => {
 		if (!potDetail?.attended) {
-			partyAttendance();
-			handleParticipate();
+			const success = await partyAttendance();
+			if (success) {
+				handleParticipate();
+			}
 		} else if (getCurrentTimeStatus() === 'voting_active') {
-			// RANDOM 타입일 때는 투표 불가
 			if (potDetail.vote.voteType === 'RANDOM') {
 				return;
 			}
 
-			// 일반 투표일 때
 			if (isVoted) {
-				// 이미 투표한 경우 -> 다시 투표하기 (로컬 상태만 변경)
 				setIsVoted(false);
 				setSelectedRestaurantId(null);
 			} else {
-				// 아직 투표하지 않은 경우 -> 투표 액션
 				handleVoteAction();
 			}
 		}
@@ -259,7 +258,7 @@ const PotDetail = () => {
 	}
 
 	const handleRestaurantSelect = (restaurantId: number): void => {
-		if (!canSelectRestaurant()) return;
+		if (!canSelectRestaurant() || isVoted) return;
 
 		if (selectedRestaurantId === restaurantId) {
 			setSelectedRestaurantId(null);
@@ -271,6 +270,9 @@ const PotDetail = () => {
 	const canSelectRestaurant = (): boolean => {
 		// RANDOM 타입일 때는 식당 선택 불가
 		if (potDetail?.vote.voteType === 'RANDOM') {
+			return false;
+		}
+		if (isVoted) {
 			return false;
 		}
 		return potDetail?.attended === true && getCurrentTimeStatus() === 'voting_active';

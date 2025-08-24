@@ -106,7 +106,7 @@ const RestaurantCarousel = ({
 
 	// 선택 상태 체크박스 렌더링
 	const renderSelectionCheckbox = (candidate: Candidate) => {
-		if (!canSelectRestaurant) return null;
+		if (!canSelectRestaurant || isVoted) return null;
 
 		const isSelected = selectedRestaurantId === candidate.candidateId;
 
@@ -147,7 +147,7 @@ const RestaurantCarousel = ({
 
 	// 투표 상태에 따른 카드 스타일
 	const getCardStyle = (candidate: Candidate) => {
-		const baseStyle = 'bg-white rounded-[20px] overflow-hidden cursor-pointer transition-all duration-300 relative mx-auto restaurant-card';
+		const baseStyle = `bg-white rounded-[20px] overflow-hidden ${!isVoted ? 'cursor-pointer' : 'cursor-default'} transition-all duration-300 relative mx-auto restaurant-card`;
 
 		if (timeStatus === 'after_end') {
 			// 투표 종료 후 우승자들만 어두운 배경 (동점자 포함, 0표 전부도 포함)
@@ -222,7 +222,7 @@ const RestaurantCarousel = ({
 		<Slider {...slickSettings}>
 			{restaurants.map((candidate) => (
 				<div key={candidate.candidateId}>
-					<div onClick={() => onCardClick?.(candidate)} className={getCardStyle(candidate)}>
+					<div onClick={() => !isVoted && onCardClick?.(candidate)} className={getCardStyle(candidate)}>
 						<div className="w-full overflow-hidden relative h-[200px]">
 							<img src={candidate.reviewImagePath} alt={`${candidate.restaurantName} 음식`} className="w-full h-full object-cover" />
 							<div className="absolute inset-0 gradient-overlay opacity-0 transition-opacity duration-300" />

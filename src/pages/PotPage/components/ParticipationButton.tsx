@@ -8,7 +8,7 @@ interface ParticipationButtonProps {
 	isVoted?: boolean;
 	selectedRestaurantId?: number | null;
 	isLoading?: boolean;
-	onParticipateClick: () => void;
+	onParticipateClick: () => void | Promise<void>;
 	voteType?: string;
 	isPotCreator?: boolean;
 }
@@ -22,68 +22,29 @@ const ParticipationButton = ({
 	isLoading = false,
 	onParticipateClick,
 	voteType,
-	isPotCreator = false,
 }: ParticipationButtonProps) => {
 	// 버튼 텍스트 결정
 	const getButtonText = (): string => {
-		if (isLoading) {
-			return '처리 중...';
-		}
+		if (isLoading) return '처리 중...';
+		if (!attendable) return BUTTON_TEXT.notAttendable;
+		if (!attended) return BUTTON_TEXT.participate;
 
-		// 참여할 수 없는 팟인 경우
-		if (!attendable) {
-			return '참여할 수 없는 팟이에요';
-		}
-
-		// 팟 생성자인 경우
-		if (isPotCreator) {
-			if (timeStatus === 'after_end') {
-				return '투표가 종료되었어요';
-			}
-			if (voteType === 'RANDOM') {
-				if (timeStatus === 'before_start') {
-					return '아직 추첨이 시작되지 않았어요';
-				}
-				return '랜덤 추첨이 종료되었어요';
-			}
-			if (timeStatus === 'before_start') {
-				return '아직 투표가 시작되지 않았어요';
-			}
-
-			return '투표가 종료되었어요';
-		}
-
-		// 일반 사용자인 경우
-		if (!attended) {
-			return BUTTON_TEXT.participate; // "참여하기"
-		}
-
-		// 참여한 사용자
-		if (voteType === 'RANDOM') {
-			if (timeStatus === 'before_start') {
-				return BUTTON_TEXT.notStarted; // "아직 추첨이 시작되지 않았어요"
-			}
-			if (timeStatus === 'after_end') {
-				return BUTTON_TEXT.randomEnded; // "랜덤 추첨이 종료되었어요"
-			}
-		}
-
-		// 일반 투표일 때
-		if (timeStatus === 'before_start') {
-			return BUTTON_TEXT.participated; // "아직 투표가 시작되지 않았어요"
-		}
+		// 투표 진행 중일 때
 		if (timeStatus === 'voting_active') {
-			if (isVoted) {
-				return BUTTON_TEXT.voteAgain; // "다시 투표하기"
-			}
-			// 투표하지 않은 경우, 식당 선택 여부에 따라 버튼 텍스트 결정
-			if (selectedRestaurantId !== null) {
-				return BUTTON_TEXT.vote; // "투표하기" (식당 선택됨)
-			}
-			return '투표하기'; // 식당 선택 안 됨
+			if (isVoted) return BUTTON_TEXT.voteAgain;
+			return BUTTON_TEXT.vote;
 		}
+
+		// 투표 시작 전
+		if (timeStatus === 'before_start') {
+			if (voteType === 'RANDOM') return BUTTON_TEXT.notStarted;
+			return BUTTON_TEXT.participated;
+		}
+
+		// 투표 종료 후
 		if (timeStatus === 'after_end') {
-			return BUTTON_TEXT.voteEnded; // "투표가 종료되었어요"
+			if (voteType === 'RANDOM') return BUTTON_TEXT.randomEnded;
+			return BUTTON_TEXT.voteEnded;
 		}
 
 		return BUTTON_TEXT.participate;
@@ -119,7 +80,12 @@ const ParticipationButton = ({
 
 	return (
 		<div className="fixed bottom-7.5 w-full left-0 px-4.5">
-			<Button variant={isButtonDisabled() ? 'disabled' : 'active'} onClick={onParticipateClick} disabled={isButtonDisabled()} className={getButtonClassName()}>
+			<Button
+				variant={isButtonDisabled() ? 'disabled' : 'active'}
+				onClick={async () => await onParticipateClick()}
+				disabled={isButtonDisabled()}
+				className={getButtonClassName()}
+			>
 				{getButtonText()}
 			</Button>
 		</div>
