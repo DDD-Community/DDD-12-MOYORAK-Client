@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 
 import { post } from '.';
 
-interface IAuthSignInResponse {
+export interface IAuthSignInResponse {
 	accessToken: string;
 	refreshToken: string;
 }
