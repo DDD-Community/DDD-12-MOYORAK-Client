@@ -41,6 +41,7 @@ const ReviewRegistration = () => {
 	const teamId = location.state?.teamId;
 	const teamRestaurantId = location.state?.teamRestaurantId;
 	const name = location.state?.name;
+	const userId = localStorage.getItem('userId') ?? '';
 
 	const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (!e.target.files) return;
@@ -75,7 +76,7 @@ const ReviewRegistration = () => {
 	const postReview = async () => {
 		try {
 			await post<IReviewRegistrationRequest>(`/teams/${teamId}/restaurants/${teamRestaurantId}/reviews`, {
-				userId: 5,
+				userId: Number(userId),
 				servingTimeId: Number(foodPrepTime),
 				waitingTimeId: Number(waitingTime),
 				score: satisfaction,
@@ -238,7 +239,7 @@ const ReviewRegistration = () => {
 
 				{isEdit ? (
 					<CustomDialog headerText={{ title: '리뷰 수정이 완료되었어요' }} onOpen={isOpen} onOpenChange={setIsOpen} className="w-[271px]">
-						<Button variant="active" onClick={() => navigate('/restaurant-detail/1')} className="mt-[24px]">
+						<Button variant="active" onClick={() => navigate(`/restaurant-detail/${teamRestaurantId}`)} className="mt-[24px]">
 							확인
 						</Button>
 					</CustomDialog>

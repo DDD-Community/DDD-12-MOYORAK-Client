@@ -39,6 +39,7 @@ const RestaurantRegistration = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [restaurantName, setRestaurantName] = useState('');
 	const teamId = localStorage.getItem('teamId') ?? '';
+	const userId = localStorage.getItem('userId') ?? '';
 
 	const location = useLocation();
 	const { restaurant } = (location.state as { restaurant?: { id: string; name: string } } | undefined) ?? {};
@@ -76,7 +77,7 @@ const RestaurantRegistration = () => {
 			const response = await post<IRestaurantRegistrationRequest>(`/teams/${teamId}/restaurants`, {
 				restaurantId: Number(restaurant?.id),
 				summary: restaurantDescription,
-				userId: 5,
+				userId: Number(userId),
 				servingTimeId: Number(foodPrepTime),
 				waitingTimeId: Number(waitingTime),
 				score: satisfaction,
