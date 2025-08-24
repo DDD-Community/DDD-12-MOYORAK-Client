@@ -85,7 +85,7 @@ const PotMake = () => {
 	const [attendable, setAttendable] = useState(true);
 
 	// TanStack Query 훅 사용
-	const { data: teamMembers = [], isLoading: isLoadingTeamMembers, error: teamMembersError } = useQueryTeamMembers(teamId.toString());
+	const { data: teamMembers = [], isLoading: isLoadingTeamMembers } = useQueryTeamMembers(teamId.toString());
 	const { mutate: makeParty } = useMutationMakeParty(teamId.toString());
 
 	const [startTime, setStartTime] = useState('오전 00:00');
@@ -368,25 +368,12 @@ const PotMake = () => {
 		return formatTo24Hour(ampm, Number(hour), Number(minute));
 	};
 
-	// TanStack Query가 자동으로 데이터를 가져오므로 별도의 useEffect가 필요 없음
-
 	// 로딩 상태 처리
 	if (isLoadingTeamMembers) {
 		return (
 			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
 				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
 					로딩 중...
-				</Typography>
-			</div>
-		);
-	}
-
-	// 에러 상태 처리
-	if (teamMembersError) {
-		return (
-			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
-				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
-					팀 멤버 정보를 불러오는데 실패했습니다.
 				</Typography>
 			</div>
 		);

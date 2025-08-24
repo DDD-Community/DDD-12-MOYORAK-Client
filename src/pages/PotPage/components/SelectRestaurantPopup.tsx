@@ -63,7 +63,7 @@ const SelectRestaurantPopup = ({ onClose, initialSelectedIds = [] }: ISelectRest
 
 	// TanStack Query 훅 사용
 	const apiSortOption = getSortOptionForAPI(sortOption);
-	const { data: teamRestaurantList, isLoading, error } = useQueryTeamRestaurantList(teamId.toString(), apiSortOption, size, currentPage);
+	const { data: teamRestaurantList, isLoading } = useQueryTeamRestaurantList(teamId.toString(), apiSortOption, size, currentPage);
 
 	// 로딩 상태 처리
 	if (isLoading) {
@@ -71,17 +71,6 @@ const SelectRestaurantPopup = ({ onClose, initialSelectedIds = [] }: ISelectRest
 			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
 				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
 					로딩 중...
-				</Typography>
-			</div>
-		);
-	}
-
-	// 에러 상태 처리
-	if (error) {
-		return (
-			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
-				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
-					식당 목록을 불러오는데 실패했습니다.
 				</Typography>
 			</div>
 		);
