@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { useMutationAuthSignIn } from '@/apis/useMutationAuthSignIn';
 import { useMutationAuthSignUp } from '@/apis/useMutationAuthSignUp';
@@ -11,33 +11,37 @@ import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 import { useSignupStore } from '@/store/signupStore';
 
-const BasicProfile = () => {
+interface IBasicProfileProps {
+	locationState: {
+		email: string;
+		name: string;
+		profileImage?: string;
+	};
+}
+
+const BasicProfile = ({ locationState }: IBasicProfileProps) => {
 	const navigate = useNavigate();
-	const { state } = useLocation() as { state: { email: string; name: string; profileImage?: string } };
 	const { username, birth, gender, setUsername, setBirth, setGender, nextStep } = useSignupStore();
 
-	console.log(state);
 	const { mutate } = useMutationAuthSignUp();
 	const { mutate: signIn } = useMutationAuthSignIn();
 
 	useEffect(() => {
-		if (!state) return;
-
-		if (!state.email || !state.name) {
+		if (!locationState.email || !locationState.name) {
 			navigate('/auth', { replace: true });
 		}
-	}, [state, navigate]);
+	}, [locationState, navigate]);
 
 	const onSignup = () => {
-		if (!gender || !state) return;
+		if (!gender || !locationState) return;
 
 		mutate(
 			{
-				email: state.email,
+				email: locationState.email,
 				name: username,
 				gender: gender,
 				birthday: birth.replace(/\//g, '-'),
-				profileImage: state.profileImage ?? '',
+				profileImage: locationState.profileImage ?? '',
 			},
 			{
 				onSuccess: (data) => {
