@@ -208,7 +208,6 @@ const PotMake = () => {
 		setPotMakeRequest((prev) => ({
 			...prev,
 			isUserSelected: value.length > 0,
-			// 선택된 팀원들 + 본인(userId: 5) 포함
 			users: { ids: [...value.map((member) => ({ userId: member.id })), { userId: 5 }] },
 		}));
 	};

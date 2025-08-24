@@ -41,7 +41,8 @@ const AddRestaurantPopup = ({ onClose, existingRestaurantIds }: IAddRestaurantPo
 	const [selectedOpen, setSelectedOpen] = useState<boolean>(false);
 	const { getCategoryDisplay } = useCategoryMapping();
 
-	const teamId = 1;
+	const teamId = localStorage.getItem('teamId') ?? '';
+
 	const size = 100;
 	const currentPage = 1;
 

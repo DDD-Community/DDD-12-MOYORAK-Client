@@ -27,7 +27,7 @@ const PotDetail = () => {
 	const { getCategoryDisplay } = useCategoryMapping();
 	const { mutate: voteRestaurant, isPending: isVoting } = useMutationVote();
 	const { mutate: addRestaurantToParty, isPending: isAddingRestaurant } = useMutationAddRestaurantToParty();
-	const teamId = 1;
+	const teamId = localStorage.getItem('teamId') ?? '';
 	const { id } = useParams();
 
 	const { data: potDetail, isLoading: isLoadingPotDetail, error: potDetailError } = useQueryPotDetail(teamId.toString(), id || '');
@@ -200,7 +200,7 @@ const PotDetail = () => {
 		if (selectedRestaurantId && potDetail) {
 			voteRestaurant(
 				{
-					teamId,
+					teamId: Number(teamId),
 					partyId: Number(id),
 					voteId: potDetail.vote.id,
 					candidateId: selectedRestaurantId,
@@ -292,7 +292,7 @@ const PotDetail = () => {
 		if (selectedRestaurants && selectedRestaurants.length > 0 && potDetail) {
 			addRestaurantToParty(
 				{
-					teamId,
+					teamId: Number(teamId),
 					partyId: Number(id),
 					teamRestaurantId: selectedRestaurants[0].teamRestaurantId,
 					voteId: potDetail.vote.id,

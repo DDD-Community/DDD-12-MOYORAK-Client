@@ -17,7 +17,7 @@ const Participant = () => {
 	};
 
 	const partyId = 1;
-	const teamId = 1;
+	const teamId = localStorage.getItem('teamId') ?? '';
 
 	// TanStack Query 훅 사용
 	const { data: participantList = [], isLoading, error } = useQueryParticipantList(teamId.toString(), partyId.toString());

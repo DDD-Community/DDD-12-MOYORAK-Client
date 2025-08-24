@@ -18,7 +18,7 @@ const RestaurantDetail = () => {
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const [lastToastTime, setLastToastTime] = useState(0);
 
-	const teamId = 1;
+	const teamId = localStorage.getItem('teamId') ?? '';
 	const { teamRestaurantId } = useParams<{ teamRestaurantId: string }>();
 
 	// TanStack Query 훅 사용

@@ -21,7 +21,6 @@ const NewRestaurantSelect = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { restaurant } = (location.state as { restaurant?: { name: string } } | undefined) ?? {};
-	// TanStack Query 훅 사용
 	const { data: newRestaurantSelect, isLoading, error } = useQueryExternalRestaurantSearch(restaurant?.name || '');
 
 	const handleAddRestaurant = (selectedRestaurant: INewRestaurantSelect) => {

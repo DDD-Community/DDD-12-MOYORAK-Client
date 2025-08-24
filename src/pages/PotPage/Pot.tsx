@@ -19,7 +19,7 @@ const Pot = () => {
 	const currentTime = new Date();
 	const { getCategoryDisplay } = useCategoryMapping();
 
-	const teamId = 1;
+	const teamId = localStorage.getItem('teamId') ?? '';
 	const size = 100;
 	const currentPage = 1;
 

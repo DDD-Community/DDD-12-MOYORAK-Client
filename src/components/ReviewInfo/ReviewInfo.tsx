@@ -23,7 +23,7 @@ const ReviewInfo = ({ restaurantName }: IReviewInfoProps) => {
 	const [openOptionMenu, setOpenOptionMenu] = useState<number | null>(null);
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedReviewId, setSelectedReviewId] = useState<number | null>(null);
-	const teamId = 1;
+	const teamId = localStorage.getItem('teamId') ?? '';
 	const { teamRestaurantId } = useParams<{ teamRestaurantId: string }>();
 
 	const { data: reviewList, isLoading: isLoadingReviews, error: reviewsError } = useQueryReviewList(teamId.toString(), teamRestaurantId || '');

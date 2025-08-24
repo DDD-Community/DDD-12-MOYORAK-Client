@@ -44,7 +44,7 @@ const SelectRestaurantPopup = ({ onClose, initialSelectedIds = [] }: ISelectRest
 		setSearchValue(e.target.value);
 	};
 
-	const teamId = 1;
+	const teamId = localStorage.getItem('teamId') ?? '';
 	const size = 100;
 	const currentPage = 1;
 
