@@ -1,4 +1,5 @@
-import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useMutationAuthSignIn } from '@/apis/useMutationAuthSignIn';
 import { useMutationAuthSignUp } from '@/apis/useMutationAuthSignUp';
@@ -11,18 +12,27 @@ import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 import { useSignupStore } from '@/store/signupStore';
 
 const BasicProfile = () => {
-	const { state } = useLocation() as { state: { email?: string; name?: string; profileImage?: string } };
+	const navigate = useNavigate();
+	const { state } = useLocation() as { state: { email: string; name: string; profileImage?: string } };
 	const { username, birth, gender, setUsername, setBirth, setGender, nextStep } = useSignupStore();
 
 	const { mutate } = useMutationAuthSignUp();
 	const { mutate: signIn } = useMutationAuthSignIn();
+
+	useEffect(() => {
+		if (!state) return;
+
+		if (!state.email || !state.name) {
+			navigate('/auth', { replace: true });
+		}
+	}, [state]);
 
 	const onSignup = () => {
 		if (!gender || !state) return;
 
 		mutate(
 			{
-				email: state.email ?? '',
+				email: state.email,
 				name: username,
 				gender: gender,
 				birthday: birth.replace(/\//g, '-'),
