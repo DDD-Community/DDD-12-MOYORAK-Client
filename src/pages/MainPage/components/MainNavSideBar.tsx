@@ -45,7 +45,7 @@ const MainNavSideBar = ({ onCopy }: IMainNavBarProps) => {
 			<button className="w-full text-left px-4 py-2 hover:bg-gray-100" onClick={handleOpen}>
 				<Typography variant={FONT_VARIANT.label01}>우리 팀에 초대하기</Typography>
 			</button>
-			<button className="w-full text-left px-4 py-2 hover:bg-gray-100" onClick={() => navigate('/review-registration')}>
+			<button className="w-full text-left px-4 py-2 hover:bg-gray-100" onClick={() => navigate('/restaurant-registration')}>
 				<Typography variant={FONT_VARIANT.label01}>우리 팀 식당 등록</Typography>
 			</button>
 			<button className="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500">
