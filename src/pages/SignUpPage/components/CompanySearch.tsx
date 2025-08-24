@@ -81,10 +81,14 @@ const CompanySearch = () => {
 	};
 
 	const onSaveCompany = async () => {
-		if (!company || !baseAddress) {
-			alert('회사 이름과 주소를 입력해주세요.');
-			return;
+		if (!companyList) return;
+
+		if (companyList.searchResponses.length === 1) {
+			localStorage.setItem('companyId', String(companyList.searchResponses[0].companyId));
+			return nextStep();
 		}
+
+		if (!company && !baseAddress) return;
 
 		try {
 			const { longitude, latitude } = await getCoordinates(baseAddress);
@@ -139,6 +143,11 @@ const CompanySearch = () => {
 				isError={!isRegisterCompany && companyList?.searchResponses.length === 0}
 				message={validMessage}
 			/>
+			{companyList?.searchResponses.map((item) => (
+				<ul>
+					<li>{item.name}</li>
+				</ul>
+			))}
 
 			{companyList && companyList.searchResponses.length === 0 && (
 				<FilterButton variant="general" className="rounded-[17px] py-1.5 flex items-center gap-0.5 mt-5" onClick={onRegisterCompany}>

@@ -37,7 +37,7 @@ const Input = forwardRef<HTMLInputElement, IInputProps & Omit<IFormLabelProps, '
 		return (
 			<div className={className}>
 				{label && <FormLabel id={id} isEssential={isEssential} label={label} />}
-				<div className="relative mb-[10px]">
+				<div className="relative mb-[10px] flex">
 					<input
 						ref={ref}
 						id={id}

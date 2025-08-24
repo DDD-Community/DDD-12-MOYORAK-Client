@@ -3,7 +3,10 @@ import { useQuery } from '@tanstack/react-query';
 import { get } from '.';
 
 interface ISearchTeamResponse {
-	teams: string[];
+	teams: {
+		teamId: number;
+		name: string;
+	}[];
 }
 
 const getSearchTeam = async (companyId: number, team: string): Promise<ISearchTeamResponse> => {

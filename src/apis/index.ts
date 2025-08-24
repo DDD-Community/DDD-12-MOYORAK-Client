@@ -1,4 +1,6 @@
-import axios from 'axios';
+import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
+
+import type { IAuthSignInResponse } from './useMutationAuthSignIn';
 
 interface IApiErrorResponse {
 	type: string;
@@ -48,16 +50,52 @@ api.interceptors.request.use(
 	}
 );
 
+let isRefreshing = false;
+let pendingRequests: ((token: string) => void)[] = [];
+
 api.interceptors.response.use(
 	(response) => response,
-	(error) => {
-		// AxiosError 타입으로 캐스팅하여 detail 필드에 접근 가능
-		if (axios.isAxiosError(error) && error.response) {
-			const apiError: IApiErrorResponse = error.response.data;
-			console.error('API Error:', apiError);
-			// 에러를 다시 던져서 호출하는 곳에서 catch 할 수 있도록 합니다.
-			return Promise.reject(apiError); // 또는 new Error(apiError.detail) 등
+	async (error: AxiosError<IApiErrorResponse>) => {
+		const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+
+		if (error.response?.status === 401 && !originalRequest._retry) {
+			originalRequest._retry = true;
+
+			if (!isRefreshing) {
+				isRefreshing = true;
+				try {
+					const refreshToken = localStorage.getItem('refreshToken');
+					if (!refreshToken) throw new Error('No refresh token');
+
+					const { data } = await axios.post<IAuthSignInResponse>(`${import.meta.env.VITE_API_URL}/auth/refresh`, { 'X-REFRESH-TOKEN': refreshToken });
+
+					const newAccessToken = data.accessToken;
+					localStorage.setItem('accessToken', newAccessToken);
+
+					pendingRequests.forEach((cb) => cb(newAccessToken));
+					pendingRequests = [];
+
+					originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+					return api(originalRequest);
+				} catch (refreshError) {
+					console.error('토큰 갱신 실패:', refreshError);
+					localStorage.removeItem('accessToken');
+					localStorage.removeItem('refreshToken');
+					window.location.href = '/login';
+					return Promise.reject(refreshError);
+				} finally {
+					isRefreshing = false;
+				}
+			}
+
+			return new Promise((resolve) => {
+				pendingRequests.push((token: string) => {
+					originalRequest.headers.Authorization = `Bearer ${token}`;
+					resolve(api(originalRequest));
+				});
+			});
 		}
+
 		return Promise.reject(error);
 	}
 );

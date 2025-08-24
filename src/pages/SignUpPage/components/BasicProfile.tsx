@@ -1,3 +1,5 @@
+import { useLocation } from 'react-router-dom';
+
 import { useMutationAuthSignIn } from '@/apis/useMutationAuthSignIn';
 import { useMutationAuthSignUp } from '@/apis/useMutationAuthSignUp';
 import Button from '@/components/Button/Button';
@@ -7,7 +9,6 @@ import Input from '@/components/Input/Input';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 import { useSignupStore } from '@/store/signupStore';
-import { useLocation } from 'react-router-dom';
 
 const BasicProfile = () => {
 	const { state } = useLocation();
@@ -15,10 +16,11 @@ const BasicProfile = () => {
 
 	const { mutate } = useMutationAuthSignUp();
 	const { mutate: signIn } = useMutationAuthSignIn();
+	console.log(username, birth, gender);
 
 	const onSignup = () => {
 		if (!gender) return;
-
+		console.log('?');
 		mutate(
 			{
 				email: state.email,

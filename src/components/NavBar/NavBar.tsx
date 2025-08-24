@@ -1,4 +1,4 @@
-import Icon, { type IconTypes } from '@/components/Icon';
+import { type IconTypes } from '@/components/Icon';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 
@@ -80,7 +80,13 @@ const NavBar = (props: INavBarProps) => {
 								{props.leftText}
 							</Typography>
 						</div>
-						<Icon name={props.rightIcon} size={24} onClick={props.onRightIconClick} />
+						<IconButton
+							iconStyle={{
+								name: props.rightIcon,
+								size: 24,
+							}}
+							onClick={props.onRightIconClick}
+						/>
 					</div>
 				);
 

@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
 
+import { useMutationAddTeam } from '@/apis/useMutationAddTeam';
+import { useQuerySearchTeam } from '@/apis/useQuerySearchTeam';
 import Button from '@/components/Button/Button';
 import FilterButton from '@/components/FilterButton/FilterButton';
 import Icon from '@/components/Icon';
@@ -7,8 +9,6 @@ import Input from '@/components/Input/Input';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 import { useSignupStore } from '@/store/signupStore';
-import { useQuerySearchTeam } from '@/apis/useQuerySearchTeam';
-import { useMutationAddTeam } from '@/apis/useMutationAddTeam';
 
 const TeamSearch = () => {
 	const { team, setTeam, nextStep } = useSignupStore();
@@ -20,7 +20,11 @@ const TeamSearch = () => {
 
 	const companyId = localStorage.getItem('companyId');
 
-	const { mutate, isSuccess } = useMutationAddTeam();
+	const { mutate, isSuccess } = useMutationAddTeam({
+		onSuccess: (data) => {
+			localStorage.setItem('companyId', String(data.teamId));
+		},
+	});
 
 	const onRegisterTeam = () => {
 		setIsRegisterTeam(true);
@@ -40,6 +44,14 @@ const TeamSearch = () => {
 		if (isSuccess) return `${team}이 우리 회사에 등록되었습니다.`;
 	}, [isSearchEnabled, teamList, isSuccess]);
 
+	const onSaveTeam = () => {
+		if (teamList && teamList.teams.length === 1) {
+			const teamId = teamList.teams[0].teamId;
+			localStorage.setItem('teamId', String(teamId));
+		}
+		nextStep();
+	};
+
 	return (
 		<section className="px-5">
 			<Typography as="h1" variant={FONT_VARIANT.header02} fontColor={PALETTE.gray10} className="mb-[5px]">
@@ -58,7 +70,7 @@ const TeamSearch = () => {
 					setTeam(e.target.value);
 					setIsSearchEnabled(false);
 				}}
-				isSuccess={isRegisterTeam}
+				isSuccess={isRegisterTeam && teamList?.teams.length === 1}
 				isError={teamList?.teams.length === 0}
 				message={validMessage}
 				rightButton={
@@ -82,7 +94,7 @@ const TeamSearch = () => {
 			)}
 
 			<div className="fixed bottom-[30px] left-0 w-full px-5">
-				<Button variant={!team ? 'disabled' : 'active'} onClick={nextStep}>
+				<Button variant={!team ? 'disabled' : 'active'} onClick={onSaveTeam}>
 					다음
 				</Button>
 			</div>

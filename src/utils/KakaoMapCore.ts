@@ -136,8 +136,8 @@ export default class KakaoMapCore {
 
 		infoContent.innerHTML = `
 			<strong>${option.name}</strong><br/>
-			위도: ${option.longitude}<br/>
-			경도: ${option.latitude}
+			위도: ${option.latitude}<br/>
+			경도: ${option.longitude}
 		`;
 
 		const infoOverlay = new kakao.maps.CustomOverlay({

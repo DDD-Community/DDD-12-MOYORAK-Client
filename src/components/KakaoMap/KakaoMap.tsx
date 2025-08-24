@@ -63,8 +63,8 @@ const KakaoMap = ({ companyLocation, optionsList = [] }: IKakaoMapProps) => {
 	}, [optionsList, companyLocation]);
 
 	return (
-		<div className="relative  h-[calc(100vh-70px)] mx-auto bg-white rounded-lg shadow-lg">
-			<div ref={mapRef} className="w-full h-screen bg-gray-200" />
+		<div className="relative flex-1 bg-white rounded-lg shadow-lg">
+			<div ref={mapRef} className="w-full h-full bg-gray-200" />
 		</div>
 	);
 };
