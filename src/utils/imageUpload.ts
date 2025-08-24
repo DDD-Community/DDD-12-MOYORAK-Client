@@ -42,7 +42,7 @@ export const getFileExtension = (file: File): string => {
 	const mimeType = file.type;
 	switch (mimeType) {
 		case 'image/jpeg':
-			return 'jpg';
+			return 'jpeg'; // jpg 대신 jpeg로 통일
 		case 'image/png':
 			return 'png';
 		case 'image/gif':
@@ -58,7 +58,8 @@ export const getFileExtension = (file: File): string => {
 			console.log('HEIC/HEIF MIME 타입을 JPG로 변환합니다.');
 			return 'jpg';
 		default:
-			return 'jpg';
+			// 기본값도 jpeg로 통일
+			return 'jpeg';
 	}
 };
 
@@ -96,7 +97,7 @@ export const uploadSingleImage = async (file: File): Promise<string> => {
 			method: 'PUT',
 			body: file,
 			headers: {
-				'Content-Type': file.type,
+				'Content-Type': file.type === 'image/jpg' ? 'image/jpeg' : file.type, // jpg를 jpeg로 통일
 			},
 		});
 
@@ -115,7 +116,7 @@ export const uploadSingleImage = async (file: File): Promise<string> => {
  * 파일 유효성 검증
  */
 export const validateImageFiles = (files: File[]): File[] => {
-	const supportedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/heic', 'image/heif'];
+	const supportedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/heic', 'image/heif'];
 
 	return files.filter((file) => {
 		// MIME 타입 체크
