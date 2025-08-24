@@ -30,7 +30,7 @@ const PotDetail = () => {
 	const teamId = Number(localStorage.getItem('teamId'));
 	const { id } = useParams();
 
-	const { data: potDetail, isLoading: isLoadingPotDetail, error: potDetailError } = useQueryPotDetail(teamId.toString(), id || '');
+	const { data: potDetail, isLoading: isLoadingPotDetail } = useQueryPotDetail(teamId.toString(), id || '');
 	const { mutate: joinParty } = useMutationJoinParty(teamId.toString(), id || '');
 
 	const userId = Number(localStorage.getItem('userId'));
@@ -230,28 +230,6 @@ const PotDetail = () => {
 			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
 				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
 					로딩 중...
-				</Typography>
-			</div>
-		);
-	}
-
-	// 에러 상태 처리
-	if (potDetailError) {
-		return (
-			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
-				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
-					팟 정보를 불러오는데 실패했습니다.
-				</Typography>
-			</div>
-		);
-	}
-
-	// 데이터가 없을 때 처리
-	if (!potDetail) {
-		return (
-			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
-				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
-					팟 정보가 없습니다.
 				</Typography>
 			</div>
 		);

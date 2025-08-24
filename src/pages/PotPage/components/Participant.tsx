@@ -21,7 +21,7 @@ const Participant = () => {
 	const teamId = localStorage.getItem('teamId') ?? '';
 
 	// TanStack Query 훅 사용
-	const { data: participantList = [], isLoading, error } = useQueryParticipantList(teamId.toString(), id || '');
+	const { data: participantList = [], isLoading } = useQueryParticipantList(teamId.toString(), id || '');
 
 	// 로딩 상태 처리
 	if (isLoading) {
@@ -29,17 +29,6 @@ const Participant = () => {
 			<div className="px-4.5 bg-[#F5F5F5] pt-5 h-screen flex items-center justify-center">
 				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
 					로딩 중...
-				</Typography>
-			</div>
-		);
-	}
-
-	// 에러 상태 처리
-	if (error) {
-		return (
-			<div className="px-4.5 bg-[#F5F5F5] pt-5 h-screen flex items-center justify-center">
-				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
-					참여자 목록을 불러오는데 실패했습니다.
 				</Typography>
 			</div>
 		);

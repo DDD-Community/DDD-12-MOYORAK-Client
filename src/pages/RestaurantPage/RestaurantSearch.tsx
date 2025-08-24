@@ -22,7 +22,7 @@ const RestaurantSearch = () => {
 	const [searchValue, setSearchValue] = useState('');
 
 	// TanStack Query 훅 사용
-	const { data: restaurantResponse, isLoading, error } = useQueryRestaurantSearch(searchValue);
+	const { data: restaurantResponse, isLoading } = useQueryRestaurantSearch(searchValue);
 	const restaurants = restaurantResponse?.data || [];
 	const searchPerformed = !!searchValue.trim();
 
@@ -48,17 +48,6 @@ const RestaurantSearch = () => {
 				<div className="flex flex-col gap-2.5 items-center justify-center pt-40">
 					<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
 						검색 중...
-					</Typography>
-				</div>
-			);
-		}
-
-		// 에러 상태 처리
-		if (error) {
-			return (
-				<div className="flex flex-col gap-2.5 items-center justify-center pt-40">
-					<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
-						검색에 실패했습니다.
 					</Typography>
 				</div>
 			);

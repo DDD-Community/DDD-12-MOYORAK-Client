@@ -23,10 +23,8 @@ const Pot = () => {
 	const size = 100;
 	const currentPage = 1;
 
-	// TanStack Query 훅 사용
-	const { data: potList, isLoading, error } = useQueryPotList(teamId.toString(), size, currentPage);
+	const { data: potList, isLoading } = useQueryPotList(teamId.toString(), size, currentPage);
 
-	// 남은 시간 계산 함수
 	const getTimeRemaining = (targetTime: Date) => {
 		const diff = targetTime.getTime() - currentTime.getTime();
 
@@ -48,28 +46,6 @@ const Pot = () => {
 			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
 				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
 					로딩 중...
-				</Typography>
-			</div>
-		);
-	}
-
-	// 에러 상태 처리
-	if (error) {
-		return (
-			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
-				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
-					팟 목록을 불러오는데 실패했습니다.
-				</Typography>
-			</div>
-		);
-	}
-
-	// 데이터가 없을 때 처리
-	if (!potList || potList.data.length === 0) {
-		return (
-			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
-				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
-					아직 팟이 없습니다.
 				</Typography>
 			</div>
 		);

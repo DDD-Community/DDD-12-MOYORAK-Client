@@ -29,11 +29,13 @@ const NewRestaurantSelect = () => {
 	// 회사 위치 정보 가져오기
 	const { data: companyPosition } = useQueryCompanyPosition(Number(companyId));
 
-	const {
-		data: newRestaurantSelect,
-		isLoading,
-		error,
-	} = useQueryExternalRestaurantSearch(restaurant?.name || '', companyPosition?.longtitude || 0, companyPosition?.latitude || 0);
+	const { data: newRestaurantSelect, isLoading } = useQueryExternalRestaurantSearch(
+		restaurant?.name || '',
+		companyPosition?.longtitude || 0,
+		companyPosition?.latitude || 0
+	);
+
+	console.log('newRestaurantSelect', newRestaurantSelect);
 
 	const handleAddRestaurant = (selectedRestaurant: INewRestaurantSelect) => {
 		navigate('/new-restaurant-registration', {
@@ -55,17 +57,6 @@ const NewRestaurantSelect = () => {
 		);
 	}
 
-	// 에러 상태 처리
-	if (error) {
-		return (
-			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
-				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
-					검색에 실패했습니다.
-				</Typography>
-			</div>
-		);
-	}
-
 	return (
 		<div className="bg-gray-02 min-h-screen">
 			<NavBar variant="iconWithText" leftIcon="back" leftText="신규 식당 추가하기" onLeftIconClick={() => navigate(-1)} />
@@ -77,7 +68,7 @@ const NewRestaurantSelect = () => {
 					<Icon name="search" />
 				</div>
 
-				{newRestaurantSelect?.data.length === 0 ? (
+				{!newRestaurantSelect || newRestaurantSelect.data.length === 0 ? (
 					<div className="flex flex-col gap-5.25 items-center justify-center h-[calc(100vh-100px)]">
 						<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
 							등록되어 있지 않은 식당이에요
@@ -85,8 +76,9 @@ const NewRestaurantSelect = () => {
 						<img src={noRestaurant} alt="noRestaurant" className="w-[158px] h-[152px]" />
 					</div>
 				) : (
+					// 데이터가 있고 결과가 있는 경우
 					<div className="flex flex-col gap-4.5 items-center">
-						{newRestaurantSelect?.data.map((item) => (
+						{newRestaurantSelect.data.map((item) => (
 							<div key={item.name} className="rounded-[5px] bg-white w-full h-[100px] flex items-center justify-between px-4.5 py-3.5">
 								<div className="flex flex-col gap-[5px]">
 									<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.gray10} className="font-semibold">
