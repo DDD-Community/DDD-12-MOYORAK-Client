@@ -11,23 +11,22 @@ import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 import { useSignupStore } from '@/store/signupStore';
 
 const BasicProfile = () => {
-	const { state } = useLocation();
+	const { state } = useLocation() as { state: { email?: string; name?: string; profileImage?: string } };
 	const { username, birth, gender, setUsername, setBirth, setGender, nextStep } = useSignupStore();
 
 	const { mutate } = useMutationAuthSignUp();
 	const { mutate: signIn } = useMutationAuthSignIn();
-	console.log(username, birth, gender);
 
 	const onSignup = () => {
-		if (!gender) return;
-		console.log('?');
+		if (!gender || !state) return;
+
 		mutate(
 			{
-				email: state.email,
+				email: state.email ?? '',
 				name: username,
 				gender: gender,
 				birthday: birth.replace(/\//g, '-'),
-				profileImage: state.profileImage,
+				profileImage: state.profileImage ?? '',
 			},
 			{
 				onSuccess: (data) => {
