@@ -46,7 +46,7 @@ export const REVIEW_LIST = [
 		waitTime: '10분',
 		prepTime: '10분',
 		review: '리뷰를 입력해주세요 리뷰를 입력해주세요 정말 맛있는 식당이에요. 음식도 빨리 나오고 직원분들도 친절하셨습니다. 다음에 또 올 의향이 있어요!',
-		images: [1, 2, 3], // 이미지 3개
+		images: [1, 2, 3],
 	},
 	{
 		name: '김지민',
@@ -65,4 +65,8 @@ export const BUTTON_TEXT = {
 	vote: '투표하기',
 	voteAgain: '다시 투표하기',
 	voteEnded: '투표가 종료되었어요',
+	notStarted: '아직 추첨이 시작되지 않았어요',
+	randomEnded: '랜덤 추첨이 종료되었어요',
+	potOneDay: '팟은 하루에 하나만 참여할 수 있어요',
+	notAttendable: '참여할 수 없는 팟이에요',
 };

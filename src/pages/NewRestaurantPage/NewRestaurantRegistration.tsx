@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { post } from '@/apis';
+import { useMutationAddRestaurant } from '@/apis/useMutationAddRestaurant';
 import Button from '@/components/Button/Button';
 import CategoryDropdown from '@/components/Dropdown/CategoryDropdown';
 import FormLabel from '@/components/Input/FormLabel';
@@ -36,26 +36,30 @@ const NewRestaurantRegistration = () => {
 		latitude: 37.27612295897271,
 	});
 
-	const postNewRestaurantRegistration = async () => {
-		try {
-			const apiData = {
-				...newRestaurantRegistration,
-				category: CATEGORY_API_MAPPING[newRestaurantRegistration.category as TCategoryDisplay],
-			};
+	const { mutate: addRestaurant, isPending: isAddingRestaurant } = useMutationAddRestaurant();
 
-			const response = await post<INewRestaurantRegistrationRequest>('/restaurants', apiData);
-			navigate('/restaurant-registration', {
-				state: {
-					restaurant: {
-						id: (response as unknown as { restaurantId: string }).restaurantId,
-						name: newRestaurantRegistration.name,
+	const postNewRestaurantRegistration = () => {
+		const apiData = {
+			...newRestaurantRegistration,
+			category: CATEGORY_API_MAPPING[newRestaurantRegistration.category as TCategoryDisplay],
+		};
+
+		addRestaurant(apiData, {
+			onSuccess: (response) => {
+				navigate('/restaurant-registration', {
+					state: {
+						restaurant: {
+							id: response.restaurantId,
+							name: newRestaurantRegistration.name,
+						},
 					},
-				},
-			});
-		} catch (error) {
-			console.error('식당 등록에 실패했습니다:', error);
-			alert('식당 등록에 실패했습니다.');
-		}
+				});
+			},
+			onError: (error) => {
+				console.error('식당 등록에 실패했습니다:', error);
+				alert('식당 등록에 실패했습니다.');
+			},
+		});
 	};
 
 	return (
@@ -84,8 +88,9 @@ const NewRestaurantRegistration = () => {
 					<Button
 						variant={newRestaurantRegistration.category && newRestaurantRegistration.address && newRestaurantRegistration.name ? 'active' : 'disabled'}
 						onClick={() => postNewRestaurantRegistration()}
+						disabled={isAddingRestaurant}
 					>
-						추가하기
+						{isAddingRestaurant ? '추가 중...' : '추가하기'}
 					</Button>
 				</div>
 			</div>

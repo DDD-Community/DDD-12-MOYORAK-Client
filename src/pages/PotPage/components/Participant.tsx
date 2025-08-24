@@ -1,32 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import { get } from '@/apis';
+import { useQueryParticipantList } from '@/apis/useQueryParticipantList';
 import noParticipant from '@/assets/noParticipant.png';
-import Button from '@/components/Button/Button';
 import Icon from '@/components/Icon';
 import Typography from '@/components/Typography';
-import { BUTTON_TEXT } from '@/constants/data.constant';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 
-interface IParticipantResponse {
-	userId: number;
-	userName: string;
-	profileImage: string;
-	mealTags: {
-		dislikes: string[];
-		allergies: string[];
-	};
-}
-
-interface ParticipantProps {
-	timeStatus: 'before_start' | 'voting_active' | 'after_end';
-	isParticipated: boolean;
-	onParticipateClick: () => void;
-}
-
-const Participant = ({ timeStatus, isParticipated, onParticipateClick }: ParticipantProps) => {
+const Participant = () => {
 	const [expandedParticipant, setExpandedParticipant] = useState<number | null>(null);
-	const [participantList, setParticipantList] = useState<IParticipantResponse[]>([]);
 
 	const toggleParticipantExpansion = (participantId: number) => {
 		setExpandedParticipant((prev) => {
@@ -35,52 +16,33 @@ const Participant = ({ timeStatus, isParticipated, onParticipateClick }: Partici
 		});
 	};
 
-	// 투표 상태에 따른 버튼 텍스트
-	const getButtonText = (): string => {
-		if (timeStatus === 'after_end') {
-			return BUTTON_TEXT.voteEnded;
-		}
-
-		if (!isParticipated) {
-			return BUTTON_TEXT.participate;
-		}
-
-		const buttonTextMap = {
-			before_start: BUTTON_TEXT.participated,
-			voting_active: BUTTON_TEXT.vote,
-		};
-
-		return buttonTextMap[timeStatus] || BUTTON_TEXT.participate;
-	};
-
-	// 버튼 비활성화 여부
-	const isButtonDisabled = (): boolean => {
-		if (timeStatus === 'after_end') return true;
-		if (isParticipated && timeStatus === 'before_start') return true;
-		return false;
-	};
-
-	// 버튼 스타일 클래스
-	const getButtonClassName = (): string => {
-		return isButtonDisabled() ? 'bg-gray-03 text-gray-08' : 'bg-[#BEEE05] text-gray-10';
-	};
-
 	const partyId = 1;
-	const teamId = 1;
+	const teamId = localStorage.getItem('teamId') ?? '';
 
-	const getParticipantList = async () => {
-		try {
-			const response = await get<IParticipantResponse[]>(`/teams/${teamId}/parties/${partyId}/party-attendees`);
-			setParticipantList(response as IParticipantResponse[]);
-		} catch (error) {
-			console.error('팟 참여자 목록 조회 실패:', error);
-			setParticipantList([]);
-		}
-	};
+	// TanStack Query 훅 사용
+	const { data: participantList = [], isLoading, error } = useQueryParticipantList(teamId.toString(), partyId.toString());
 
-	useEffect(() => {
-		getParticipantList();
-	}, []);
+	// 로딩 상태 처리
+	if (isLoading) {
+		return (
+			<div className="px-4.5 bg-[#F5F5F5] pt-5 h-screen flex items-center justify-center">
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
+					로딩 중...
+				</Typography>
+			</div>
+		);
+	}
+
+	// 에러 상태 처리
+	if (error) {
+		return (
+			<div className="px-4.5 bg-[#F5F5F5] pt-5 h-screen flex items-center justify-center">
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
+					참여자 목록을 불러오는데 실패했습니다.
+				</Typography>
+			</div>
+		);
+	}
 
 	return (
 		<div className="px-4.5 bg-[#F5F5F5] pt-5 h-screen">
@@ -202,17 +164,6 @@ const Participant = ({ timeStatus, isParticipated, onParticipateClick }: Partici
 					<img src={noParticipant} alt="noParticipant" className="w-30 h-30.75" />
 				</div>
 			)}
-
-			<div className="fixed bottom-7.5 w-full left-0 px-4.5">
-				<Button
-					variant={isButtonDisabled() ? 'disabled' : 'active'}
-					onClick={onParticipateClick}
-					disabled={isButtonDisabled()}
-					className={getButtonClassName()}
-				>
-					{getButtonText()}
-				</Button>
-			</div>
 		</div>
 	);
 };

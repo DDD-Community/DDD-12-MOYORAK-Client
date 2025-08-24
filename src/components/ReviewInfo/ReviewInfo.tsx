@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
-import { del, get } from '@/apis';
+import { useMutationDeleteReview } from '@/apis/useMutationDeleteReview';
+import { useQueryReviewList } from '@/apis/useQueryReviewList';
 import reviewDelete from '@/assets/reviewDelete.png';
 import starIcon from '@/assets/star.png';
 import Button from '@/components/Button/Button';
@@ -11,25 +12,6 @@ import Icon from '@/components/Icon';
 import { CustomToast } from '@/components/Toast/BaseToaster';
 import Typography from '@/components/Typography/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
-
-interface IReviewListResponse {
-	size: number;
-	currentPage: number;
-	totalCount: number;
-	data: [
-		{
-			id: number;
-			extraText: string;
-			score: number;
-			servingTime: number;
-			waitingTime: number;
-			userNickname: string;
-			userProfileImageUrl: string;
-			photoUrls: string[];
-			createdDate: string;
-		},
-	];
-}
 
 interface IReviewInfoProps {
 	restaurantName: string;
@@ -40,23 +22,12 @@ const ReviewInfo = ({ restaurantName }: IReviewInfoProps) => {
 	const [expandedReviews, setExpandedReviews] = useState<Set<number>>(new Set());
 	const [openOptionMenu, setOpenOptionMenu] = useState<number | null>(null);
 	const [isOpen, setIsOpen] = useState(false);
-	const [reviewList, setReviewList] = useState<IReviewListResponse | null>(null);
 	const [selectedReviewId, setSelectedReviewId] = useState<number | null>(null);
-	const teamId = 1;
+	const teamId = localStorage.getItem('teamId') ?? '';
 	const { teamRestaurantId } = useParams<{ teamRestaurantId: string }>();
 
-	const getRestaurantReviewInfo = async () => {
-		try {
-			const response = await get<IReviewListResponse>(`/teams/${teamId}/restaurants/${teamRestaurantId}/reviews?currentPage=1&size=10`);
-			setReviewList(response as IReviewListResponse);
-		} catch (error) {
-			console.error('리뷰 정보를 불러오는데 실패했습니다:', error);
-		}
-	};
-
-	useEffect(() => {
-		getRestaurantReviewInfo();
-	}, []);
+	const { data: reviewList, isLoading: isLoadingReviews, error: reviewsError } = useQueryReviewList(teamId.toString(), teamRestaurantId || '');
+	const { mutate: deleteReview } = useMutationDeleteReview(teamId.toString(), teamRestaurantId || '');
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
@@ -97,15 +68,16 @@ const ReviewInfo = ({ restaurantName }: IReviewInfoProps) => {
 		});
 	};
 
-	const deleteReview = async (reviewId: number) => {
-		try {
-			await del(`/teams/${teamId}/restaurants/${teamRestaurantId}/reviews/${reviewId}`);
-			getRestaurantReviewInfo();
-			toast(<CustomToast title="리뷰가 삭제되었습니다." icon="check" />);
-		} catch (error) {
-			console.error('리뷰를 삭제하는데 실패했습니다:', error);
-			toast(<CustomToast title="리뷰 삭제에 실패했습니다." icon="invalidInput" />);
-		}
+	const handleDeleteReview = (reviewId: number) => {
+		deleteReview(reviewId.toString(), {
+			onSuccess: () => {
+				toast(<CustomToast title="리뷰가 삭제되었습니다." icon="check" />);
+			},
+			onError: (error) => {
+				console.error('리뷰를 삭제하는데 실패했습니다:', error);
+				toast(<CustomToast title="리뷰 삭제에 실패했습니다." icon="invalidInput" />);
+			},
+		});
 	};
 
 	const handleDelete = (reviewId: number) => {
@@ -116,7 +88,7 @@ const ReviewInfo = ({ restaurantName }: IReviewInfoProps) => {
 
 	const handleConfirmDelete = () => {
 		if (selectedReviewId) {
-			deleteReview(selectedReviewId);
+			handleDeleteReview(selectedReviewId);
 			setIsOpen(false);
 			setSelectedReviewId(null);
 		}
@@ -127,6 +99,39 @@ const ReviewInfo = ({ restaurantName }: IReviewInfoProps) => {
 		setSelectedReviewId(null);
 	};
 
+	// 로딩 상태 처리
+	if (isLoadingReviews) {
+		return (
+			<div className="flex items-center justify-center py-10">
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
+					리뷰를 불러오는 중...
+				</Typography>
+			</div>
+		);
+	}
+
+	// 에러 상태 처리
+	if (reviewsError) {
+		return (
+			<div className="flex items-center justify-center py-10">
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
+					리뷰를 불러오는데 실패했습니다.
+				</Typography>
+			</div>
+		);
+	}
+
+	// 데이터가 없을 때 처리
+	if (!reviewList || reviewList.data.length === 0) {
+		return (
+			<div className="flex items-center justify-center py-10">
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
+					아직 리뷰가 없습니다.
+				</Typography>
+			</div>
+		);
+	}
+
 	return (
 		<div>
 			<div className="flex items-center gap-1.5 mb-5">
@@ -134,7 +139,7 @@ const ReviewInfo = ({ restaurantName }: IReviewInfoProps) => {
 					리뷰
 				</Typography>
 				<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.gray08}>
-					{reviewList?.totalCount}개
+					{reviewList.totalCount}개
 				</Typography>
 			</div>
 

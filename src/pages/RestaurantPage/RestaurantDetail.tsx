@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
-import { get } from '@/apis';
+import { useQueryRestaurantDetail, useQueryRestaurantPhotos } from '@/apis/useQueryRestaurantDetail';
 import noGallery from '@/assets/noGallery.png';
 import starIcon from '@/assets/star.png';
 import Icon from '@/components/Icon';
@@ -11,28 +11,6 @@ import { CustomToast } from '@/components/Toast/BaseToaster';
 import Typography from '@/components/Typography/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 
-interface IRestaurantInfoResponse {
-	name: string;
-	summary: string;
-	placeUrl: string;
-	servingTime: number;
-	waitingTime: number;
-	reviewCount: number;
-	score: number;
-	photoPath: string;
-}
-
-interface IReviewPhotosResponse {
-	size: number;
-	currentPage: number;
-	totalCount: number;
-	data: [
-		{
-			path: string;
-		},
-	];
-}
-
 const RestaurantDetail = () => {
 	const navigate = useNavigate();
 	const [activeTab, setActiveTab] = useState<'reviews' | 'photos'>('reviews');
@@ -40,13 +18,14 @@ const RestaurantDetail = () => {
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const [lastToastTime, setLastToastTime] = useState(0);
 
-	const [restaurantInfo, setRestaurantInfo] = useState<IRestaurantInfoResponse | null>(null);
-	const imageUrl = restaurantInfo?.photoPath;
-
-	const [reviewPhotos, setReviewPhotos] = useState<IReviewPhotosResponse | null>(null);
-	const teamId = 1;
+	const teamId = localStorage.getItem('teamId') ?? '';
 	const { teamRestaurantId } = useParams<{ teamRestaurantId: string }>();
 
+	// TanStack Query 훅 사용
+	const { data: restaurantInfo, isLoading: isLoadingRestaurant } = useQueryRestaurantDetail(teamId.toString(), teamRestaurantId || '');
+	const { data: reviewPhotos, isLoading: isLoadingPhotos } = useQueryRestaurantPhotos(teamId.toString(), teamRestaurantId || '');
+
+	const imageUrl = restaurantInfo?.photoPath;
 	const allImages = reviewPhotos?.data?.map((photo) => photo.path) || [];
 
 	const handleReviewWrite = () => {
@@ -59,26 +38,7 @@ const RestaurantDetail = () => {
 		});
 	};
 
-	const getRestaurantInfo = async () => {
-		if (!teamRestaurantId) return;
-
-		const response = await get(`/teams/${teamId}/restaurants/${teamRestaurantId}`);
-		setRestaurantInfo(response as IRestaurantInfoResponse);
-	};
-
-	const getRestaurantReviewPhotos = async () => {
-		if (!teamRestaurantId) return;
-
-		const response = await get(`/teams/${teamId}/restaurants/${teamRestaurantId}/reviews/photos?currentPage=1&size=10`);
-		setReviewPhotos(response as IReviewPhotosResponse);
-	};
-
-	useEffect(() => {
-		if (teamRestaurantId) {
-			getRestaurantInfo();
-			getRestaurantReviewPhotos();
-		}
-	}, [teamRestaurantId]);
+	// TanStack Query가 자동으로 데이터를 가져오므로 별도의 함수와 useEffect가 필요 없음
 
 	const openGallery = (imageIndex: number) => {
 		setCurrentImageIndex(imageIndex);
@@ -114,6 +74,17 @@ const RestaurantDetail = () => {
 			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
 				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
 					잘못된 접근입니다.
+				</Typography>
+			</div>
+		);
+	}
+
+	// 로딩 상태 처리
+	if (isLoadingRestaurant || isLoadingPhotos) {
+		return (
+			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
+					로딩 중...
 				</Typography>
 			</div>
 		);

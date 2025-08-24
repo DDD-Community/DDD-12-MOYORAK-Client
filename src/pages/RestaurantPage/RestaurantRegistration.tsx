@@ -38,7 +38,7 @@ const RestaurantRegistration = () => {
 	const [isUploading, setIsUploading] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
 	const [restaurantName, setRestaurantName] = useState('');
-	const teamId = 1;
+	const teamId = localStorage.getItem('teamId') ?? '';
 
 	const location = useLocation();
 	const { restaurant } = (location.state as { restaurant?: { id: string; name: string } } | undefined) ?? {};

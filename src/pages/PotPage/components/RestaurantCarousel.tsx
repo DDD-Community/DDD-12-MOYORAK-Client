@@ -106,7 +106,7 @@ const RestaurantCarousel = ({
 
 	// 선택 상태 체크박스 렌더링
 	const renderSelectionCheckbox = (candidate: Candidate) => {
-		if (!canSelectRestaurant) return null;
+		if (!canSelectRestaurant || isVoted) return null;
 
 		const isSelected = selectedRestaurantId === candidate.candidateId;
 
@@ -125,12 +125,38 @@ const RestaurantCarousel = ({
 		);
 	};
 
+	// 우승 식당들 찾기 (동점자 포함)
+	const getWinningRestaurants = () => {
+		if (!restaurants || !voters) return [];
+
+		// 각 후보별 투표 수 계산
+		const voteCounts = restaurants.map((candidate) => ({
+			...candidate,
+			voteCount: voters.filter((voter) => voter.candidateId === candidate.candidateId).length,
+		}));
+
+		// 가장 많은 표를 받은 식당 찾기
+		const maxVotes = Math.max(...voteCounts.map((c) => c.voteCount));
+
+		// 최고 득표수가 0이면 모든 식당이 우승자 (모두 검정색)
+		if (maxVotes === 0) return voteCounts;
+
+		// 최고 득표수를 받은 모든 식당들 반환 (동점자 포함)
+		return voteCounts.filter((c) => c.voteCount === maxVotes);
+	};
+
 	// 투표 상태에 따른 카드 스타일
 	const getCardStyle = (candidate: Candidate) => {
-		const baseStyle = 'bg-white rounded-[20px] overflow-hidden cursor-pointer transition-all duration-300 relative mx-auto restaurant-card';
+		const baseStyle = `bg-white rounded-[20px] overflow-hidden ${!isVoted ? 'cursor-pointer' : 'cursor-default'} transition-all duration-300 relative mx-auto restaurant-card`;
 
 		if (timeStatus === 'after_end') {
-			return `${baseStyle} bg-[#484848]`;
+			// 투표 종료 후 우승자들만 어두운 배경 (동점자 포함, 0표 전부도 포함)
+			const winningRestaurants = getWinningRestaurants();
+			const isWinner = winningRestaurants.some((restaurant) => restaurant.candidateId === candidate.candidateId);
+			if (isWinner) {
+				return `${baseStyle} bg-[#484848]`;
+			}
+			return `${baseStyle}`;
 		}
 
 		if (isVoted && selectedRestaurantId === candidate.candidateId) {
@@ -141,9 +167,14 @@ const RestaurantCarousel = ({
 	};
 
 	// 투표 상태에 따른 텍스트 색상
-	const getTextColor = (type: 'category' | 'name' | 'rating' | 'review') => {
+	const getTextColor = (candidate: Candidate, type: 'category' | 'name' | 'rating' | 'review') => {
 		if (timeStatus === 'after_end') {
-			return PALETTE.white;
+			// 투표 종료 후 우승자들만 흰색 텍스트 (동점자 포함, 0표 전부도 포함)
+			const winningRestaurants = getWinningRestaurants();
+			const isWinner = winningRestaurants.some((restaurant) => restaurant.candidateId === candidate.candidateId);
+			if (isWinner) {
+				return PALETTE.white;
+			}
 		}
 
 		switch (type) {
@@ -160,15 +191,23 @@ const RestaurantCarousel = ({
 		}
 	};
 
-	const getStarIconColor = () => {
-		return timeStatus === 'after_end' ? 'text-white' : 'text-red-500';
+	const getStarIconColor = (candidate: Candidate) => {
+		if (timeStatus === 'after_end') {
+			// 투표 종료 후 우승자들만 흰색 별 (동점자 포함, 0표 전부도 포함)
+			const winningRestaurants = getWinningRestaurants();
+			const isWinner = winningRestaurants.some((restaurant) => restaurant.candidateId === candidate.candidateId);
+			if (isWinner) {
+				return 'text-white';
+			}
+		}
+		return 'text-red-500';
 	};
 
 	const slickSettings = {
 		dots: false,
-		infinite: restaurants.length > 2,
+		infinite: restaurants.length > 1,
 		speed: 500,
-		slidesToShow: restaurants.length <= 2 ? restaurants.length : 1,
+		slidesToShow: restaurants.length <= 1 ? restaurants.length : 1,
 		slidesToScroll: 1,
 		centerMode: restaurants.length > 2,
 		arrows: restaurants.length > 2,
@@ -183,7 +222,7 @@ const RestaurantCarousel = ({
 		<Slider {...slickSettings}>
 			{restaurants.map((candidate) => (
 				<div key={candidate.candidateId}>
-					<div onClick={() => onCardClick?.(candidate)} className={getCardStyle(candidate)}>
+					<div onClick={() => !isVoted && onCardClick?.(candidate)} className={getCardStyle(candidate)}>
 						<div className="w-full overflow-hidden relative h-[200px]">
 							<img src={candidate.reviewImagePath} alt={`${candidate.restaurantName} 음식`} className="w-full h-full object-cover" />
 							<div className="absolute inset-0 gradient-overlay opacity-0 transition-opacity duration-300" />
@@ -197,24 +236,28 @@ const RestaurantCarousel = ({
 						<div
 							className={`p-4 ${
 								timeStatus === 'after_end'
-									? 'bg-[#484848]'
+									? (() => {
+											const winningRestaurants = getWinningRestaurants();
+											const isWinner = winningRestaurants.some((restaurant) => restaurant.candidateId === candidate.candidateId);
+											return isWinner ? 'bg-[#484848]' : 'bg-white';
+										})()
 									: isVoted && selectedRestaurantId === candidate.candidateId
 										? 'bg-[rgba(190,238,5,0.15)]'
 										: 'bg-white'
 							}`}
 						>
-							<Typography variant={FONT_VARIANT.caption01} fontColor={getTextColor('category')} className="mb-1">
+							<Typography variant={FONT_VARIANT.caption01} fontColor={getTextColor(candidate, 'category')} className="mb-1">
 								{getCategoryDisplay(candidate.restaurantCategory)}
 							</Typography>
-							<Typography variant={FONT_VARIANT.body01} fontColor={getTextColor('name')} className="font-semibold mb-0.75">
+							<Typography variant={FONT_VARIANT.body01} fontColor={getTextColor(candidate, 'name')} className="font-semibold mb-0.75">
 								{candidate.restaurantName}
 							</Typography>
 							<div className="flex items-center gap-1">
-								<Icon name="star" size={14} className={getStarIconColor()} />
-								<Typography variant={FONT_VARIANT.body02} fontColor={getTextColor('rating')} className="font-medium">
+								<Icon name="star" size={14} className={getStarIconColor(candidate)} />
+								<Typography variant={FONT_VARIANT.body02} fontColor={getTextColor(candidate, 'rating')} className="font-medium">
 									{candidate.averageReviewScore.toFixed(1)}
 								</Typography>
-								<Typography variant={FONT_VARIANT.body02} fontColor={getTextColor('review')}>
+								<Typography variant={FONT_VARIANT.body02} fontColor={getTextColor(candidate, 'review')}>
 									· 리뷰 {candidate.reviewCount}
 								</Typography>
 							</div>

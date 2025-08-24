@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { get } from '@/apis';
+import { useQueryRestaurantSearch } from '@/apis/useQueryRestaurantSearch';
 import searchCharacter from '@/assets/searchCharacter.png';
 import FilterButton from '@/components/FilterButton/FilterButton';
 import Icon from '@/components/Icon';
@@ -16,54 +16,19 @@ interface IRestaurant {
 	roadAddress: string;
 }
 
-interface IRestaurantResponse {
-	size: number;
-	currentPage: number;
-	totalCount: number;
-	data: IRestaurant[];
-}
-
 const RestaurantSearch = () => {
 	const navigate = useNavigate();
 
 	const [searchValue, setSearchValue] = useState('');
-	const [restaurants, setRestaurants] = useState<IRestaurant[]>([]);
-	const [searchPerformed, setSearchPerformed] = useState(false);
+
+	// TanStack Query 훅 사용
+	const { data: restaurantResponse, isLoading, error } = useQueryRestaurantSearch(searchValue);
+	const restaurants = restaurantResponse?.data || [];
+	const searchPerformed = !!searchValue.trim();
 
 	const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchValue(e.target.value);
-		if (!e.target.value.trim()) {
-			setRestaurants([]);
-			setSearchPerformed(false);
-		}
 	};
-
-	const getRestaurants = async (keyword: string) => {
-		if (!keyword.trim()) return;
-		try {
-			const response = await get<IRestaurantResponse>(`/restaurants/search?keyword=${keyword}&size=10&currentPage=1`);
-			setRestaurants((response as IRestaurantResponse).data || []);
-			setSearchPerformed(true);
-		} catch (error) {
-			console.error('식당 검색 API 에러:', error);
-			setRestaurants([]);
-			setSearchPerformed(true);
-		}
-	};
-
-	useEffect(() => {
-		if (!searchValue.trim()) {
-			setRestaurants([]);
-			setSearchPerformed(false);
-			return;
-		}
-
-		const timeoutId = setTimeout(() => {
-			getRestaurants(searchValue);
-		}, 300);
-
-		return () => clearTimeout(timeoutId);
-	}, [searchValue]);
 
 	const handleRegister = (restaurant: IRestaurant) => {
 		navigate('/restaurant-registration', {
@@ -77,6 +42,28 @@ const RestaurantSearch = () => {
 	};
 
 	const renderSearchResults = () => {
+		// 로딩 상태 처리
+		if (isLoading && searchValue.trim()) {
+			return (
+				<div className="flex flex-col gap-2.5 items-center justify-center pt-40">
+					<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
+						검색 중...
+					</Typography>
+				</div>
+			);
+		}
+
+		// 에러 상태 처리
+		if (error) {
+			return (
+				<div className="flex flex-col gap-2.5 items-center justify-center pt-40">
+					<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
+						검색에 실패했습니다.
+					</Typography>
+				</div>
+			);
+		}
+
 		if (!searchPerformed) {
 			return (
 				<div className="flex flex-col gap-2.5 items-center justify-center pt-40">

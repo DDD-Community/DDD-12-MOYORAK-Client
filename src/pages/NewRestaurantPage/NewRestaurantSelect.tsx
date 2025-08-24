@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { get } from '@/apis';
+import { useQueryExternalRestaurantSearch } from '@/apis/useQueryExternalRestaurantSearch';
 import noRestaurant from '@/assets/noRestaurant.png';
 import FilterButton from '@/components/FilterButton/FilterButton';
 import Icon from '@/components/Icon';
@@ -18,33 +17,11 @@ interface INewRestaurantSelect {
 	latitude: number;
 }
 
-interface INewRestaurantSelectResponse {
-	size: number;
-	currentPage: number;
-	totalCount: number;
-	data: INewRestaurantSelect[];
-}
-
 const NewRestaurantSelect = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { restaurant } = (location.state as { restaurant?: { name: string } } | undefined) ?? {};
-	const [newRestaurantSelect, setNewRestaurantSelect] = useState<INewRestaurantSelectResponse | null>(null);
-
-	const getNewRestaurantSelect = async () => {
-		try {
-			const response = await get<INewRestaurantSelectResponse>(
-				`/restaurants/external/search?query=${restaurant?.name}&longitude=127.043616&latitude=37.279838&radius=2000&page=1&size=15`
-			);
-			setNewRestaurantSelect(response as INewRestaurantSelectResponse);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	useEffect(() => {
-		getNewRestaurantSelect();
-	}, []);
+	const { data: newRestaurantSelect, isLoading, error } = useQueryExternalRestaurantSearch(restaurant?.name || '');
 
 	const handleAddRestaurant = (selectedRestaurant: INewRestaurantSelect) => {
 		navigate('/new-restaurant-registration', {
@@ -54,6 +31,28 @@ const NewRestaurantSelect = () => {
 			replace: true,
 		});
 	};
+
+	// 로딩 상태 처리
+	if (isLoading) {
+		return (
+			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
+					검색 중...
+				</Typography>
+			</div>
+		);
+	}
+
+	// 에러 상태 처리
+	if (error) {
+		return (
+			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
+					검색에 실패했습니다.
+				</Typography>
+			</div>
+		);
+	}
 
 	return (
 		<div className="bg-gray-02 min-h-screen">

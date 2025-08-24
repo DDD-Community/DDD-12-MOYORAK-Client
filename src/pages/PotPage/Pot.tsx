@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { get } from '@/apis';
+import { useQueryPotList } from '@/apis/useQueryPotList';
 import arrow from '@/assets/arrow.png';
 import divider from '@/assets/divider.png';
 import noGallery from '@/assets/noGallery.png';
@@ -15,51 +14,17 @@ import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 import { useCategoryMapping } from '@/hooks/useCategoryMapping';
 
-interface IPotResponse {
-	size: number;
-	currentPage: number;
-	totalCount: number;
-	data: Array<{
-		id: number;
-		startDate: string;
-		endDate: string;
-		title: string;
-		voteType: string;
-		voteStatus: string;
-		attendeeCount: number;
-		partyRestaurantResponseList: Array<{
-			name: string;
-			restaurantCategory: string;
-			reviewScore: number;
-			reviewCount: number;
-		}>;
-		userProfileList: string[];
-		isParticipating: boolean;
-	}>;
-}
-
 const Pot = () => {
 	const navigate = useNavigate();
-	const [potList, setPotList] = useState<IPotResponse | null>(null);
 	const currentTime = new Date();
 	const { getCategoryDisplay } = useCategoryMapping();
 
-	const teamId = 1;
-	const size = 10;
+	const teamId = localStorage.getItem('teamId') ?? '';
+	const size = 100;
 	const currentPage = 1;
 
-	const getPotList = async () => {
-		try {
-			const response = await get<IPotResponse>(`/teams/${teamId}/parties?size=${size}&currentPage=${currentPage}`);
-			setPotList(response as IPotResponse);
-		} catch (error) {
-			console.error('팟 목록 조회 실패:', error);
-		}
-	};
-
-	useEffect(() => {
-		getPotList();
-	}, []);
+	// TanStack Query 훅 사용
+	const { data: potList, isLoading, error } = useQueryPotList(teamId.toString(), size, currentPage);
 
 	// 남은 시간 계산 함수
 	const getTimeRemaining = (targetTime: Date) => {
@@ -76,6 +41,39 @@ const Pot = () => {
 		}
 		return `${remainingMinutes}분`;
 	};
+
+	// 로딩 상태 처리
+	if (isLoading) {
+		return (
+			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
+					로딩 중...
+				</Typography>
+			</div>
+		);
+	}
+
+	// 에러 상태 처리
+	if (error) {
+		return (
+			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
+					팟 목록을 불러오는데 실패했습니다.
+				</Typography>
+			</div>
+		);
+	}
+
+	// 데이터가 없을 때 처리
+	if (!potList || potList.data.length === 0) {
+		return (
+			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
+					아직 팟이 없습니다.
+				</Typography>
+			</div>
+		);
+	}
 
 	// 실시간 투표 상태 판단 함수
 	const getRealTimeVoteStatus = (startDate: string, endDate: string) => {
@@ -209,7 +207,7 @@ const Pot = () => {
 			</div>
 
 			{potList?.data && potList.data.length > 0 ? (
-				<div className="mb-6">
+				<div className="mb-20">
 					<div className="space-y-5.5">
 						{potList.data.map((pot) => {
 							const realTimeVoteInfo = getRealTimeVoteStatus(pot.startDate, pot.endDate);

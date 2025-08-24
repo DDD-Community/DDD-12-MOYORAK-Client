@@ -36,6 +36,7 @@ export const del = async <T = unknown>(url: string, params?: object): Promise<TA
 	return data;
 };
 
+// // 요청 인터셉터 추가: localStorage에서 토큰을 가져와 Authorization 헤더에 추가
 api.interceptors.request.use(
 	(config) => {
 		const accessToken = localStorage.getItem('accessToken');
