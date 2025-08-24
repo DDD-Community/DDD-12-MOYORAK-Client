@@ -16,6 +16,7 @@ const BasicProfile = () => {
 	const { state } = useLocation() as { state: { email: string; name: string; profileImage?: string } };
 	const { username, birth, gender, setUsername, setBirth, setGender, nextStep } = useSignupStore();
 
+	console.log(state);
 	const { mutate } = useMutationAuthSignUp();
 	const { mutate: signIn } = useMutationAuthSignIn();
 
@@ -25,7 +26,7 @@ const BasicProfile = () => {
 		if (!state.email || !state.name) {
 			navigate('/auth', { replace: true });
 		}
-	}, [state, state.email, state.name]);
+	}, [state, state?.email, state?.name]);
 
 	const onSignup = () => {
 		if (!gender || !state) return;
