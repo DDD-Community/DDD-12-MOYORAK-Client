@@ -27,13 +27,13 @@ const PotDetail = () => {
 	const { getCategoryDisplay } = useCategoryMapping();
 	const { mutate: voteRestaurant, isPending: isVoting } = useMutationVote();
 	const { mutate: addRestaurantToParty, isPending: isAddingRestaurant } = useMutationAddRestaurantToParty();
-	const teamId = localStorage.getItem('teamId') ?? '';
+	const teamId = Number(localStorage.getItem('teamId'));
 	const { id } = useParams();
 
 	const { data: potDetail, isLoading: isLoadingPotDetail, error: potDetailError } = useQueryPotDetail(teamId.toString(), id || '');
 	const { mutate: joinParty } = useMutationJoinParty(teamId.toString(), id || '');
 
-	const userId = 5;
+	const userId = Number(localStorage.getItem('userId'));
 	const [activeTab, setActiveTab] = useState<TabType>('restaurant');
 
 	const isPotCreator = potDetail?.voters.some((voter) => voter.userId === userId);

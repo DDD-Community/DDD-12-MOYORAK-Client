@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useMutationAddRestaurant } from '@/apis/useMutationAddRestaurant';
+import { useQueryCompanyPosition } from '@/apis/useQueryCompanyPosition';
 import Button from '@/components/Button/Button';
 import CategoryDropdown from '@/components/Dropdown/CategoryDropdown';
 import FormLabel from '@/components/Input/FormLabel';
@@ -26,17 +27,34 @@ const NewRestaurantRegistration = () => {
 	const location = useLocation();
 	const { restaurant } = (location.state as { restaurant?: { name: string; placeUrl: string; address: string; roadAddress: string } } | undefined) ?? {};
 
+	// 로컬스토리지에서 companyId 가져오기
+	const companyId = localStorage.getItem('companyId') ?? '';
+
+	// 회사 위치 정보 가져오기
+	const { data: companyPosition } = useQueryCompanyPosition(Number(companyId));
+
 	const [newRestaurantRegistration, setNewRestaurantRegistration] = useState<INewRestaurantRegistrationRequest>({
 		placeUrl: restaurant?.placeUrl ?? '',
 		name: restaurant?.name ?? '',
 		address: restaurant?.address ?? '',
 		roadAddress: restaurant?.roadAddress ?? '',
 		category: '',
-		longitude: 127.04268860648028,
-		latitude: 37.27612295897271,
+		longitude: companyPosition?.longtitude ?? 0,
+		latitude: companyPosition?.latitude ?? 0,
 	});
 
 	const { mutate: addRestaurant, isPending: isAddingRestaurant } = useMutationAddRestaurant();
+
+	// 회사 위치 정보가 변경될 때마다 상태 업데이트
+	useEffect(() => {
+		if (companyPosition) {
+			setNewRestaurantRegistration((prev) => ({
+				...prev,
+				longitude: companyPosition.longtitude,
+				latitude: companyPosition.latitude,
+			}));
+		}
+	}, [companyPosition]);
 
 	const postNewRestaurantRegistration = () => {
 		const apiData = {

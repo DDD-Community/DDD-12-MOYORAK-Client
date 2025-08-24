@@ -20,11 +20,11 @@ interface INewRestaurantSelectResponse {
 
 export const useQueryExternalRestaurantSearch = (
 	query: string,
-	longitude: number = 127.043616,
-	latitude: number = 37.279838,
+	longitude: number = 0, // 기본값 제거, 호출하는 곳에서 전달해야 함
+	latitude: number = 0, // 기본값 제거, 호출하는 곳에서 전달해야 함
 	radius: number = 2000,
 	page: number = 1,
-	size: number = 15
+	size: number = 100
 ) => {
 	return useQuery({
 		queryKey: ['external', 'restaurants', query, longitude, latitude, radius, page, size],

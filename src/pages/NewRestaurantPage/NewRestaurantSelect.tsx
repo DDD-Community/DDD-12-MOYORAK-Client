@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 
+import { useQueryCompanyPosition } from '@/apis/useQueryCompanyPosition';
 import { useQueryExternalRestaurantSearch } from '@/apis/useQueryExternalRestaurantSearch';
 import noRestaurant from '@/assets/noRestaurant.png';
 import FilterButton from '@/components/FilterButton/FilterButton';
@@ -21,7 +22,18 @@ const NewRestaurantSelect = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { restaurant } = (location.state as { restaurant?: { name: string } } | undefined) ?? {};
-	const { data: newRestaurantSelect, isLoading, error } = useQueryExternalRestaurantSearch(restaurant?.name || '');
+
+	// 로컬스토리지에서 companyId 가져오기
+	const companyId = localStorage.getItem('companyId') ?? '';
+
+	// 회사 위치 정보 가져오기
+	const { data: companyPosition } = useQueryCompanyPosition(Number(companyId));
+
+	const {
+		data: newRestaurantSelect,
+		isLoading,
+		error,
+	} = useQueryExternalRestaurantSearch(restaurant?.name || '', companyPosition?.longtitude || 0, companyPosition?.latitude || 0);
 
 	const handleAddRestaurant = (selectedRestaurant: INewRestaurantSelect) => {
 		navigate('/new-restaurant-registration', {

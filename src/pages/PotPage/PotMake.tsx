@@ -72,7 +72,8 @@ const PotMake = () => {
 	const navigate = useNavigate();
 	const { getCategoryDisplay } = useCategoryMapping();
 
-	const teamId = 1;
+	const teamId = localStorage.getItem('teamId') ?? '';
+	const userId = localStorage.getItem('userId') ?? '';
 
 	const [potTitle, setPotTitle] = useState('');
 	const [potMember, setPotMember] = useState('');
@@ -109,7 +110,7 @@ const PotMake = () => {
 	const [potMakeRequest, setPotMakeRequest] = useState<IPotMakeRequest>({
 		title: '',
 		isUserSelected: false,
-		users: { ids: [{ userId: 5 }] },
+		users: { ids: [{ userId: Number(userId) }] },
 		restaurants: { ids: [] },
 		voteType: 'SELECT',
 		fromTime: '',
@@ -208,7 +209,7 @@ const PotMake = () => {
 		setPotMakeRequest((prev) => ({
 			...prev,
 			isUserSelected: value.length > 0,
-			users: { ids: [...value.map((member) => ({ userId: member.id })), { userId: 5 }] },
+			users: { ids: [...value.map((member) => ({ userId: member.id })), { userId: Number(userId) }] },
 		}));
 	};
 
@@ -230,8 +231,8 @@ const PotMake = () => {
 			setPotMakeRequest((prev) => ({
 				...prev,
 				isUserSelected: false,
-				// 팀원 미선택이어도 본인(userId: 5)은 포함
-				users: { ids: [{ userId: 5 }] },
+				// 팀원 미선택이어도 본인(userId)은 포함
+				users: { ids: [{ userId: Number(userId) }] },
 			}));
 		} else if (value === 'select') {
 			setPotMakeRequest((prev) => ({
