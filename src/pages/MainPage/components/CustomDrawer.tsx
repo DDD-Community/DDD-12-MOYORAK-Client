@@ -18,11 +18,7 @@ interface ICustomDrawerProps {
 
 const CustomDrawer = ({ header }: ICustomDrawerProps) => {
 	const teamId = localStorage.getItem('teamId');
-	const { data: restaurantList } = useQueryTeamRestaurantList(Number(teamId), {
-		size: 10,
-		currentPage: 1,
-		sortOption: 'DISTANCE',
-	});
+	const { data: restaurantList } = useQueryTeamRestaurantList(String(teamId), 'DISTANCE');
 
 	const [height, setHeight] = useState(BASIC_HEIGHT);
 	const dragging = useRef(false);

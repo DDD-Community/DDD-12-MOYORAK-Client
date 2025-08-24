@@ -2,18 +2,20 @@ import { useQuery } from '@tanstack/react-query';
 
 import { get } from './index';
 
-interface ITeamRestaurantResponse {
+export interface ITeamRestaurantItem {
+	teamRestaurantId: number;
+	restaurantName: string;
+	restaurantCategory: string;
+	averageReviewScore: number;
+	reviewCount: number;
+	reviewImagePath: string;
+}
+
+export interface ITeamRestaurantResponse {
 	size: number;
 	currentPage: number;
 	totalCount: number;
-	data: Array<{
-		teamRestaurantId: number;
-		restaurantName: string;
-		restaurantCategory: string;
-		averageReviewScore: number;
-		reviewCount: number;
-		reviewImagePath: string;
-	}>;
+	data: ITeamRestaurantItem[];
 }
 
 export const useQueryTeamRestaurantList = (teamId: string, sortOption: string, size: number = 100, currentPage: number = 1) => {
