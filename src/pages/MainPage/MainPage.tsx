@@ -60,7 +60,6 @@ const MainPage = () => {
 
 					{showInvitation && <MainNavSideBar onCopy={setCopied} />}
 				</div>
-
 				<KakaoMap
 					companyLocation={{
 						center: { lat: company?.latitude || 37.5665, lng: company?.longtitude || 126.978 },
@@ -69,6 +68,7 @@ const MainPage = () => {
 					}}
 					optionsList={data?.locations || []}
 				/>
+
 				<MainBottomSheet />
 				{copied && (
 					<Tooltip open>

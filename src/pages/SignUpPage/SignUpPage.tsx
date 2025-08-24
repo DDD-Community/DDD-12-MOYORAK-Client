@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import NavBar from '@/components/NavBar/NavBar';
 import Typography from '@/components/Typography';
@@ -16,8 +16,6 @@ const TOTAL_STEPS = 4;
 
 const SignUpPage = () => {
 	const navigate = useNavigate();
-
-	const { state } = useLocation() as { state: { email: string; name: string; profileImage?: string } };
 
 	const [searchParams, setSearchParams] = useSearchParams();
 
@@ -76,7 +74,7 @@ const SignUpPage = () => {
 					<span className="text-gray-07">/{TOTAL_STEPS}</span>
 				</Typography>
 
-				{step === 1 && <BasicProfile locationState={state} />}
+				{step === 1 && <BasicProfile />}
 				{step === 2 && <FoodPreference />}
 				{step === 3 && <CompanySearch />}
 				{step === 4 && <TeamSearch />}

@@ -4,7 +4,7 @@ import AuthPage from '@/pages/AuthPage/AuthPage';
 import RedirectPage from '@/pages/AuthPage/RedirectPage';
 import Developer from '@/pages/Developer';
 import MainPage from '@/pages/MainPage/MainPage';
-import MyPage from '@/pages/MyPage';
+import MyPage from '@/pages/MyPage/MyPage';
 import NewRestaurantRegistration from '@/pages/NewRestaurantPage/NewRestaurantRegistration';
 import NewRestaurantSelect from '@/pages/NewRestaurantPage/NewRestaurantSelect';
 import NotFound from '@/pages/NotFound';
@@ -17,9 +17,10 @@ import RestaurantRegistration from '@/pages/RestaurantPage/RestaurantRegistratio
 import RestaurantSearch from '@/pages/RestaurantPage/RestaurantSearch';
 import ReviewEdit from '@/pages/RestaurantPage/ReviewEdit';
 import ReviewRegistration from '@/pages/RestaurantPage/ReviewRegistration';
+import SearchRestaurantPage from '@/pages/SearchRestaurantPage/SearchRestaurantPage';
 import PopupAddress from '@/pages/SignUpPage/components/PopupAddress';
 import SignUpPage from '@/pages/SignUpPage/SignUpPage';
-import TeamShareListSearch from '@/pages/TeamShareListSearch';
+import TeamAdminPage from '@/pages/TeamAdminPage/TeamAdminPage';
 
 const AppRouter = () => {
 	return (
@@ -29,7 +30,8 @@ const AppRouter = () => {
 			<Route path="/redirect" element={<RedirectPage />} />
 			<Route path="/signup" element={<SignUpPage />} />
 			<Route path="/popup-address" element={<PopupAddress />} />
-			<Route path="/search" element={<TeamShareListSearch />} />
+			<Route path="/admin-team" element={<TeamAdminPage />} />
+			<Route path="/search" element={<SearchRestaurantPage />} />
 			<Route path="/mypage" element={<MyPage />} />
 			<Route path="/pot" element={<Pot />} />
 			<Route path="/pot-make" element={<PotMake />} />

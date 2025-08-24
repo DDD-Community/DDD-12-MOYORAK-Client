@@ -20,8 +20,11 @@ const RedirectPage = () => {
 		}
 
 		if (name && email) {
+			localStorage.setItem('email', email);
+			localStorage.setItem('name', name);
+			localStorage.setItem('profileImage', profileImage ?? '');
+
 			navigate('/signup?step=1', {
-				state: { email, name, profileImage },
 				replace: true,
 			});
 			return;
