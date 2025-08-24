@@ -22,7 +22,7 @@ const RedirectPage = () => {
 		}
 
 		if (name && email) {
-			navigate('/signup', {
+			navigate('/signup?step=1', {
 				state: {
 					name: name,
 					email: email,
