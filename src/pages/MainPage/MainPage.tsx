@@ -22,6 +22,8 @@ const MainPage = () => {
 	const [copied, setCopied] = useState<boolean>(false);
 
 	const isLogin = useLocation().state?.isLogin || Boolean(localStorage.getItem('accessToken'));
+	const accessToken = localStorage.getItem('accessToken');
+
 	const companyId = localStorage.getItem('companyId');
 	const teamId = localStorage.getItem('teamId');
 
@@ -34,11 +36,21 @@ const MainPage = () => {
 	};
 
 	useEffect(() => {
-		if (isLogin) {
+		if (isLogin && accessToken) {
+			try {
+				const payloadBase64 = accessToken.split('.')[1];
+				const decodedPayload = JSON.parse(atob(payloadBase64));
+				const userId = decodedPayload.userId;
+
+				localStorage.setItem('userId', String(userId));
+			} catch (error) {
+				console.error('AccessToken 디코딩 실패', error);
+			}
+
 			localStorage.setItem('companyId', String(user?.companyId));
 			localStorage.setItem('teamId', String(user?.teamId));
 		}
-	}, [isLogin]);
+	}, [isLogin, accessToken, user]);
 
 	if (isLogin) {
 		return (

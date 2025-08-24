@@ -1,8 +1,10 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 
-import RestaurantReview from './RestaurantReview';
 import { useQueryTeamRestaurantList } from '@/apis/useQueryTeamRestaurantList';
+
 import Empty from '../Empty';
+
+import RestaurantReview from './RestaurantReview';
 
 const BASIC_HEIGHT = 300;
 const MIN_HEIGHT = 120;
@@ -15,7 +17,8 @@ interface ICustomDrawerProps {
 }
 
 const CustomDrawer = ({ header }: ICustomDrawerProps) => {
-	const { data: restaurantList } = useQueryTeamRestaurantList(8, {
+	const teamId = localStorage.getItem('teamId');
+	const { data: restaurantList } = useQueryTeamRestaurantList(Number(teamId), {
 		size: 10,
 		currentPage: 1,
 		sortOption: 'DISTANCE',
