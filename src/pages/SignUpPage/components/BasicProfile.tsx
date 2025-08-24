@@ -11,38 +11,33 @@ import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 import { useSignupStore } from '@/store/signupStore';
 
-interface IBasicProfileProps {
-	locationState: {
-		email: string;
-		name: string;
-		profileImage?: string;
-	} | null;
-}
-
-const BasicProfile = ({ locationState }: IBasicProfileProps) => {
+const BasicProfile = () => {
 	const navigate = useNavigate();
 	const { username, birth, gender, setUsername, setBirth, setGender, nextStep } = useSignupStore();
 
-	console.log(locationState);
 	const { mutate } = useMutationAuthSignUp();
 	const { mutate: signIn } = useMutationAuthSignIn();
 
+	const email = localStorage.getItem('email');
+	const name = localStorage.getItem('name');
+	const profileImage = localStorage.getItem('profileImage');
+
 	useEffect(() => {
-		if (!locationState?.email || !locationState?.name) {
+		if (!email || !name) {
 			navigate('/auth', { replace: true });
 		}
-	}, [locationState, navigate]);
+	}, [email, name, navigate]);
 
 	const onSignup = () => {
-		if (!gender || !locationState) return;
+		if (!gender || !email) return;
 
 		mutate(
 			{
-				email: locationState.email,
+				email: email,
 				name: username,
 				gender: gender,
 				birthday: birth.replace(/\//g, '-'),
-				profileImage: locationState.profileImage ?? '',
+				profileImage: profileImage ?? '',
 			},
 			{
 				onSuccess: (data) => {
