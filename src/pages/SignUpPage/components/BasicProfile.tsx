@@ -25,7 +25,7 @@ const BasicProfile = () => {
 		if (!state.email || !state.name) {
 			navigate('/auth', { replace: true });
 		}
-	}, [state]);
+	}, [state, state.email, state.name]);
 
 	const onSignup = () => {
 		if (!gender || !state) return;
