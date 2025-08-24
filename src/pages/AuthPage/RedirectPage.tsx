@@ -2,35 +2,33 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const RedirectPage = () => {
-	const name = new URLSearchParams(location.search).get('name');
-	const email = new URLSearchParams(location.search).get('email');
-	const profileImage = new URLSearchParams(location.search).get('profileImage');
-	const accessToken = new URLSearchParams(location.search).get('accessToken');
-	const refreshToken = new URLSearchParams(location.search).get('refreshToken');
-
 	const navigate = useNavigate();
 
-	console.log(email, name, profileImage);
-
 	useEffect(() => {
+		const params = new URLSearchParams(window.location.search);
+		const name = params.get('name');
+		const email = params.get('email');
+		const profileImage = params.get('profileImage');
+		const accessToken = params.get('accessToken');
+		const refreshToken = params.get('refreshToken');
+
 		if (accessToken && refreshToken) {
 			localStorage.setItem('accessToken', accessToken);
 			localStorage.setItem('refreshToken', refreshToken);
-			navigate('/', { state: true });
-
+			navigate('/', { state: { login: true }, replace: true });
 			return;
 		}
 
 		if (name && email) {
 			navigate('/signup?step=1', {
-				state: {
-					name: name,
-					email: email,
-					profileImage: profileImage,
-				},
+				state: { email, name, profileImage },
+				replace: true,
 			});
+			return;
 		}
-	}, [name, email, accessToken]);
+
+		navigate('/auth', { replace: true });
+	}, [navigate]);
 
 	return <h1>loading...</h1>;
 };
