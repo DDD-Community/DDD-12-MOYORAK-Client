@@ -16,18 +16,19 @@ interface IBasicProfileProps {
 		email: string;
 		name: string;
 		profileImage?: string;
-	};
+	} | null;
 }
 
 const BasicProfile = ({ locationState }: IBasicProfileProps) => {
 	const navigate = useNavigate();
 	const { username, birth, gender, setUsername, setBirth, setGender, nextStep } = useSignupStore();
 
+	console.log(locationState);
 	const { mutate } = useMutationAuthSignUp();
 	const { mutate: signIn } = useMutationAuthSignIn();
 
 	useEffect(() => {
-		if (!locationState.email || !locationState.name) {
+		if (!locationState?.email || !locationState?.name) {
 			navigate('/auth', { replace: true });
 		}
 	}, [locationState, navigate]);
