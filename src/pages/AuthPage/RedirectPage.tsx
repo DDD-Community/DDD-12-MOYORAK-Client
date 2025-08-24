@@ -10,15 +10,13 @@ const RedirectPage = () => {
 
 	const navigate = useNavigate();
 
+	console.log(email, name, profileImage);
+
 	useEffect(() => {
 		if (accessToken && refreshToken) {
 			localStorage.setItem('accessToken', accessToken);
 			localStorage.setItem('refreshToken', refreshToken);
-			navigate('/', {
-				state: {
-					login: true,
-				},
-			});
+			navigate('/', { state: true });
 
 			return;
 		}
