@@ -11,7 +11,7 @@ interface IButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const Button = ({ children, variant = 'general', onClick, className, ...rest }: IButtonProps) => {
 	const getButtonClasses = () => {
-		const baseClasses = 'h-[50px] font-heading text-base font-medium leading-[150%] tracking-[0.091px] rounded-[20px] transition-colors duration-200';
+		const baseClasses = 'h-[50px] w-full font-heading text-base font-medium leading-[150%] tracking-[0.091px] rounded-[20px] transition-colors duration-200';
 
 		switch (variant) {
 			case 'disabled':
