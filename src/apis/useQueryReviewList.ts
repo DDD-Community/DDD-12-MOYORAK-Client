@@ -24,5 +24,7 @@ export const useQueryReviewList = (teamId: string, teamRestaurantId: string) => 
 		queryKey: ['reviews', teamId, teamRestaurantId],
 		queryFn: () => get<IReviewListResponse>(`/teams/${teamId}/restaurants/${teamRestaurantId}/reviews?currentPage=1&size=10`),
 		enabled: !!teamId && !!teamRestaurantId,
+		staleTime: 0,
+		gcTime: 0,
 	});
 };

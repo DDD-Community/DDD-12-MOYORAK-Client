@@ -28,6 +28,8 @@ export const useQueryRestaurantDetail = (teamId: string, teamRestaurantId: strin
 		queryKey: ['restaurant', 'detail', teamId, teamRestaurantId],
 		queryFn: () => get<RestaurantDetail>(`/teams/${teamId}/restaurants/${teamRestaurantId}`),
 		enabled: !!teamId && !!teamRestaurantId,
+		staleTime: 0,
+		gcTime: 0,
 	});
 };
 
@@ -36,5 +38,7 @@ export const useQueryRestaurantPhotos = (teamId: string, teamRestaurantId: strin
 		queryKey: ['restaurant', 'photos', teamId, teamRestaurantId],
 		queryFn: () => get<RestaurantPhotos>(`/teams/${teamId}/restaurants/${teamRestaurantId}/reviews/photos?currentPage=1&size=100`),
 		enabled: !!teamId && !!teamRestaurantId,
+		staleTime: 0,
+		gcTime: 0,
 	});
 };

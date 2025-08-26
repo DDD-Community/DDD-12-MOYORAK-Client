@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { put } from '@/apis';
 import emptyStarIcon from '@/assets/emptyStar.png';
@@ -28,6 +29,7 @@ const ReviewEdit = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const reviewData = location.state;
+	const queryClient = useQueryClient();
 
 	const [waitingTime, setWaitingTime] = useState('');
 	const [foodPrepTime, setFoodPrepTime] = useState('');
@@ -118,6 +120,12 @@ const ReviewEdit = () => {
 				photoPaths: allImagePaths,
 				extraText: review,
 			});
+
+			// 리뷰 수정 완료 후 정확한 쿼리 키로 무효화
+			queryClient.invalidateQueries({ queryKey: ['reviews', teamId] });
+			queryClient.invalidateQueries({ queryKey: ['restaurant', 'photos', teamId] });
+			queryClient.invalidateQueries({ queryKey: ['restaurant', 'detail', teamId] });
+
 			setIsOpen(true);
 		} catch (error) {
 			console.error('리뷰 수정에 실패했습니다:', error);

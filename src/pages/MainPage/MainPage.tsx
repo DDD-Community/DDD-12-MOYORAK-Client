@@ -12,11 +12,6 @@ import MainBottomSheet from './components/MainBottomSheet';
 import MainIntro from './components/MainIntro';
 import MainNavSideBar from './components/MainNavSideBar';
 
-const COMPANY_LOCATION = {
-	center: { lat: 37.5665, lng: 126.978 },
-	placeName: '디폴트 회사',
-};
-
 const MainPage = () => {
 	const [showInvitation, setShowInvitation] = useState(false);
 	const [copied, setCopied] = useState<boolean>(false);
@@ -31,6 +26,14 @@ const MainPage = () => {
 	const { data: company } = useQueryCompanyPosition(Number(companyId), isLogin);
 	const { data: user } = useQueryUser(isLogin);
 
+	const companyLocation = {
+		center: {
+			lat: company?.latitude || 37.5665,
+			lng: company?.longtitude || 126.978,
+		},
+		placeName: '회사',
+	};
+
 	const onShowInvitation = () => {
 		setShowInvitation((prev) => !prev);
 	};
@@ -40,8 +43,7 @@ const MainPage = () => {
 			try {
 				const payloadBase64 = accessToken.split('.')[1];
 				const decodedPayload = JSON.parse(atob(payloadBase64));
-				const userId = decodedPayload.userId;
-				console.log(userId);
+				const userId = decodedPayload.sub;
 
 				localStorage.setItem('userId', String(userId));
 			} catch (error) {
@@ -65,14 +67,7 @@ const MainPage = () => {
 
 					{showInvitation && <MainNavSideBar onCopy={setCopied} />}
 				</div>
-				<KakaoMap
-					companyLocation={{
-						center: { lat: company?.latitude || 37.5665, lng: company?.longtitude || 126.978 },
-						level: 2,
-						placeName: '회사',
-					}}
-					optionsList={data?.locations || []}
-				/>
+				<KakaoMap companyLocation={companyLocation} optionsList={data?.locations || []} />
 
 				<MainBottomSheet />
 				{copied && (
@@ -89,7 +84,7 @@ const MainPage = () => {
 
 	return (
 		<>
-			<KakaoMap companyLocation={COMPANY_LOCATION} optionsList={data?.locations || []} />
+			<KakaoMap companyLocation={companyLocation} optionsList={data?.locations || []} />
 			<MainIntro />
 		</>
 	);

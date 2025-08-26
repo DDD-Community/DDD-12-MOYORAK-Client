@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { post } from '@/apis';
 import emptyStarIcon from '@/assets/emptyStar.png';
@@ -40,6 +41,7 @@ const RestaurantRegistration = () => {
 	const [restaurantName, setRestaurantName] = useState('');
 	const teamId = localStorage.getItem('teamId') ?? '';
 	const userId = localStorage.getItem('userId') ?? '';
+	const queryClient = useQueryClient();
 
 	const location = useLocation();
 	const { restaurant } = (location.state as { restaurant?: { id: string; name: string } } | undefined) ?? {};
@@ -85,6 +87,15 @@ const RestaurantRegistration = () => {
 				extraText: review,
 			} as IRestaurantRegistrationRequest);
 			setTeamRestaurantId(Number((response as unknown as { teamRestaurantId: string }).teamRestaurantId));
+
+			// 리뷰 등록 완료 후 정확한 쿼리 키로 무효화
+			queryClient.invalidateQueries({ queryKey: ['reviews', teamId] });
+			queryClient.invalidateQueries({ queryKey: ['restaurant', 'photos', teamId] });
+			queryClient.invalidateQueries({ queryKey: ['restaurant', 'detail', teamId] });
+
+			// 모든 reviews 관련 쿼리 강제 무효화 (정확한 키 사용)
+			queryClient.removeQueries({ queryKey: ['reviews', teamId] });
+
 			setIsOpen(true);
 		} catch (error) {
 			console.error('식당 등록에 실패했습니다:', error);
@@ -310,7 +321,7 @@ const RestaurantRegistration = () => {
 						</div>
 					</div>
 
-					<Button variant={isButtonActive ? 'active' : 'disabled'} onClick={registerRestaurant} disabled={!isButtonActive}>
+					<Button variant={isButtonActive ? 'active' : 'disabled'} disabled={!isButtonActive}>
 						{isUploading ? '이미지 업로드 중...' : '등록하기'}
 					</Button>
 				</form>
