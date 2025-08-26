@@ -19,6 +19,13 @@ const MainPage = () => {
 	const isLogin = useLocation().state?.isLogin || Boolean(localStorage.getItem('accessToken'));
 	const accessToken = localStorage.getItem('accessToken');
 
+	// // 테스트용 더미데이터 설정
+	// const companyId = '15'; // localStorage.getItem('companyId');
+	// const teamId = '7'; // localStorage.getItem('teamId');
+
+	localStorage.setItem('companyId', '15');
+	localStorage.setItem('teamId', '7');
+
 	const companyId = localStorage.getItem('companyId');
 	const teamId = localStorage.getItem('teamId');
 
@@ -43,14 +50,21 @@ const MainPage = () => {
 			try {
 				const payloadBase64 = accessToken.split('.')[1];
 				const decodedPayload = JSON.parse(atob(payloadBase64));
-				const userId = decodedPayload.sub;
+				const userId = decodedPayload.sub; // JWT 표준에서 sub는 subject(사용자 ID)
 
-				localStorage.setItem('userId', String(userId));
+				// userId가 유효한 값일 때만 저장
+				if (userId && userId !== 'undefined') {
+					console.log('JWT에서 추출된 userId:', userId);
+					localStorage.setItem('userId', String(userId));
+				}
 			} catch (error) {
 				console.error('AccessToken 디코딩 실패', error);
+				localStorage.setItem('userId', '31');
 			}
+		} else {
+			localStorage.setItem('userId', '31');
 		}
-	}, [isLogin, accessToken]);
+	}, [isLogin, accessToken, user]);
 
 	useEffect(() => {
 		if (isLogin && user?.companyId && user?.teamId) {
