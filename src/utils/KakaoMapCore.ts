@@ -1,6 +1,6 @@
 import type { ITeamRestaurantLocationItem } from '@/apis/useQueryTeamRestaurantsLocations';
 import location from '@/assets/location.png';
-import userCompany from '@/assets/userCompany.png';
+import 회사핀 from '@/assets/회사핀.png';
 
 export interface IKakaoMapOptions {
 	center?: { lat: number; lng: number };
@@ -155,7 +155,7 @@ export default class KakaoMapCore {
 
 		const pos = new kakao.maps.LatLng(option.center.lat, option.center.lng);
 		const imageSize = new kakao.maps.Size(100, 115);
-		const markerImage = new kakao.maps.MarkerImage(userCompany, imageSize);
+		const markerImage = new kakao.maps.MarkerImage(회사핀, imageSize);
 
 		const marker = new kakao.maps.Marker({
 			position: pos,
