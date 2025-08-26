@@ -3,8 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { get } from '.';
 
 interface IUserResponse {
-	teamId: unknown;
-	companyId: unknown;
+	teamId: number;
+	companyId: number;
 }
 
 const getUser = async (): Promise<IUserResponse> => {
