@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { useMutationAuthSignIn } from '@/apis/useMutationAuthSignIn';
 import { useMutationAuthSignUp } from '@/apis/useMutationAuthSignUp';
@@ -13,30 +13,31 @@ import { useSignupStore } from '@/store/signupStore';
 
 const BasicProfile = () => {
 	const navigate = useNavigate();
-	const { state } = useLocation() as { state: { email: string; name: string; profileImage?: string } };
 	const { username, birth, gender, setUsername, setBirth, setGender, nextStep } = useSignupStore();
 
 	const { mutate } = useMutationAuthSignUp();
 	const { mutate: signIn } = useMutationAuthSignIn();
 
-	useEffect(() => {
-		if (!state) return;
+	const email = localStorage.getItem('email');
+	const name = localStorage.getItem('name');
+	const profileImage = localStorage.getItem('profileImage');
 
-		if (!state.email || !state.name) {
+	useEffect(() => {
+		if (!email || !name) {
 			navigate('/auth', { replace: true });
 		}
-	}, [state, navigate]);
+	}, [email, name, navigate]);
 
 	const onSignup = () => {
-		if (!gender || !state) return;
+		if (!gender || !email) return;
 
 		mutate(
 			{
-				email: state.email,
+				email: email,
 				name: username,
 				gender: gender,
 				birthday: birth.replace(/\//g, '-'),
-				profileImage: state.profileImage ?? '',
+				profileImage: profileImage ?? '',
 			},
 			{
 				onSuccess: (data) => {

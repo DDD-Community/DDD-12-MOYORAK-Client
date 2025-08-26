@@ -2,37 +2,36 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const RedirectPage = () => {
-	const name = new URLSearchParams(location.search).get('name');
-	const email = new URLSearchParams(location.search).get('email');
-	const profileImage = new URLSearchParams(location.search).get('profileImage');
-	const accessToken = new URLSearchParams(location.search).get('accessToken');
-	const refreshToken = new URLSearchParams(location.search).get('refreshToken');
-
 	const navigate = useNavigate();
 
 	useEffect(() => {
+		const params = new URLSearchParams(window.location.search);
+		const name = params.get('name');
+		const email = params.get('email');
+		const profileImage = params.get('profileImage');
+		const accessToken = params.get('accessToken');
+		const refreshToken = params.get('refreshToken');
+
 		if (accessToken && refreshToken) {
 			localStorage.setItem('accessToken', accessToken);
 			localStorage.setItem('refreshToken', refreshToken);
-			navigate('/', {
-				state: {
-					login: true,
-				},
-			});
-
+			navigate('/', { state: { login: true }, replace: true });
 			return;
 		}
 
 		if (name && email) {
-			navigate('/signup', {
-				state: {
-					name: name,
-					email: email,
-					profileImage: profileImage,
-				},
+			localStorage.setItem('email', email);
+			localStorage.setItem('name', name);
+			localStorage.setItem('profileImage', profileImage ?? '');
+
+			navigate('/signup?step=1', {
+				replace: true,
 			});
+			return;
 		}
-	}, [name, email, accessToken]);
+
+		navigate('/auth', { replace: true });
+	}, [navigate]);
 
 	return <h1>loading...</h1>;
 };

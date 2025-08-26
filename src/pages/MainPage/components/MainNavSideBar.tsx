@@ -48,7 +48,7 @@ const MainNavSideBar = ({ onCopy }: IMainNavBarProps) => {
 			<button className="w-full text-left px-4 py-2 hover:bg-gray-100" onClick={() => navigate('/restaurant-registration')}>
 				<Typography variant={FONT_VARIANT.label01}>우리 팀 식당 등록</Typography>
 			</button>
-			<button className="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-500">
+			<button className="w-full text-left px-4 py-2 hover:bg-gray-100" onClick={() => navigate('/admin-team')}>
 				<Typography variant={FONT_VARIANT.label01}>팀원 관리</Typography>
 			</button>
 			<CustomDialog
