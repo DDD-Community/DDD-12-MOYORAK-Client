@@ -1,13 +1,11 @@
 import { useState } from 'react';
-import Slider from 'react-slick';
+import { Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
 import Icon from '@/components/Icon';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 import { useCategoryMapping } from '@/hooks/useCategoryMapping';
-
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
 
 interface Candidate {
 	candidateId: number;
@@ -35,26 +33,6 @@ interface RestaurantCarouselProps {
 	voters?: Voter[];
 }
 
-const CustomPrevArrow = ({ onClick }: { onClick?: () => void }) => (
-	<button
-		onClick={onClick}
-		className="absolute left-2 top-1/2 -translate-y-1/2 z-30 w-9.5 h-9.5 bg-[#303030B3] rounded-full flex items-center justify-center transition-all"
-		aria-label="이전 식당 보기"
-	>
-		<Icon name="arrow" size={22} className="rotate-180 text-white" />
-	</button>
-);
-
-const CustomNextArrow = ({ onClick }: { onClick?: () => void }) => (
-	<button
-		onClick={onClick}
-		className="absolute right-2 top-1/2 -translate-y-1/2 z-30 w-9.5 h-9.5 bg-[#303030B3] rounded-full flex items-center justify-center transition-all"
-		aria-label="다음 식당 보기"
-	>
-		<Icon name="arrow" size={22} className="text-white" />
-	</button>
-);
-
 const RestaurantCarousel = ({
 	restaurants,
 	onCardClick,
@@ -69,12 +47,14 @@ const RestaurantCarousel = ({
 
 	// 투표 배지 렌더링
 	const renderVoteBadge = (candidate: Candidate) => {
-		// voters 배열에서 해당 candidateId를 가진 투표자 수 계산
 		const voteCount = voters.filter((voter) => voter.candidateId === candidate.candidateId).length;
 
 		return (
 			<div className="relative" onMouseEnter={() => setHoveredRestaurantId(candidate.candidateId)} onMouseLeave={() => setHoveredRestaurantId(null)}>
-				<div className="absolute bottom-4 left-4 border border-primary-200 rounded-[6px] flex items-center gap-1 px-1.25 py-0.75 bg-black/60 backdrop-blur-2px shadow-[0_0_3.161px_0_rgba(255,255,255,0.25)]">
+				<div
+					className="absolute bottom-4 left-4 border border-primary-200 rounded-[6px] flex items-center gap-1 px-1.25 py-0.75 bg-black/60 backdrop-blur-2px shadow-[0_0_3.161px_0_rgba(255,255,255,0.25)] z-10"
+					style={{ padding: '3px 5px', borderRadius: '6px' }}
+				>
 					<Icon name="vote" />
 					<Typography variant={FONT_VARIANT.caption02} fontColor={PALETTE.primary200} className="font-semibold">
 						{voteCount}표
@@ -82,14 +62,20 @@ const RestaurantCarousel = ({
 				</div>
 				{/* Hover 시 참여자 정보 오버레이 */}
 				{hoveredRestaurantId === candidate.candidateId && voteCount > 0 && (
-					<div className="absolute bottom-11 left-1 bg-black/60 backdrop-blur-2px rounded-[10px] px-3.75 py-2.75 shadow-lg border border-gray-600 min-w-[100px] z-20">
-						<div className="flex flex-col gap-1.5">
+					<div
+						className="absolute bottom-11 left-1 bg-black/60 backdrop-blur-2px rounded-[10px] px-3.75 py-2.75 shadow-lg border border-gray-600 min-w-[100px] z-20"
+						style={{ padding: '11px 15px', borderRadius: '10px', minWidth: '100px' }}
+					>
+						<div className="flex flex-col gap-1.5" style={{ gap: '6px' }}>
 							{voters
 								.filter((voter) => voter.candidateId === candidate.candidateId)
 								.map((voter) => (
-									<div key={voter.name} className="flex items-center gap-2">
-										<div className="w-4.5 h-4.5 rounded-[400px] bg-gray-02 border border-gray-04">
-											<img src={voter.profileImageUrl} alt={voter.name} className="w-full h-full object-cover" />
+									<div key={voter.name} className="flex items-center gap-2" style={{ gap: '8px' }}>
+										<div
+											className="w-4.5 h-4.5 rounded-[400px] bg-gray-02 border border-gray-04"
+											style={{ width: '18px', height: '18px', borderRadius: '400px' }}
+										>
+											<img src={voter.profileImageUrl} alt={voter.name} className="w-full h-full object-cover" style={{ borderRadius: '400px' }} />
 										</div>
 										<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray03} className="font-medium">
 											{voter.name}
@@ -97,7 +83,10 @@ const RestaurantCarousel = ({
 									</div>
 								))}
 						</div>
-						<div className="absolute top-full left-3.5 w-0 h-0 border-l-[10px] border-r-[10px] border-t-[8px] border-transparent border-t-gray-800/95" />
+						<div
+							className="absolute top-full left-3.5 w-0 h-0 border-l-[10px] border-r-[10px] border-t-[8px] border-transparent border-t-gray-800/95"
+							style={{ left: '14px', borderLeftWidth: '10px', borderRightWidth: '10px', borderTopWidth: '8px' }}
+						/>
 					</div>
 				)}
 			</div>
@@ -113,11 +102,14 @@ const RestaurantCarousel = ({
 		return (
 			<div className="absolute top-4 right-4 z-10">
 				{isSelected ? (
-					<div className="w-7.5 h-7.5 bg-[#BEEE05] rounded-lg flex items-center justify-center">
+					<div className="w-7.5 h-7.5 bg-[#BEEE05] rounded-lg flex items-center justify-center" style={{ width: '30px', height: '30px', borderRadius: '8px' }}>
 						<Icon name="check" size={16} className="text-white" />
 					</div>
 				) : (
-					<div className="w-7.5 h-7.5 border-1 border-gray-04 rounded-lg bg-gray-02 flex items-center justify-center">
+					<div
+						className="w-7.5 h-7.5 border-1 border-gray-04 rounded-lg bg-gray-02 flex items-center justify-center"
+						style={{ width: '30px', height: '30px', borderRadius: '8px', border: '1px solid' }}
+					>
 						<Icon name="noCheck" size={16} />
 					</div>
 				)}
@@ -129,28 +121,23 @@ const RestaurantCarousel = ({
 	const getWinningRestaurants = () => {
 		if (!restaurants || !voters) return [];
 
-		// 각 후보별 투표 수 계산
 		const voteCounts = restaurants.map((candidate) => ({
 			...candidate,
 			voteCount: voters.filter((voter) => voter.candidateId === candidate.candidateId).length,
 		}));
 
-		// 가장 많은 표를 받은 식당 찾기
 		const maxVotes = Math.max(...voteCounts.map((c) => c.voteCount));
 
-		// 최고 득표수가 0이면 모든 식당이 우승자 (모두 검정색)
 		if (maxVotes === 0) return voteCounts;
 
-		// 최고 득표수를 받은 모든 식당들 반환 (동점자 포함)
 		return voteCounts.filter((c) => c.voteCount === maxVotes);
 	};
 
 	// 투표 상태에 따른 카드 스타일
 	const getCardStyle = (candidate: Candidate) => {
-		const baseStyle = `bg-white rounded-[20px] overflow-hidden ${!isVoted ? 'cursor-pointer' : 'cursor-default'} transition-all duration-300 relative mx-auto restaurant-card`;
+		const baseStyle = `bg-white overflow-hidden ${!isVoted ? 'cursor-pointer' : 'cursor-default'} transition-all duration-300 relative restaurant-card h-full`;
 
 		if (timeStatus === 'after_end') {
-			// 투표 종료 후 우승자들만 어두운 배경 (동점자 포함, 0표 전부도 포함)
 			const winningRestaurants = getWinningRestaurants();
 			const isWinner = winningRestaurants.some((restaurant) => restaurant.candidateId === candidate.candidateId);
 			if (isWinner) {
@@ -160,7 +147,7 @@ const RestaurantCarousel = ({
 		}
 
 		if (isVoted && selectedRestaurantId === candidate.candidateId) {
-			return `${baseStyle} border border-[#BEEE05] bg-[rgba(190,238,5,0.15)] box-shadow: 0 0 7px 0 rgba(0, 0, 0, 0.05)`;
+			return `${baseStyle} border border-[#BEEE05] bg-[rgba(190,238,5,0.15)]`;
 		}
 
 		return `${baseStyle}`;
@@ -169,7 +156,6 @@ const RestaurantCarousel = ({
 	// 투표 상태에 따른 텍스트 색상
 	const getTextColor = (candidate: Candidate, type: 'category' | 'name' | 'rating' | 'review') => {
 		if (timeStatus === 'after_end') {
-			// 투표 종료 후 우승자들만 흰색 텍스트 (동점자 포함, 0표 전부도 포함)
 			const winningRestaurants = getWinningRestaurants();
 			const isWinner = winningRestaurants.some((restaurant) => restaurant.candidateId === candidate.candidateId);
 			if (isWinner) {
@@ -193,7 +179,6 @@ const RestaurantCarousel = ({
 
 	const getStarIconColor = (candidate: Candidate) => {
 		if (timeStatus === 'after_end') {
-			// 투표 종료 후 우승자들만 흰색 별 (동점자 포함, 0표 전부도 포함)
 			const winningRestaurants = getWinningRestaurants();
 			const isWinner = winningRestaurants.some((restaurant) => restaurant.candidateId === candidate.candidateId);
 			if (isWinner) {
@@ -203,69 +188,172 @@ const RestaurantCarousel = ({
 		return 'text-red-500';
 	};
 
-	const slickSettings = {
-		dots: false,
-		infinite: restaurants.length > 1,
-		speed: 500,
-		slidesToShow: restaurants.length <= 1 ? restaurants.length : 1,
-		slidesToScroll: 1,
-		centerMode: restaurants.length > 2,
-		arrows: restaurants.length > 2,
-		prevArrow: <CustomPrevArrow />,
-		nextArrow: <CustomNextArrow />,
-		autoplay: false,
-		swipeToSlide: true,
-		focusOnSelect: false,
-	};
+	// 카드 렌더링 함수
+	const renderCard = (candidate: Candidate) => (
+		<div
+			onClick={() => !isVoted && onCardClick?.(candidate)}
+			className={getCardStyle(candidate)}
+			style={{ borderRadius: '20px', boxShadow: isVoted && selectedRestaurantId === candidate.candidateId ? '0 0 7px 0 rgba(0, 0, 0, 0.05)' : undefined }}
+		>
+			<div className="w-full overflow-hidden relative h-[200px]" style={{ height: '200px' }}>
+				<img src={candidate.reviewImagePath} alt={`${candidate.restaurantName} 음식`} className="w-full h-full object-cover" />
+				<div className="absolute inset-0 gradient-overlay opacity-0 transition-opacity duration-300" />
 
-	return (
-		<Slider {...slickSettings}>
-			{restaurants.map((candidate) => (
-				<div key={candidate.candidateId}>
-					<div onClick={() => !isVoted && onCardClick?.(candidate)} className={getCardStyle(candidate)}>
-						<div className="w-full overflow-hidden relative h-[200px]">
-							<img src={candidate.reviewImagePath} alt={`${candidate.restaurantName} 음식`} className="w-full h-full object-cover" />
-							<div className="absolute inset-0 gradient-overlay opacity-0 transition-opacity duration-300" />
+				{renderVoteBadge(candidate)}
+				{renderSelectionCheckbox(candidate)}
+			</div>
 
-							{renderVoteBadge(candidate)}
-
-							{renderSelectionCheckbox(candidate)}
-						</div>
-
-						{/* 카드 정보 */}
-						<div
-							className={`p-4 ${
-								timeStatus === 'after_end'
-									? (() => {
-											const winningRestaurants = getWinningRestaurants();
-											const isWinner = winningRestaurants.some((restaurant) => restaurant.candidateId === candidate.candidateId);
-											return isWinner ? 'bg-[#484848]' : 'bg-white';
-										})()
-									: isVoted && selectedRestaurantId === candidate.candidateId
-										? 'bg-[rgba(190,238,5,0.15)]'
-										: 'bg-white'
-							}`}
-						>
-							<Typography variant={FONT_VARIANT.caption01} fontColor={getTextColor(candidate, 'category')} className="mb-1">
-								{getCategoryDisplay(candidate.restaurantCategory)}
-							</Typography>
-							<Typography variant={FONT_VARIANT.body01} fontColor={getTextColor(candidate, 'name')} className="font-semibold mb-0.75">
-								{candidate.restaurantName}
-							</Typography>
-							<div className="flex items-center gap-1">
-								<Icon name="star" size={14} className={getStarIconColor(candidate)} />
-								<Typography variant={FONT_VARIANT.body02} fontColor={getTextColor(candidate, 'rating')} className="font-medium">
-									{candidate.averageReviewScore.toFixed(1)}
-								</Typography>
-								<Typography variant={FONT_VARIANT.body02} fontColor={getTextColor(candidate, 'review')}>
-									· 리뷰 {candidate.reviewCount}
-								</Typography>
-							</div>
-						</div>
-					</div>
+			{/* 카드 정보 */}
+			<div
+				className={`p-4 ${
+					timeStatus === 'after_end'
+						? (() => {
+								const winningRestaurants = getWinningRestaurants();
+								const isWinner = winningRestaurants.some((restaurant) => restaurant.candidateId === candidate.candidateId);
+								return isWinner ? 'bg-[#484848]' : 'bg-white';
+							})()
+						: isVoted && selectedRestaurantId === candidate.candidateId
+							? 'bg-[rgba(190,238,5,0.15)]'
+							: 'bg-white'
+				}`}
+				style={{ padding: '16px' }}
+			>
+				<Typography variant={FONT_VARIANT.caption01} fontColor={getTextColor(candidate, 'category')} className="mb-1">
+					{getCategoryDisplay(candidate.restaurantCategory)}
+				</Typography>
+				<Typography variant={FONT_VARIANT.body01} fontColor={getTextColor(candidate, 'name')} className="font-semibold mb-0.75">
+					{candidate.restaurantName}
+				</Typography>
+				<div className="flex items-center gap-1" style={{ gap: '4px' }}>
+					<Icon name="star" size={14} className={getStarIconColor(candidate)} />
+					<Typography variant={FONT_VARIANT.body02} fontColor={getTextColor(candidate, 'rating')} className="font-medium">
+						{candidate.averageReviewScore.toFixed(1)}
+					</Typography>
+					<Typography variant={FONT_VARIANT.body02} fontColor={getTextColor(candidate, 'review')}>
+						· 리뷰 {candidate.reviewCount}
+					</Typography>
 				</div>
-			))}
-		</Slider>
+			</div>
+		</div>
+	);
+
+	// 1개일 때는 슬라이드 없이 렌더링
+	if (restaurants.length === 1) {
+		return (
+			<div style={{ padding: '0 20px' }}>
+				<div style={{ maxWidth: '335px', margin: '0 auto' }}>{renderCard(restaurants[0])}</div>
+			</div>
+		);
+	}
+
+	// 2개일 때 - 슬라이드 가능하게 하되 가운데 정렬
+	if (restaurants.length === 2) {
+		return (
+			<div style={{ padding: '0 20px' }}>
+				<div style={{ maxWidth: '335px', margin: '0 auto', position: 'relative' }}>
+					<style>{`
+                  .swiper-button-prev,
+                  .swiper-button-next {
+                     width: 38px !important;
+                     height: 38px !important;
+                     background: rgba(48, 48, 48, 0.7);
+                     border-radius: 50%;
+                     color: white;
+                  }
+                  .swiper-button-prev:after,
+                  .swiper-button-next:after {
+                     font-size: 20px !important;
+                  }
+                  .swiper-button-prev {
+                     left: 10px !important;
+                  }
+                  .swiper-button-next {
+                     right: 10px !important;
+                  }
+               `}</style>
+					<Swiper modules={[Navigation]} spaceBetween={0} slidesPerView={1} navigation loop={true}>
+						{restaurants.map((candidate) => (
+							<SwiperSlide key={candidate.candidateId}>{renderCard(candidate)}</SwiperSlide>
+						))}
+					</Swiper>
+				</div>
+			</div>
+		);
+	}
+
+	// 3개 이상일 때 - 양 옆 카드가 보이는 슬라이드
+	return (
+		<div className="restaurant-swiper-wrapper">
+			<style>{`
+            .restaurant-swiper-wrapper {
+               padding: 0 10px;
+               overflow: hidden;
+            }
+            
+            .restaurant-swiper-wrapper .swiper {
+               overflow: visible !important;
+               padding: 10px 0;
+            }
+            
+            .restaurant-swiper-wrapper .swiper-slide {
+               transition: all 0.3s ease;
+               opacity: 0.5;
+               transform: scale(0.75);
+            }
+            
+            .restaurant-swiper-wrapper .swiper-slide-active {
+               opacity: 1;
+               transform: scale(1);
+            }
+            
+            .restaurant-swiper-wrapper .swiper-button-prev,
+            .restaurant-swiper-wrapper .swiper-button-next {
+               width: 38px !important;
+               height: 38px !important;
+               background: rgba(48, 48, 48, 0.7);
+               border-radius: 50%;
+               color: white;
+               top: 50%;
+               transform: translateY(-50%);
+            }
+            
+            .restaurant-swiper-wrapper .swiper-button-prev:after,
+            .restaurant-swiper-wrapper .swiper-button-next:after {
+               font-size: 20px !important;
+            }
+            
+            .restaurant-swiper-wrapper .swiper-button-prev {
+               left: 20px !important;
+            }
+            
+            .restaurant-swiper-wrapper .swiper-button-next {
+               right: 20px !important;
+            }
+            
+            .restaurant-swiper-wrapper .swiper-button-disabled {
+               opacity: 0.35;
+            }
+         `}</style>
+
+			<Swiper
+				modules={[Navigation]}
+				spaceBetween={12}
+				slidesPerView={1.6}
+				centeredSlides={true}
+				navigation
+				loop={restaurants.length > 3}
+				breakpoints={{
+					480: {
+						slidesPerView: 1.5,
+						spaceBetween: 15,
+					},
+				}}
+			>
+				{restaurants.map((candidate) => (
+					<SwiperSlide key={candidate.candidateId}>{renderCard(candidate)}</SwiperSlide>
+				))}
+			</Swiper>
+		</div>
 	);
 };
 
