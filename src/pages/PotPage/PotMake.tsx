@@ -125,7 +125,7 @@ const PotMake = () => {
 		id: member.userId,
 		name: member.name,
 		team: '팀',
-		isHonbapMode: member.state === 'OFF',
+		isHonbapMode: member.state === 'ON',
 	}));
 
 	// 시간 유효성 검사 함수
