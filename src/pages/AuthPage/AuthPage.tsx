@@ -41,7 +41,7 @@ const AuthPage = () => {
 				</Typography>
 			</section>
 
-			<img src={auth} className="mx-auto mb-[104px]" />
+			<img src={auth} className="mx-auto mb-[104px] w-70" />
 			<button onClick={googleLogin} className="border-[1px] border-gray-05 flex items-center gap-[11.9px] py-[13px] px-[72px] rounded-[50px] mb-[15px] mx-auto">
 				<Icon name="googleLogin" />
 				<Typography variant={FONT_VARIANT.body01}>Google로 간편하게 시작</Typography>
