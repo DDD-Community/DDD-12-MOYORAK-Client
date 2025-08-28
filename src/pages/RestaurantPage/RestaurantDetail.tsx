@@ -38,8 +38,6 @@ const RestaurantDetail = () => {
 		});
 	};
 
-	// TanStack Query가 자동으로 데이터를 가져오므로 별도의 함수와 useEffect가 필요 없음
-
 	const openGallery = (imageIndex: number) => {
 		setCurrentImageIndex(imageIndex);
 		setIsGalleryOpen(true);

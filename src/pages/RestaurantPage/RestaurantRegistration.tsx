@@ -83,17 +83,14 @@ const RestaurantRegistration = () => {
 				servingTimeId: Number(foodPrepTime),
 				waitingTimeId: Number(waitingTime),
 				score: satisfaction,
-				photoPaths: imageUrls, // 업로드된 URL들 사용
+				photoPaths: imageUrls,
 				extraText: review,
 			} as IRestaurantRegistrationRequest);
 			setTeamRestaurantId(Number((response as unknown as { teamRestaurantId: string }).teamRestaurantId));
 
-			// 리뷰 등록 완료 후 정확한 쿼리 키로 무효화
 			queryClient.invalidateQueries({ queryKey: ['reviews', teamId] });
 			queryClient.invalidateQueries({ queryKey: ['restaurant', 'photos', teamId] });
 			queryClient.invalidateQueries({ queryKey: ['restaurant', 'detail', teamId] });
-
-			// 모든 reviews 관련 쿼리 강제 무효화 (정확한 키 사용)
 			queryClient.removeQueries({ queryKey: ['reviews', teamId] });
 
 			setIsOpen(true);
@@ -122,7 +119,7 @@ const RestaurantRegistration = () => {
 		satisfaction > 0 &&
 		review.length > 0 &&
 		images.length > 0 &&
-		!isUploading; // 업로드 중이 아닐 때만 활성화
+		!isUploading;
 
 	const handleRestaurantSearch = () => {
 		navigate('/restaurant-search');
@@ -140,12 +137,12 @@ const RestaurantRegistration = () => {
 			<div className="bg-gray-02 min-h-screen ">
 				<form className="p-4.5 flex flex-col gap-6 " onSubmit={handleSubmit}>
 					<div className="py-6 px-4 rounded-[20px] bg-white flex flex-col gap-6.25">
-						<div className="flex flex-col gap-1.25">
+						<div className="flex flex-col ">
 							<FormLabel label="식당 이름" isEssential id="restaurant" className="font-semibold" />
 							<div className="relative">
 								<div
 									className={`
-										w-full ${FONT_VARIANT.header02} py-[7px] pr-[48px] mb-[10px]
+										w-full ${FONT_VARIANT.header02} pt-[10px] pb-[7px] pr-[48px] mb-[10px]
 										flex items-center cursor-pointer
 										transition-colors duration-200
 										border-b-[1px] ${restaurantName ? 'border-b-primary-200' : 'border-b-gray-04'}
@@ -177,11 +174,9 @@ const RestaurantRegistration = () => {
 								/>
 							</div>
 						</div>
-						<div className="flex flex-col gap-1.25">
+						<div className="flex flex-col">
+							<FormLabel label="한줄 소개" isEssential />
 							<Input
-								label="한줄 소개"
-								isEssential
-								id="potTitle"
 								placeholder="식당을 간단하게 소개해 주세요"
 								value={restaurantDescription}
 								onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRestaurantDescription(e.target.value)}
