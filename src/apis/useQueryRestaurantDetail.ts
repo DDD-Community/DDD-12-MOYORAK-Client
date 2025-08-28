@@ -36,7 +36,7 @@ export const useQueryRestaurantDetail = (teamId: string, teamRestaurantId: strin
 export const useQueryRestaurantPhotos = (teamId: string, teamRestaurantId: string) => {
 	return useQuery({
 		queryKey: ['restaurant', 'photos', teamId, teamRestaurantId],
-		queryFn: () => get<RestaurantPhotos>(`/teams/${teamId}/restaurants/${teamRestaurantId}/reviews/photos?currentPage=1&size=100`),
+		queryFn: () => get<RestaurantPhotos>(`/teams/${teamId}/restaurants/${teamRestaurantId}/reviews/photos?currentPage=1&size=5`),
 		enabled: !!teamId && !!teamRestaurantId,
 		staleTime: 0,
 		gcTime: 0,

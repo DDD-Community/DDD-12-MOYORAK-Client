@@ -21,5 +21,7 @@ export const useQueryTeamSearchHistory = (teamId: number, enabled = true) => {
 		queryKey: ['teams', teamId, 'team-members', 'me', 'search-history'],
 		enabled,
 		queryFn: () => getTeamSearchHistory(teamId),
+		staleTime: 0,
+		gcTime: 0,
 	});
 };

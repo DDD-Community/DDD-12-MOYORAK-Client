@@ -25,5 +25,7 @@ export const useQueryTeamViewHistory = (teamId: number, enabled = true) => {
 		queryKey: ['teams', teamId, 'team-members', 'me', 'view-history'],
 		enabled,
 		queryFn: () => getTeamViewHistory(teamId),
+		staleTime: 0,
+		gcTime: 0,
 	});
 };

@@ -25,7 +25,7 @@ interface IPotResponse {
 	}>;
 }
 
-export const useQueryPotList = (teamId: string, size: number = 100, currentPage: number = 1) => {
+export const useQueryPotList = (teamId: string, size: number = 5, currentPage: number = 1) => {
 	return useQuery({
 		queryKey: ['pots', teamId, size, currentPage],
 		queryFn: () => get<IPotResponse>(`/teams/${teamId}/parties?size=${size}&currentPage=${currentPage}`),

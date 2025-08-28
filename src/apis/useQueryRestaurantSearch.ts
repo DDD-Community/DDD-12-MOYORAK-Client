@@ -15,7 +15,7 @@ interface IRestaurantResponse {
 	data: IRestaurant[];
 }
 
-export const useQueryRestaurantSearch = (keyword: string, size: number = 10, currentPage: number = 1) => {
+export const useQueryRestaurantSearch = (keyword: string, size: number = 5, currentPage: number = 1) => {
 	return useQuery({
 		queryKey: ['restaurants', 'search', keyword, size, currentPage],
 		queryFn: () => get<IRestaurantResponse>(`/restaurants/search?keyword=${keyword}&size=${size}&currentPage=${currentPage}`),
