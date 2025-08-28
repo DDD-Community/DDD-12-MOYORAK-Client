@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { get } from '.';
 
 export interface ICompanyPositionResponse {
-	longtitude: number;
+	longitude: number;
 	latitude: number;
 }
 
