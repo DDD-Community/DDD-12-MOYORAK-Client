@@ -11,11 +11,11 @@ interface IButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const Button = ({ children, variant = 'general', onClick, className, ...rest }: IButtonProps) => {
 	const getButtonClasses = () => {
-		const baseClasses = 'h-[50px] w-full font-heading text-base font-medium leading-[150%] tracking-[0.091px] rounded-[20px] transition-colors duration-200';
+		const baseClasses = 'h-[50px] w-full font-heading text-base font-semibold leading-[150%] tracking-[0.091px] rounded-[20px] transition-colors duration-200';
 
 		switch (variant) {
 			case 'disabled':
-				return `${baseClasses} bg-gray-03 text-gray-05 cursor-not-allowed`;
+				return `${baseClasses} bg-gray-03 text-gray-06 cursor-not-allowed`;
 			case 'general':
 				return `${baseClasses} border border-gray-03 bg-white text-gray-07 hover:bg-gray-01`;
 			case 'active':

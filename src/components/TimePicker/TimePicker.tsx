@@ -56,27 +56,29 @@ const TimePicker = ({ value, onChange, disabled, displayValue }: ITimePickerProp
 			</button>
 			{open && (
 				<>
-					<div className="fixed inset-0 z-40" onClick={() => setOpen(false)} aria-label="close timepicker" />
+					<div className="fixed z-40" onClick={() => setOpen(false)} aria-label="close timepicker" />
 					<div
-						className="absolute left-1/2 -translate-x-1/2 top-10 z-50 bg-white rounded-2xl shadow-lg border p-0 w-[196px] overflow-hidden"
+						className="absolute left-1/2 -translate-x-1/2 top-10 z-50 rounded-[12px] border border-gray-04 bg-white shadow-sm p-0 w-[196px] overflow-hidden"
 						onClick={(e) => e.stopPropagation()}
 					>
-						<div className="max-h-[240px] overflow-y-auto py-2">
-							<div className="flex items-start px-2">
-								<div className="w-[60px]">
-									{AM_PM_OPTIONS.map((ampm) => (
-										<div
-											key={ampm}
-											className={`h-[38px] text-center flex items-center justify-center ${isAmpmActive(ampm) && 'bg-lime-50'}`}
-											onClick={() => handleClickAmpm(ampm)}
-										>
-											<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray10}>
-												{ampm}
-											</Typography>
-										</div>
-									))}
-								</div>
+						<div className="flex px-2">
+							{/* 오전/오후 - 고정 */}
+							<div className="w-[60px] py-2">
+								{AM_PM_OPTIONS.map((ampm) => (
+									<div
+										key={ampm}
+										className={`h-[38px] text-center flex items-center justify-center ${isAmpmActive(ampm) && 'bg-lime-50'}`}
+										onClick={() => handleClickAmpm(ampm)}
+									>
+										<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray10}>
+											{ampm}
+										</Typography>
+									</div>
+								))}
+							</div>
 
+							{/* 시간/분 - 스크롤 가능 */}
+							<div className="flex max-h-[240px] overflow-y-auto py-2">
 								<div className="w-[60px]">
 									{HOUR_OPTIONS.map((hour) => (
 										<div

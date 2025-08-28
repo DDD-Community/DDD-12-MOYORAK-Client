@@ -5,7 +5,7 @@ import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 import Icon from '../Icon';
 import Typography from '../Typography';
 
-import FormLabel, { type IFormLabelProps } from './FormLabel';
+import OnBoardingLabel, { type IOnBoardingLabelProps } from './OnBoardingLabel';
 
 interface IInputProps extends InputHTMLAttributes<HTMLInputElement> {
 	isEssential?: boolean;
@@ -23,7 +23,7 @@ const BORDER_COLOR = {
 	[PALETTE.primary200]: 'border-b-primary-200',
 };
 
-const Input = forwardRef<HTMLInputElement, IInputProps & Omit<IFormLabelProps, 'onChange'>>(
+const Input = forwardRef<HTMLInputElement, IInputProps & Omit<IOnBoardingLabelProps, 'onChange'>>(
 	(
 		{ isEssential, label, id, type = 'text', isSuccess = false, onChange, isError = false, message, placeholder, value, className, rightButton, ...rest },
 		ref
@@ -36,7 +36,7 @@ const Input = forwardRef<HTMLInputElement, IInputProps & Omit<IFormLabelProps, '
 
 		return (
 			<div className={className}>
-				{label && <FormLabel id={id} isEssential={isEssential} label={label} />}
+				{label && <OnBoardingLabel id={id} isEssential={isEssential} label={label} />}
 				<div className="relative mb-[10px] flex">
 					<input
 						ref={ref}
@@ -47,7 +47,7 @@ const Input = forwardRef<HTMLInputElement, IInputProps & Omit<IFormLabelProps, '
 						value={value}
 						type={type}
 						className={`
-              w-full ${FONT_VARIANT.header02} py-[7px] pr-[48px]
+              w-full ${FONT_VARIANT.header02} py-[10px] pr-[48px]
               placeholder:text-xl placeholder:text-gray-05 placeholder:font-medium
               border-b-[1px] ${borderClass}
               cursor-text

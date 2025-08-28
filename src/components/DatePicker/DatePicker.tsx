@@ -36,7 +36,7 @@ export const DatePicker = ({ date, onChangeDate }: IDatePickerProps) => {
 						}}
 					/>
 				</PopoverTrigger>
-				<PopoverContent className="w-auto overflow-hidden p-0 bg-white shadow-lg border border-gray-200 z-50" align="start">
+				<PopoverContent className="w-auto overflow-hidden p-0 bg-white shadow-lg border border-gray-03 z-50" align="start">
 					<Calendar
 						mode="single"
 						selected={date ? new Date(date) : undefined}
