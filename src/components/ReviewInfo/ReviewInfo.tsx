@@ -25,6 +25,7 @@ const ReviewInfo = ({ restaurantName }: IReviewInfoProps) => {
 	const [selectedReviewId, setSelectedReviewId] = useState<number | null>(null);
 	const teamId = localStorage.getItem('teamId') ?? '';
 	const { teamRestaurantId } = useParams<{ teamRestaurantId: string }>();
+	const userId = localStorage.getItem('userId') ?? '';
 
 	const { data: reviewList, isLoading: isLoadingReviews } = useQueryReviewList(teamId.toString(), teamRestaurantId || '');
 	const { mutate: deleteReview } = useMutationDeleteReview(teamId.toString(), teamRestaurantId || '');
@@ -44,8 +45,6 @@ const ReviewInfo = ({ restaurantName }: IReviewInfoProps) => {
 			document.removeEventListener('mousedown', handleClickOutside);
 		};
 	}, [openOptionMenu]);
-
-	const ownReview = true;
 
 	const handleOptionClick = (index: number) => {
 		setOpenOptionMenu(openOptionMenu === index ? null : index);
@@ -153,7 +152,7 @@ const ReviewInfo = ({ restaurantName }: IReviewInfoProps) => {
 										</Typography>
 									</div>
 								</div>
-								{ownReview && (
+								{review.userId === userId && (
 									<div className="relative option-menu-container">
 										<Icon name="selectOption" size={24} onClick={() => handleOptionClick(index)} className="cursor-pointer" />
 										{isOptionOpen && (
