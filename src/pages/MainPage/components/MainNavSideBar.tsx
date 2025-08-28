@@ -2,12 +2,11 @@ import { type Dispatch, type SetStateAction, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useMutationTeamInvitation } from '@/apis/useMutationTeamInvitation';
-import Button from '@/components/Button/Button';
+import invite from '@/assets/invite.png';
 import CustomDialog from '@/components/Dialog/CustomDialog';
 import Icon from '@/components/Icon';
-import Input from '@/components/Input/Input';
 import Typography from '@/components/Typography';
-import { FONT_VARIANT } from '@/constants/styles';
+import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 import useDialogHandler from '@/hooks/useDialogHandler';
 
 interface IMainNavBarProps {
@@ -64,10 +63,13 @@ const MainNavSideBar = ({ onCopy }: IMainNavBarProps) => {
 			<CustomDialog
 				onOpen={open}
 				onOpenChange={setOpen}
+				className="w-[271px] h-[200px]"
 				headerText={{
-					title: '우리팀에 초대하기',
+					title: '우리 팀에 초대하기',
 					description: (
 						<>
+							<Icon name="close" className="w-5 h-5 absolute top-4.5 right-4.5" onClick={handleClose} />
+							<img src={invite} alt="초대" className="w-[175px] h-[102px] absolute bottom-45 left-1/2 -translate-x-1/2" />
 							주소를 복사하고 공유해서
 							<br />
 							새로운 팀원을 초대해 보세요!
@@ -75,16 +77,19 @@ const MainNavSideBar = ({ onCopy }: IMainNavBarProps) => {
 					),
 				}}
 			>
-				<Input
-					placeholder="주소 url"
-					className="flex-1 border-none rounded-none focus:ring-0"
-					value={redirectUrl}
-					rightButton={
-						<Button variant="active" className="w-[76px]" onClick={onCopyInviteUrl}>
+				<div className="w-full h-[46px] rounded-[8px] border border-primary-200 flex items-center justify-center">
+					<div className="pl-2">
+						<Typography variant={FONT_VARIANT.label02} fontColor={PALETTE.gray07} className="text-ellipsis overflow-hidden whitespace-nowrap">
+							{redirectUrl}
+						</Typography>
+					</div>
+
+					<button className="w-[76px] h-[46px] bg-primary-200 rounded-r-[8px] flex items-center justify-center ml-[-18px]" onClick={onCopyInviteUrl}>
+						<Typography variant={FONT_VARIANT.body01} className="font-semibold text-[#1F2511]">
 							복사
-						</Button>
-					}
-				/>
+						</Typography>
+					</button>
+				</div>
 			</CustomDialog>
 		</div>
 	);

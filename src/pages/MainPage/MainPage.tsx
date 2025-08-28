@@ -6,7 +6,7 @@ import { useQueryTeamRestaurantsLocations } from '@/apis/useQueryTeamRestaurants
 import { useQueryUser } from '@/apis/useQueryUser';
 import KakaoMap from '@/components/KakaoMap';
 import NavBar from '@/components/NavBar/NavBar';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/Tooltip/Tooltip';
+import { CustomToast } from '@/components/Toast/BaseToaster';
 
 import MainBottomSheet from './components/MainBottomSheet';
 import MainIntro from './components/MainIntro';
@@ -84,14 +84,7 @@ const MainPage = () => {
 				<KakaoMap companyLocation={companyLocation} optionsList={data?.locations || []} />
 
 				<MainBottomSheet />
-				{copied && (
-					<Tooltip open>
-						<TooltipTrigger asChild>
-							<div className="fixed bottom-10 left-1/2 -translate-x-1/2 text-center" />
-						</TooltipTrigger>
-						<TooltipContent side="bottom">초대 링크가 복사되었습니다.</TooltipContent>
-					</Tooltip>
-				)}
+				{copied && <CustomToast title="초대 링크가 복사되었습니다." icon="check" />}
 			</div>
 		);
 	}

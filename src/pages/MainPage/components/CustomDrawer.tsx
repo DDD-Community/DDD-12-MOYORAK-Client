@@ -59,6 +59,8 @@ const CustomDrawer = ({ header, filterType }: ICustomDrawerProps) => {
 	const maxHeightRef = useRef(window.innerHeight * 0.9);
 	const newHeight = useRef(height);
 
+	// const userId = localStorage.getItem('userId') ?? '';
+
 	// 핸들 영역 ref
 	const handleRef = useRef<HTMLDivElement>(null);
 
@@ -197,7 +199,7 @@ const CustomDrawer = ({ header, filterType }: ICustomDrawerProps) => {
 				borderTopLeftRadius: height === fullHeightRef.current ? 0 : 30,
 				borderTopRightRadius: height === fullHeightRef.current ? 0 : 30,
 			}}
-			className={`fixed left-0 right-0 bg-white shadow-lg z-50 flex flex-col ${disableTransition ? '' : 'transition-[height] duration-300 ease-out'}`}
+			className={`fixed left-0 right-0 bg-white z-50 flex flex-col ${disableTransition ? '' : 'transition-[height] duration-300 ease-out'}`}
 			onTouchStart={onDragStartTouch}
 			onTouchMove={onTouchMove}
 			onTouchEnd={onTouchEnd}
