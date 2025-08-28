@@ -188,9 +188,6 @@ const PotMake = () => {
 			? !isDefaultTime(startTime) && !isDefaultTime(announceTime) && !isDefaultTime(eatTime)
 			: !isDefaultTime(announceTime) && !isDefaultTime(eatTime));
 
-	// TanStack Query가 자동으로 데이터를 가져오므로 별도의 함수가 필요 없음
-
-	// Event handlers
 	const handleChangeOpen = () => {
 		setIsOpen(!isOpen);
 	};
@@ -318,12 +315,10 @@ const PotMake = () => {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		// 시간 유효성 검사
 		if (!validateTimes()) {
 			return;
 		}
 
-		// 기본 시간이 변경되지 않았는지 확인
 		if (potMethod === 'normal' && isDefaultTime(startTime)) {
 			alert('투표 시작 시간을 선택해주세요.');
 			return;
@@ -337,7 +332,6 @@ const PotMake = () => {
 			...potMakeRequest,
 			title: potTitle,
 			content: potDesc,
-			// 랜덤 추첨일 때는 fromTime을 00:00:00으로 설정
 			fromTime: potMethod === 'random' ? '00:00:00' : potMakeRequest.fromTime,
 			restaurants: {
 				ids: selectedRestaurants.map((restaurant) => ({
@@ -390,7 +384,8 @@ const PotMake = () => {
 						<form className="p-4.5 flex flex-col gap-6" onSubmit={handleSubmit}>
 							{/* 팟 제목 */}
 							<div className="py-6 px-4 rounded-[20px] bg-white">
-								<Input label="팟 제목" isEssential id="potTitle" placeholder="제목을 입력해 주세요" value={potTitle} onChange={handlePotTitleChange} />
+								<FormLabel id="potTitle" label="팟 제목" isEssential />
+								<Input id="potTitle" placeholder="제목을 입력해 주세요" value={potTitle} onChange={handlePotTitleChange} />
 							</div>
 
 							{/* 팀원 선택 */}

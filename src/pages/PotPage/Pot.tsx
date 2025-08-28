@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useQueryPotList } from '@/apis/useQueryPotList';
@@ -10,6 +11,7 @@ import voting from '@/assets/voting.png';
 import Button from '@/components/Button/Button';
 import FilterButton from '@/components/FilterButton/FilterButton';
 import Icon from '@/components/Icon';
+import Pagination from '@/components/Pagination/Pagination';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 import { useCategoryMapping } from '@/hooks/useCategoryMapping';
@@ -19,9 +21,9 @@ const Pot = () => {
 	const currentTime = new Date();
 	const { getCategoryDisplay } = useCategoryMapping();
 
+	const [currentPage, setCurrentPage] = useState(1);
 	const teamId = localStorage.getItem('teamId') ?? '';
-	const size = 100;
-	const currentPage = 1;
+	const size = 10; // 10개씩 표시
 
 	const { data: potList, isLoading } = useQueryPotList(teamId.toString(), size, currentPage);
 
@@ -258,7 +260,7 @@ const Pot = () => {
 											</Typography>
 										</div>
 										<div className="flex -space-x-2">
-											{pot.userProfileList.map((profileImage, profileIdx) => (
+											{pot.userProfileList.slice(0, 5).map((profileImage, profileIdx) => (
 												<div key={profileIdx} className="w-9 h-9 rounded-full border-[1px] border-solid border-gray-04 bg-gray-02">
 													<img src={profileImage} alt="팟 참가자 이미지" className="w-full h-full rounded-full" />
 												</div>
@@ -269,6 +271,11 @@ const Pot = () => {
 							);
 						})}
 					</div>
+
+					{/* 페이지네이션 */}
+					{potList && (
+						<Pagination currentPage={currentPage} totalCount={potList.totalCount} size={size} onPageChange={setCurrentPage} variant="large" className="mt-8" />
+					)}
 				</div>
 			) : (
 				<div className="flex flex-col items-center justify-center gap-3.25 mt-28">

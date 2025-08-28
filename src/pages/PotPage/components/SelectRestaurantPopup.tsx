@@ -6,6 +6,7 @@ import FilterButton from '@/components/FilterButton/FilterButton';
 import Icon from '@/components/Icon';
 import SearchInput from '@/components/Input/SearchInput';
 import NavBar from '@/components/NavBar/NavBar';
+import Pagination from '@/components/Pagination/Pagination';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 import { useCategoryMapping } from '@/hooks/useCategoryMapping';
@@ -39,14 +40,15 @@ const SelectRestaurantPopup = ({ onClose, initialSelectedIds = [] }: ISelectRest
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [selectedIds, setSelectedIds] = useState<number[]>(initialSelectedIds);
 	const [selectedOpen, setSelectedOpen] = useState<boolean>(false);
+	const [currentPage, setCurrentPage] = useState(1);
 	const { getCategoryDisplay } = useCategoryMapping();
 	const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchValue(e.target.value);
+		setCurrentPage(1); // 검색 시 첫 페이지로 이동
 	};
 
 	const teamId = localStorage.getItem('teamId') ?? '';
-	const size = 100;
-	const currentPage = 1;
+	const size = 10; // 10개씩 표시
 
 	const getSortOptionForAPI = (filterType: FilterType): string => {
 		switch (filterType) {
@@ -64,6 +66,12 @@ const SelectRestaurantPopup = ({ onClose, initialSelectedIds = [] }: ISelectRest
 	// TanStack Query 훅 사용
 	const apiSortOption = getSortOptionForAPI(sortOption);
 	const { data: teamRestaurantList, isLoading } = useQueryTeamRestaurantList(teamId.toString(), apiSortOption, size, currentPage);
+
+	// 정렬 옵션 변경 시 첫 페이지로 이동
+	const handleSortOptionChange = (newSortOption: FilterType) => {
+		setSortOption(newSortOption);
+		setCurrentPage(1);
+	};
 
 	// 로딩 상태 처리
 	if (isLoading) {
@@ -115,7 +123,7 @@ const SelectRestaurantPopup = ({ onClose, initialSelectedIds = [] }: ISelectRest
 			/>
 
 			<div className="px-4.5 py-6.25">
-				<SearchInput placeholder="찾으려는 식당을 image.png검색해 주세요" id="restaurantName" onChange={handleSearch} value={searchValue} />
+				<SearchInput placeholder="찾으려는 식당을 검색해 주세요" id="restaurantName" onChange={handleSearch} value={searchValue} />
 
 				<div className={`bg-white rounded-[20px] mt-5.5 mb-5.5 px-4.5 ${selectedOpen && selectedRestaurants.length > 0 ? 'py-5' : 'py-2.5'}`}>
 					<div
@@ -165,27 +173,27 @@ const SelectRestaurantPopup = ({ onClose, initialSelectedIds = [] }: ISelectRest
 						<FilterButton
 							borderRadius="17"
 							variant={sortOption === FILTER_TYPES.DISTANCE ? 'active' : 'general'}
-							onClick={() => setSortOption(FILTER_TYPES.DISTANCE)}
+							onClick={() => handleSortOptionChange(FILTER_TYPES.DISTANCE)}
 						>
 							{FILTER_TYPES.DISTANCE}
 						</FilterButton>
 						<FilterButton
 							borderRadius="17"
 							variant={sortOption === FILTER_TYPES.RATING ? 'active' : 'general'}
-							onClick={() => setSortOption(FILTER_TYPES.RATING)}
+							onClick={() => handleSortOptionChange(FILTER_TYPES.RATING)}
 						>
 							{FILTER_TYPES.RATING}
 						</FilterButton>
 						<FilterButton
 							borderRadius="17"
 							variant={sortOption === FILTER_TYPES.RECENT ? 'active' : 'general'}
-							onClick={() => setSortOption(FILTER_TYPES.RECENT)}
+							onClick={() => handleSortOptionChange(FILTER_TYPES.RECENT)}
 						>
 							{FILTER_TYPES.RECENT}
 						</FilterButton>
 					</div>
 
-					<div className="flex flex-col gap-5 ">
+					<div className="flex flex-col gap-5 mb-4">
 						{filteredRestaurants.map((r) => (
 							<div
 								key={r.teamRestaurantId}
@@ -221,6 +229,11 @@ const SelectRestaurantPopup = ({ onClose, initialSelectedIds = [] }: ISelectRest
 							</div>
 						))}
 					</div>
+
+					{/* 페이지네이션 */}
+					{!searchValue && teamRestaurantList && (
+						<Pagination currentPage={currentPage} totalCount={teamRestaurantList.totalCount} size={size} onPageChange={setCurrentPage} variant="large" />
+					)}
 				</div>
 
 				<div className="fixed bottom-[30px] left-0 w-full px-4.5">

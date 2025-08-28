@@ -403,7 +403,7 @@ const PotDetail = () => {
 	};
 
 	const renderRestaurantList = () => (
-		<div className="space-y-3.25 mb-6">
+		<div className="space-y-3.25 mb-6 mx-4.5">
 			{potDetail?.candidates.map((candidate) => (
 				<div
 					key={candidate.candidateId}
