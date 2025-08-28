@@ -1,6 +1,7 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 
 import { useQueryTeamRestaurantList } from '@/apis/useQueryTeamRestaurantList';
+import Pagination from '@/components/Pagination/Pagination';
 
 import Empty from '../Empty';
 
@@ -12,13 +13,39 @@ const MIN_HEIGHT = 120;
 const UP_THRESHOLD = 8;
 const DOWN_THRESHOLD = 8;
 
+export const FILTER_TYPES = {
+	DISTANCE: '거리순',
+	RATING: '평점순',
+	LATEST: '최신순',
+} as const;
+
+export type FilterType = (typeof FILTER_TYPES)[keyof typeof FILTER_TYPES];
+
+// 필터 타입을 API 파라미터로 매핑
+const getApiSortOption = (filterType: FilterType): string => {
+	switch (filterType) {
+		case FILTER_TYPES.DISTANCE:
+			return 'DISTANCE';
+		case FILTER_TYPES.RATING:
+			return 'RATING';
+		case FILTER_TYPES.LATEST:
+			return 'RECENT';
+		default:
+			return 'DISTANCE';
+	}
+};
+
 interface ICustomDrawerProps {
 	header: ReactNode;
+	filterType: FilterType;
 }
 
-const CustomDrawer = ({ header }: ICustomDrawerProps) => {
+const CustomDrawer = ({ header, filterType }: ICustomDrawerProps) => {
 	const teamId = localStorage.getItem('teamId');
-	const { data: restaurantList } = useQueryTeamRestaurantList(String(teamId), 'DISTANCE');
+	const [currentPage, setCurrentPage] = useState(1);
+	const size = 5;
+	const sortOption = getApiSortOption(filterType);
+	const { data: restaurantList } = useQueryTeamRestaurantList(String(teamId), sortOption, size, currentPage);
 
 	const [height, setHeight] = useState(BASIC_HEIGHT);
 	const dragging = useRef(false);
@@ -157,6 +184,11 @@ const CustomDrawer = ({ header }: ICustomDrawerProps) => {
 		};
 	}, []);
 
+	// 필터 변경 시 첫 페이지로 이동
+	useEffect(() => {
+		setCurrentPage(1);
+	}, [filterType]);
+
 	return (
 		<div
 			style={{
@@ -174,23 +206,30 @@ const CustomDrawer = ({ header }: ICustomDrawerProps) => {
 		>
 			{/* 커서칩 */}
 			{height < fullHeightRef.current && (
-				<div ref={handleRef} className="flex justify-center py-[10px] cursor-grab" onMouseDown={(e) => onDragStartMouse(e, true)}>
+				<div ref={handleRef} className="flex justify-center pt-[10px] cursor-grab" onMouseDown={(e) => onDragStartMouse(e, true)}>
 					<div className="w-14 h-1.5 bg-gray-300 rounded-full" />
 				</div>
 			)}
 
-			<header className="px-[18px] py-[10px]">{header && header}</header>
+			<header className="px-[18px] pt-[20px] pb-[10px]">{header && header}</header>
 
 			{/* 내용 */}
-			<div className={`flex-1 p-4 ${isDragging ? 'overflow-hidden' : 'overflow-auto'}`}>
+			<div className={`flex-1 p-4.5 ${isDragging ? 'overflow-hidden' : 'overflow-auto'}`}>
 				{restaurantList?.data.length === 0 ? (
 					<Empty />
 				) : (
-					<ul className="px-[18px]">
-						{restaurantList?.data.map((item, id) => (
-							<RestaurantReview key={id} item={item} />
-						))}
-					</ul>
+					<>
+						<ul className="flex flex-col gap-5">
+							{restaurantList?.data.map((item, id) => (
+								<RestaurantReview key={id} item={item} />
+							))}
+						</ul>
+
+						{/* 페이지네이션 */}
+						{restaurantList && (
+							<Pagination currentPage={currentPage} totalCount={restaurantList.totalCount} size={size} onPageChange={setCurrentPage} className="mt-6" />
+						)}
+					</>
 				)}
 			</div>
 		</div>

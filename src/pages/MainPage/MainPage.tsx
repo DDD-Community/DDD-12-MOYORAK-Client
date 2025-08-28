@@ -35,8 +35,8 @@ const MainPage = () => {
 
 	const companyLocation = {
 		center: {
-			lat: company?.latitude || 37.5665,
-			lng: company?.longtitude || 126.978,
+			lat: company?.latitude || 0,
+			lng: company?.longitude || 0,
 		},
 		placeName: '회사',
 	};
@@ -77,7 +77,7 @@ const MainPage = () => {
 		return (
 			<div className="flex flex-col h-screen relative z-0">
 				<div className="relative">
-					<NavBar variant="iconWithTextAndRightIcon" leftIcon="company" leftText="WEB 2팀" rightIcon="menu" onRightIconClick={onShowInvitation} />
+					<NavBar variant="iconWithTextAndRightIcon" leftIcon="company" leftText="WEB 2팀" rightIcon="category" onRightIconClick={onShowInvitation} />
 
 					{showInvitation && <MainNavSideBar onCopy={setCopied} />}
 				</div>

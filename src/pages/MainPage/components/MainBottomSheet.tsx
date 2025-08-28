@@ -3,24 +3,17 @@ import { useState } from 'react';
 import IconButton from '@/components/Button/IconButton';
 import FilterButton from '@/components/FilterButton/FilterButton';
 
-import CustomDrawer from './CustomDrawer';
-
-const FILTER_TYPES = {
-	DISTANCE: '거리순',
-	RATING: '평점순',
-	LATEST: '최신순',
-} as const;
-
-type FilterType = (typeof FILTER_TYPES)[keyof typeof FILTER_TYPES];
+import CustomDrawer, { FILTER_TYPES, type FilterType } from './CustomDrawer';
 
 const MainBottomSheet = () => {
 	const [buttonType, setButtonType] = useState<FilterType>(FILTER_TYPES.DISTANCE);
 
 	return (
 		<CustomDrawer
+			filterType={buttonType}
 			header={
 				<>
-					<div className="flex gap-2 mb-5 justify-between items-center">
+					<div className="flex gap-2 justify-between items-center">
 						<div className="flex gap-2">
 							<FilterButton
 								borderRadius="17"

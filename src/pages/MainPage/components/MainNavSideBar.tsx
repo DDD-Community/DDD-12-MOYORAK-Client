@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMutationTeamInvitation } from '@/apis/useMutationTeamInvitation';
 import Button from '@/components/Button/Button';
 import CustomDialog from '@/components/Dialog/CustomDialog';
+import Icon from '@/components/Icon';
 import Input from '@/components/Input/Input';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT } from '@/constants/styles';
@@ -41,15 +42,24 @@ const MainNavSideBar = ({ onCopy }: IMainNavBarProps) => {
 	};
 
 	return (
-		<div className="absolute right-2 top-14 w-[160px] bg-white shadow-lg rounded-xl py-2 z-50">
-			<button className="w-full text-left px-4 py-2 hover:bg-gray-100" onClick={handleOpen}>
-				<Typography variant={FONT_VARIANT.label01}>우리 팀에 초대하기</Typography>
+		<div className="absolute right-2 top-11 w-[160px] bg-white shadow-lg rounded-[8px] py-2 z-50">
+			<button className="w-full text-left px-4 py-2 border-b border-gray-02 hover:bg-gray-100" onClick={handleOpen}>
+				<Typography variant={FONT_VARIANT.label01} className="font-medium">
+					우리 팀에 초대하기
+				</Typography>
 			</button>
-			<button className="w-full text-left px-4 py-2 hover:bg-gray-100" onClick={() => navigate('/restaurant-registration')}>
-				<Typography variant={FONT_VARIANT.label01}>우리 팀 식당 등록</Typography>
+			<button className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b border-gray-02" onClick={() => navigate('/restaurant-registration')}>
+				<div className="flex items-center justify-between">
+					<Typography variant={FONT_VARIANT.label01} className="font-medium">
+						우리 팀 식당 등록
+					</Typography>
+					<Icon name="ourTeamRestaurantPlus" className="w-4 h-4" />
+				</div>
 			</button>
-			<button className="w-full text-left px-4 py-2 hover:bg-gray-100" onClick={() => navigate('/admin-team')}>
-				<Typography variant={FONT_VARIANT.label01}>팀원 관리</Typography>
+			<button className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b border-gray-02" onClick={() => navigate('/admin-team')}>
+				<Typography variant={FONT_VARIANT.label01} className="font-medium">
+					팀원 관리
+				</Typography>
 			</button>
 			<CustomDialog
 				onOpen={open}
