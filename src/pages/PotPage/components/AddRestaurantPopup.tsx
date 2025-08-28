@@ -40,11 +40,11 @@ const AddRestaurantPopup = ({ onClose, existingRestaurantIds }: IAddRestaurantPo
 	const [newSelectedIds, setNewSelectedIds] = useState<number[]>([]);
 	const [selectedOpen, setSelectedOpen] = useState<boolean>(false);
 	const { getCategoryDisplay } = useCategoryMapping();
+	const [currentPage, setCurrentPage] = useState(1);
 
 	const teamId = localStorage.getItem('teamId') ?? '';
 
-	const size = 100;
-	const currentPage = 1;
+	const size = 5;
 
 	const getSortOptionForAPI = (filterType: FilterType): string => {
 		switch (filterType) {
@@ -68,9 +68,8 @@ const AddRestaurantPopup = ({ onClose, existingRestaurantIds }: IAddRestaurantPo
 
 	const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchValue(e.target.value);
+		setCurrentPage(1);
 	};
-
-	// TanStack Query가 자동으로 데이터를 가져오므로 별도의 함수와 useEffect가 필요 없음
 
 	// 새로운 식당 선택/해제
 	const handleNewSelect = (id: number) => {

@@ -48,7 +48,7 @@ const SelectRestaurantPopup = ({ onClose, initialSelectedIds = [] }: ISelectRest
 	};
 
 	const teamId = localStorage.getItem('teamId') ?? '';
-	const size = 10; // 10개씩 표시
+	const size = 5;
 
 	const getSortOptionForAPI = (filterType: FilterType): string => {
 		switch (filterType) {

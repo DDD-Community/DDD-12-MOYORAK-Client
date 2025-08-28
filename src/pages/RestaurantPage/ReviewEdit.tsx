@@ -14,6 +14,7 @@ import NavBar from '@/components/NavBar/NavBar';
 import Typography from '@/components/Typography/Typography';
 import { FOOD_PREP_TIME_OPTIONS, SATISFACTION_OPTIONS, WAITING_TIME_OPTIONS } from '@/constants/data.constant';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
+import { useGetValueFromLabel } from '@/hooks/useGetValueFromLabel';
 import { extractPathFromUrl, uploadMultipleImages, validateImageFiles } from '@/utils/imageUpload';
 
 interface IReviewEditRequest {
@@ -46,20 +47,11 @@ const ReviewEdit = () => {
 	const teamRestaurantId = reviewData?.teamRestaurantId;
 	const name = reviewData?.name;
 
-	const getValueFromLabel = (label: string, options: typeof WAITING_TIME_OPTIONS) => {
-		if (!label) return '';
-
-		const normalizedLabel = label.replace(/\s/g, '');
-		const found = options.find((option) => option.label.replace(/\s/g, '') === normalizedLabel);
-
-		return found ? found.value : '';
-	};
+	const waitingTimeValue = useGetValueFromLabel(reviewData.waitingTime || '', WAITING_TIME_OPTIONS);
+	const foodPrepTimeValue = useGetValueFromLabel(reviewData.foodPrepTime || '', FOOD_PREP_TIME_OPTIONS);
 
 	useEffect(() => {
 		if (reviewData) {
-			const waitingTimeValue = getValueFromLabel(reviewData.waitingTime || '', WAITING_TIME_OPTIONS);
-			const foodPrepTimeValue = getValueFromLabel(reviewData.foodPrepTime || '', FOOD_PREP_TIME_OPTIONS);
-
 			setWaitingTime(waitingTimeValue);
 			setFoodPrepTime(foodPrepTimeValue);
 			setSatisfaction(reviewData.score || 0);

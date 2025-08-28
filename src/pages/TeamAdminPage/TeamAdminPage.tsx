@@ -16,7 +16,7 @@ const TeamAdminPage = () => {
 
 	const [pendingCurrentPage, setPendingCurrentPage] = useState(1);
 	const [approvedCurrentPage, setApprovedCurrentPage] = useState(1);
-	const size = 10; // 10개씩 표시
+	const size = 5;
 
 	const { data: pendingMemberList } = useQueryTeamMember(Number(teamId), {
 		status: TEAM_MEMBER_STATUS.PENDING,

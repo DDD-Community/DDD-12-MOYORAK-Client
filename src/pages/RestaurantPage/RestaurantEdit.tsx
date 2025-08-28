@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { type ITeamRestaurantUpdateRequest, useMutationUpdateTeamRestaurant } from '@/apis/useMutationUpdateTeamRestaurant';
+import { useQueryRestaurantPhotos } from '@/apis/useQueryRestaurantDetail';
 import { useQueryTeamRestaurantDetail } from '@/apis/useQueryTeamRestaurantDetail';
 import emptyStarIcon from '@/assets/emptyStar.png';
 import starIcon from '@/assets/star.png';
@@ -15,7 +16,8 @@ import NavBar from '@/components/NavBar/NavBar';
 import Typography from '@/components/Typography/Typography';
 import { FOOD_PREP_TIME_OPTIONS, SATISFACTION_OPTIONS, WAITING_TIME_OPTIONS } from '@/constants/data.constant';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
-import { uploadMultipleImages, validateImageFiles } from '@/utils/imageUpload';
+import { useGetValueFromLabel } from '@/hooks/useGetValueFromLabel';
+import { extractPathFromUrl, uploadMultipleImages, validateImageFiles } from '@/utils/imageUpload';
 
 const RestaurantEdit = () => {
 	const { teamRestaurantId } = useParams<{ teamRestaurantId: string }>();
@@ -24,6 +26,7 @@ const RestaurantEdit = () => {
 	const teamId = localStorage.getItem('teamId') ?? '';
 
 	const { data: restaurantDetail, isLoading } = useQueryTeamRestaurantDetail(teamId, teamRestaurantId || '');
+	const { data: restaurantPhotos, isLoading: isLoadingPhotos } = useQueryRestaurantPhotos(teamId, teamRestaurantId || '');
 
 	const { mutate: updateRestaurant, isPending } = useMutationUpdateTeamRestaurant(teamId, teamRestaurantId || '');
 
@@ -35,8 +38,13 @@ const RestaurantEdit = () => {
 	const [review, setReview] = useState<string>('');
 	const [images, setImages] = useState<File[]>([]);
 	const [imageUrls, setImageUrls] = useState<string[]>([]);
+	const [existingImageUrls, setExistingImageUrls] = useState<string[]>([]);
+	const [existingImagePaths, setExistingImagePaths] = useState<string[]>([]);
 	const [isUploading, setIsUploading] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
+
+	const waitingTimeValue = useGetValueFromLabel(restaurantDetail?.waitingTime || '', WAITING_TIME_OPTIONS);
+	const foodPrepTimeValue = useGetValueFromLabel(restaurantDetail?.servingTime || '', FOOD_PREP_TIME_OPTIONS);
 
 	// 기존 데이터로 폼 초기화
 	useEffect(() => {
@@ -44,42 +52,56 @@ const RestaurantEdit = () => {
 			setRestaurantDescription(restaurantDetail.summary || '');
 			setSatisfaction(restaurantDetail.score || 0);
 
-			// servingTime과 waitingTime을 옵션 값으로 매핑
-			const servingTimeOption = FOOD_PREP_TIME_OPTIONS.find((option) => option.label === restaurantDetail.servingTime);
-			const waitingTimeOption = WAITING_TIME_OPTIONS.find((option) => option.label === restaurantDetail.waitingTime);
-
-			if (servingTimeOption) setFoodPrepTime(servingTimeOption.value);
-			if (waitingTimeOption) setWaitingTime(waitingTimeOption.value);
+			setWaitingTime(waitingTimeValue);
+			setFoodPrepTime(foodPrepTimeValue);
 		}
-	}, [restaurantDetail]);
+	}, [restaurantDetail, foodPrepTimeValue, waitingTimeValue]);
+
+	// 기존 이미지 데이터 로드
+	useEffect(() => {
+		if (restaurantPhotos?.data && restaurantPhotos.data.length > 0) {
+			const existingImages = restaurantPhotos.data.map((photo) => photo.path);
+			const imagePaths = existingImages.map((url) => extractPathFromUrl(url));
+			setExistingImageUrls(existingImages);
+			setExistingImagePaths(imagePaths);
+		}
+	}, [restaurantPhotos]);
 
 	const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (!e.target.files) return;
 
-		const fileArr = Array.from(e.target.files).slice(0, 5 - images.length);
+		const totalImages = images.length + existingImageUrls.length;
+		const fileArr = Array.from(e.target.files).slice(0, 5 - totalImages);
 		if (fileArr.length === 0) return;
 
 		const validFiles = validateImageFiles(fileArr);
 		if (validFiles.length === 0) return;
 
 		try {
-			const { successUrls, uploadedFiles } = await uploadMultipleImages(validFiles, 5, setIsUploading);
+			const { successUrls, uploadedFiles } = await uploadMultipleImages(validFiles, 5 - totalImages, setIsUploading);
 
-			setImages((prev) => [...prev, ...uploadedFiles].slice(0, 5));
-			setImageUrls((prev) => [...prev, ...successUrls].slice(0, 5));
+			setImages((prev) => [...prev, ...uploadedFiles]);
+			setImageUrls((prev) => [...prev, ...successUrls]);
 		} catch (error) {
 			alert('이미지 업로드에 실패했습니다.');
 			console.error('이미지 업로드 에러:', error);
 		}
 	};
 
-	const removeImage = (index: number) => {
+	const removeNewImage = (index: number) => {
 		setImages((prev) => prev.filter((_, i) => i !== index));
 		setImageUrls((prev) => prev.filter((_, i) => i !== index));
 	};
 
+	const removeExistingImage = (index: number) => {
+		setExistingImageUrls((prev) => prev.filter((_, i) => i !== index));
+		setExistingImagePaths((prev) => prev.filter((_, i) => i !== index));
+	};
+
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
+
+		const allImagePaths = [...existingImagePaths, ...imageUrls];
 
 		updateRestaurant(
 			{
@@ -87,7 +109,7 @@ const RestaurantEdit = () => {
 				servingTimeId: Number(foodPrepTime),
 				waitingTimeId: Number(waitingTime),
 				score: satisfaction,
-				photoPaths: imageUrls,
+				photoPaths: allImagePaths,
 				extraText: review,
 			} as ITeamRestaurantUpdateRequest,
 			{
@@ -102,16 +124,18 @@ const RestaurantEdit = () => {
 		);
 	};
 
+	const totalImages = images.length + existingImageUrls.length;
 	const isButtonActive =
 		restaurantDescription.length > 0 &&
 		waitingTime.length > 0 &&
 		foodPrepTime.length > 0 &&
 		satisfaction > 0 &&
 		review.length > 0 &&
+		totalImages > 0 &&
 		!isUploading &&
 		!isPending;
 
-	if (isLoading) {
+	if (isLoading || isLoadingPhotos) {
 		return (
 			<div className="min-h-screen bg-gray-02 flex items-center justify-center">
 				<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-200" />
@@ -215,7 +239,7 @@ const RestaurantEdit = () => {
 							<div className="flex gap-2 flex-wrap">
 								<label
 									className={`w-[80px] h-[80px] flex flex-col items-center justify-center border border-gray-05 rounded-[12px] bg-white cursor-pointer relative ${
-										images.length >= 5 || isUploading ? 'opacity-50 pointer-events-none' : ''
+										totalImages >= 5 || isUploading ? 'opacity-50 pointer-events-none' : ''
 									}`}
 								>
 									<input
@@ -223,7 +247,7 @@ const RestaurantEdit = () => {
 										accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/bmp,image/heic,image/heif,.heic,.heif"
 										multiple
 										hidden
-										disabled={images.length >= 5 || isUploading}
+										disabled={totalImages >= 5 || isUploading}
 										onChange={handleImageChange}
 									/>
 									{isUploading ? (
@@ -237,8 +261,8 @@ const RestaurantEdit = () => {
 										<>
 											<Icon name="camera" size={24} />
 											<div className="flex items-center">
-												<Typography variant={FONT_VARIANT.label01} fontColor={images.length > 0 ? PALETTE.gray10 : PALETTE.gray07}>
-													{images.length}
+												<Typography variant={FONT_VARIANT.label01} fontColor={totalImages > 0 ? PALETTE.gray10 : PALETTE.gray07}>
+													{totalImages}
 												</Typography>
 												<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray07}>
 													/5
@@ -248,16 +272,35 @@ const RestaurantEdit = () => {
 									)}
 								</label>
 
+								{/* 기존 이미지들 */}
+								{existingImageUrls.map((imageUrl, idx) => (
+									<div
+										key={`existing-${idx}`}
+										className="border border-gray-05 w-[80px] h-[80px] rounded-[12px] relative flex-shrink-0 overflow-hidden flex items-center justify-center"
+									>
+										<img src={imageUrl} alt={`기존 이미지 ${idx + 1}`} className="object-cover w-full h-full rounded-[12px]" />
+										<button
+											type="button"
+											className="absolute top-1 right-1 w-5.5 h-5.5 bg-[#666] bg-opacity-80 rounded-full flex items-center justify-center text-white"
+											onClick={() => removeExistingImage(idx)}
+											aria-label="이미지 삭제"
+										>
+											<Icon name="close" size={16} />
+										</button>
+									</div>
+								))}
+
+								{/* 새로 업로드한 이미지들 */}
 								{images.map((img, idx) => (
 									<div
-										key={idx}
+										key={`new-${idx}`}
 										className="border border-gray-05 w-[80px] h-[80px] rounded-[12px] relative flex-shrink-0 overflow-hidden flex items-center justify-center"
 									>
 										<img src={URL.createObjectURL(img)} alt={`업로드 이미지 ${idx + 1}`} className="object-cover w-full h-full rounded-[12px]" />
 										<button
 											type="button"
 											className="absolute top-1 right-1 w-5.5 h-5.5 bg-[#666] bg-opacity-80 rounded-full flex items-center justify-center text-white"
-											onClick={() => removeImage(idx)}
+											onClick={() => removeNewImage(idx)}
 											aria-label="이미지 삭제"
 										>
 											<Icon name="close" size={16} />
