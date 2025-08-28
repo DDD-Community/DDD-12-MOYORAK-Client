@@ -39,7 +39,7 @@ const NewRestaurantRegistration = () => {
 		address: restaurant?.address ?? '',
 		roadAddress: restaurant?.roadAddress ?? '',
 		category: '',
-		longitude: companyPosition?.longtitude ?? 0,
+		longitude: companyPosition?.longitude ?? 0,
 		latitude: companyPosition?.latitude ?? 0,
 	});
 
@@ -50,7 +50,7 @@ const NewRestaurantRegistration = () => {
 		if (companyPosition) {
 			setNewRestaurantRegistration((prev) => ({
 				...prev,
-				longitude: companyPosition.longtitude,
+				longitude: companyPosition.longitude,
 				latitude: companyPosition.latitude,
 			}));
 		}
@@ -86,9 +86,18 @@ const NewRestaurantRegistration = () => {
 
 			<div className="px-4.5 py-6.25 ">
 				<div className="px-4.5 py-6.5 rounded-[20px] bg-white flex flex-col gap-10">
-					<Input label="식당 이름" id="restaurant-name" isEssential isSuccess value={newRestaurantRegistration.name} disabled />
-					<Input label="식당 주소" id="restaurant-address" isEssential isSuccess value={newRestaurantRegistration.roadAddress} disabled />
-					<Input label="외부 링크" id="restaurant-link" isEssential isSuccess value={newRestaurantRegistration.placeUrl} disabled />
+					<div className="flex flex-col">
+						<FormLabel label="식당 이름" id="restaurant-name" isEssential />
+						<Input id="restaurant-name" isSuccess value={newRestaurantRegistration.name} disabled />
+					</div>
+					<div className="flex flex-col">
+						<FormLabel label="식당 주소" id="restaurant-address" isEssential />
+						<Input id="restaurant-address" isSuccess value={newRestaurantRegistration.roadAddress} disabled />
+					</div>
+					<div className="flex flex-col">
+						<FormLabel label="외부 링크" id="restaurant-link" isEssential />
+						<Input id="restaurant-link" isSuccess value={newRestaurantRegistration.placeUrl} disabled />
+					</div>
 
 					<div className="flex flex-col gap-3.75">
 						<FormLabel label="카테고리" id="restaurant-category" isEssential />
