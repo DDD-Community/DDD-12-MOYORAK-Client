@@ -5,8 +5,8 @@ import { useMutationAuthSignIn } from '@/apis/useMutationAuthSignIn';
 import { useMutationAuthSignUp } from '@/apis/useMutationAuthSignUp';
 import Button from '@/components/Button/Button';
 import DatePicker from '@/components/DatePicker/DatePicker';
-import FormLabel from '@/components/Input/FormLabel';
 import Input from '@/components/Input/Input';
+import OnBoardingLabel from '@/components/Input/OnBoardingLabel';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 import { useSignupStore } from '@/store/signupStore';
@@ -73,12 +73,11 @@ const BasicProfile = () => {
 					isEssential
 					placeholder="생년월일을 입력해주세요."
 					value={birth}
-					onChange={(e) => setBirth(e.target.value)}
-					className="disabled"
+					disabled={true}
 					rightButton={<DatePicker date={birth} onChangeDate={setBirth} />}
 				/>
 				<div>
-					<FormLabel label="성별" isEssential className="mb-[10px]" />
+					<OnBoardingLabel label="성별" isEssential className="mb-[10px]" />
 					<div className="flex gap-[11px]">
 						<Button variant={gender === 'MALE' ? 'clicked' : undefined} onClick={() => setGender('MALE')}>
 							남성
