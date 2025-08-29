@@ -79,7 +79,7 @@ const ParticipationButton = ({
 	};
 
 	return (
-		<div className="fixed bottom-7.5 w-full left-0 px-4.5">
+		<div className="fixed bottom-7.5 w-full left-0 px-4.5 z-100">
 			<Button
 				variant={isButtonDisabled() ? 'disabled' : 'active'}
 				onClick={async () => await onParticipateClick()}

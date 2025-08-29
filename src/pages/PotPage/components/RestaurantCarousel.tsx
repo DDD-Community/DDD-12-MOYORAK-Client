@@ -108,7 +108,7 @@ const RestaurantCarousel = ({
 					</div>
 				) : (
 					<div
-						className="w-7.5 h-7.5 border-1 border-gray-04 rounded-lg bg-gray-02 flex items-center justify-center"
+						className="w-7.5 h-7.5 rounded-lg bg-gray-02 flex items-center justify-center"
 						style={{ width: '30px', height: '30px', borderRadius: '8px', border: '1px solid' }}
 					>
 						<Icon name="noCheck" size={16} />
