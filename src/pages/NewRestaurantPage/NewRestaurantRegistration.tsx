@@ -85,9 +85,12 @@ const NewRestaurantRegistration = () => {
 					},
 				});
 			},
-			onError: (error) => {
-				console.error('식당 등록에 실패했습니다:', error);
-				alert('식당 등록에 실패했습니다.');
+			onError: (error: any) => {
+				if (error?.response?.data?.detail) {
+					alert(error.response.data.detail);
+				} else {
+					alert('식당 등록에 실패했습니다.');
+				}
 			},
 		});
 	};

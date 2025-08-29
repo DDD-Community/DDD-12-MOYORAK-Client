@@ -1,5 +1,6 @@
 import type { ITeamRestaurantLocationItem } from '@/apis/useQueryTeamRestaurantsLocations';
 import location from '@/assets/location.png';
+import navigate from '@/assets/navigate.png';
 import 회사핀 from '@/assets/회사핀.png';
 
 export interface IKakaoMapOptions {
@@ -11,7 +12,7 @@ export interface IKakaoMapOptions {
 export default class KakaoMapCore {
 	private map: any = null;
 	private markers: any[] = [];
-	private selectedMarkerElement: HTMLImageElement | null = null;
+	// private selectedMarkerElement: HTMLImageElement | null = null;
 	private selectedOverlay: any = null;
 
 	async init(): Promise<void> {
@@ -117,23 +118,23 @@ export default class KakaoMapCore {
 		// 마커 리스트에는 overlay만 저장
 		this.markers.push({ marker: customOverlay, index });
 
-		content.onclick = () => {
-			// 이전 마커 크기 원복
-			if (this.selectedMarkerElement) {
-				this.selectedMarkerElement.style.width = '32px';
-				this.selectedMarkerElement.style.height = '32px';
-			}
+		// content.onclick = () => {
+		// 	// 이전 마커 크기 원복
+		// 	if (this.selectedMarkerElement) {
+		// 		this.selectedMarkerElement.style.width = '32px';
+		// 		this.selectedMarkerElement.style.height = '32px';
+		// 	}
 
-			// 현재 마커 크기 확대
-			img.style.width = '48px';
-			img.style.height = '48px';
+		// 	// 현재 마커 크기 확대
+		// 	img.style.width = '48px';
+		// 	img.style.height = '48px';
 
-			// 현재 마커 저장
-			this.selectedMarkerElement = img;
+		// 	// 현재 마커 저장
+		// 	this.selectedMarkerElement = img;
 
-			// 팝업 표시
-			this.showInfoOverlay(option, pos);
-		};
+		// 	// 팝업 표시
+		// 	this.showInfoOverlay(option, pos);
+		// };
 	}
 
 	private showInfoOverlay(option: ITeamRestaurantLocationItem, position: any) {
@@ -164,6 +165,26 @@ export default class KakaoMapCore {
 			image: markerImage,
 			map: this.map,
 			zIndex: 1000,
+		});
+
+		marker.setClickable(false);
+	}
+
+	addNavigateMarker(option: IKakaoMapOptions) {
+		if (!this.map || !option.center) return;
+
+		// 지도의 왼쪽 아래 모서리에 위치시키기 위해 회사 위치에서 약간 아래쪽으로 조정
+		const adjustedLat = option.center.lat - 0.0015; // 위도 조정 (아래쪽으로)
+		const adjustedLng = option.center.lng - 0.0005; // 경도 조정 (왼쪽으로)
+		const pos = new kakao.maps.LatLng(adjustedLat, adjustedLng);
+		const imageSize = new kakao.maps.Size(44, 44);
+		const markerImage = new kakao.maps.MarkerImage(navigate, imageSize);
+
+		const marker = new kakao.maps.Marker({
+			position: pos,
+			image: markerImage,
+			map: this.map,
+			zIndex: 999,
 		});
 
 		marker.setClickable(false);

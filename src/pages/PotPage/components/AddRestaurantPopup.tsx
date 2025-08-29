@@ -30,11 +30,20 @@ interface IAddRestaurantPopupProps {
 		}>
 	) => void;
 	existingRestaurantIds: number[]; // 이미 추가된 식당 ID들
+	existingRestaurants?: Array<{
+		// 기존 식당들의 실제 정보
+		teamRestaurantId: number;
+		restaurantName: string;
+		restaurantCategory: string;
+		averageReviewScore: number;
+		reviewCount: number;
+		reviewImagePath: string;
+	}>;
 }
 
 const MAX_TOTAL_RESTAURANTS = 5;
 
-const AddRestaurantPopup = ({ onClose, existingRestaurantIds }: IAddRestaurantPopupProps) => {
+const AddRestaurantPopup = ({ onClose, existingRestaurantIds, existingRestaurants }: IAddRestaurantPopupProps) => {
 	const [sortOption, setSortOption] = useState<FilterType>(FILTER_TYPES.DISTANCE);
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [newSelectedIds, setNewSelectedIds] = useState<number[]>([]);
@@ -98,12 +107,16 @@ const AddRestaurantPopup = ({ onClose, existingRestaurantIds }: IAddRestaurantPo
 			(r) => r.restaurantName.includes(searchValue) && !existingRestaurantIds.includes(r.teamRestaurantId) && !newSelectedIds.includes(r.teamRestaurantId)
 		) || [];
 
-	// 모든 선택된 식당 정보 (기존 + 새로 선택된)
-	const allSelectedIds = [...existingRestaurantIds, ...newSelectedIds];
-	const selectedRestaurants = teamRestaurantList?.data?.filter((r) => allSelectedIds.includes(r.teamRestaurantId)) || [];
-
 	// 새로 선택된 식당 정보
 	const newSelectedRestaurants = teamRestaurantList?.data?.filter((r) => newSelectedIds.includes(r.teamRestaurantId)) || [];
+
+	// 모든 선택된 식당 정보 (기존 + 새로 선택된)
+	const allSelectedIds = [...existingRestaurantIds, ...newSelectedIds];
+
+	// 기존 식당 정보가 props로 전달된 경우 사용, 없으면 빈 배열
+	const existingRestaurantsData = existingRestaurants || [];
+
+	const selectedRestaurants = [...existingRestaurantsData, ...newSelectedRestaurants];
 
 	// 완료 버튼 클릭 시 새로 선택된 식당들만 전달
 	const handleComplete = () => {

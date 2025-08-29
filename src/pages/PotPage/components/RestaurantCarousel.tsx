@@ -103,14 +103,11 @@ const RestaurantCarousel = ({
 		return (
 			<div className="absolute top-4 right-4 z-10">
 				{isSelected ? (
-					<div className="w-7.5 h-7.5 bg-[#BEEE05] rounded-lg flex items-center justify-center" style={{ width: '30px', height: '30px', borderRadius: '8px' }}>
+					<div className="w-7.5 h-7.5 bg-[#BEEE05] rounded-lg flex items-center justify-center">
 						<Icon name="check" size={16} className="text-white" />
 					</div>
 				) : (
-					<div
-						className="w-7.5 h-7.5 rounded-lg bg-gray-02 flex items-center justify-center"
-						style={{ width: '30px', height: '30px', borderRadius: '8px', border: '1px solid' }}
-					>
+					<div className="w-7.5 h-7.5 rounded-lg bg-gray-02 flex items-center justify-center">
 						<Icon name="noCheck" size={16} />
 					</div>
 				)}

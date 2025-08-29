@@ -44,6 +44,9 @@ const KakaoMap = ({ companyLocation, optionsList = [] }: IKakaoMapProps) => {
 				// 회사 마커 생성
 				mapInstance.current.addCompanyMarker(companyLocation);
 
+				// navigate 마커 생성 (회사 위치에)
+				mapInstance.current.addNavigateMarker(companyLocation);
+
 				// 일반 마커 생성
 				optionsList.forEach((opt, idx) => {
 					mapInstance.current?.addMarker(opt, idx);

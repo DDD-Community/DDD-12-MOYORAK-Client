@@ -533,7 +533,11 @@ const PotDetail = () => {
 	return (
 		<>
 			{showAddRestaurantPopup ? (
-				<AddRestaurantPopup onClose={handleAddRestaurant} existingRestaurantIds={potDetail.candidates.map((candidate) => candidate.teamRestaurantId)} />
+				<AddRestaurantPopup
+					onClose={handleAddRestaurant}
+					existingRestaurantIds={potDetail.candidates.map((candidate) => candidate.teamRestaurantId)}
+					existingRestaurants={potDetail.candidates}
+				/>
 			) : (
 				<>
 					<NavBar variant="iconWithText" leftText="팟 상세보기" leftIcon="back" onLeftIconClick={() => navigate('/pot')} />
