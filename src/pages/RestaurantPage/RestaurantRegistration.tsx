@@ -94,9 +94,12 @@ const RestaurantRegistration = () => {
 			queryClient.removeQueries({ queryKey: ['reviews', teamId] });
 
 			setIsOpen(true);
-		} catch (error) {
-			console.error('식당 등록에 실패했습니다:', error);
-			alert('식당 등록 실패');
+		} catch (error: any) {
+			if (error?.response?.data?.detail) {
+				alert(error.response.data.detail);
+			} else {
+				alert('식당 등록에 실패했습니다.');
+			}
 		}
 	};
 
