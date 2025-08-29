@@ -143,7 +143,7 @@ const RestaurantDetail = () => {
 						<div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-gray-10/80 to-transparent ">
 							<div>
 								<nav className="flex items-center gap-5 h-15 px-5">
-									<Icon name="restaurantBack" size={24} onClick={() => navigate(-1)} />
+									<Icon name="restaurantBack" size={24} onClick={() => navigate('/')} />
 									<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.white} className="font-semibold">
 										{restaurantInfo?.name}
 									</Typography>

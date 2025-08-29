@@ -199,7 +199,8 @@ const CustomDrawer = ({ header, filterType }: ICustomDrawerProps) => {
 				borderTopLeftRadius: height === fullHeightRef.current ? 0 : 30,
 				borderTopRightRadius: height === fullHeightRef.current ? 0 : 30,
 			}}
-			className={`fixed left-0 right-0 bg-white z-50 flex flex-col ${disableTransition ? '' : 'transition-[height] duration-300 ease-out'}`}
+			className={`fixed left-0 right-0 bg-white z-50 flex flex-col shadow-[0_-1px_7px_0_rgba(0,0,0,0.25)]
+ ${disableTransition ? '' : 'transition-[height] duration-300 ease-out'}`}
 			onTouchStart={onDragStartTouch}
 			onTouchMove={onTouchMove}
 			onTouchEnd={onTouchEnd}

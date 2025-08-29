@@ -82,8 +82,25 @@ export default class KakaoMapCore {
 		// 텍스트 라벨
 		const label = document.createElement('div');
 		label.textContent = option.name ?? '';
-		label.style.marginTop = '4px';
+		label.style.color = 'var(--Grayscale-121212, #121212)';
+		label.style.textAlign = 'center';
+		// 중앙사이드 스트로크 효과를 위한 text-shadow (8방향 그림자로 중앙사이드 효과 생성)
+		label.style.textShadow = `
+			0px -1px 0 var(--Grayscale-FFFFFF, #FFF),
+			0px 1px 0 var(--Grayscale-FFFFFF, #FFF),
+			-1px 0px 0 var(--Grayscale-FFFFFF, #FFF),
+			1px 0px 0 var(--Grayscale-FFFFFF, #FFF),
+			-0.5px -0.5px 0 var(--Grayscale-FFFFFF, #FFF),
+			0.5px -0.5px 0 var(--Grayscale-FFFFFF, #FFF),
+			-0.5px 0.5px 0 var(--Grayscale-FFFFFF, #FFF),
+			0.5px 0.5px 0 var(--Grayscale-FFFFFF, #FFF)
+		`;
+		label.style.fontFamily = 'Pretendard';
 		label.style.fontSize = '14px';
+		label.style.fontStyle = 'normal';
+		label.style.fontWeight = '600';
+		label.style.lineHeight = '143%';
+		label.style.letterSpacing = '0.14px';
 		label.style.padding = '2px 6px';
 		label.style.whiteSpace = 'nowrap';
 
@@ -125,23 +142,8 @@ export default class KakaoMapCore {
 			this.selectedOverlay.setMap(null);
 		}
 
-		// 팝업 콘텐츠
-		const infoContent = document.createElement('div');
-		infoContent.style.padding = '10px';
-		infoContent.style.background = 'white';
-		infoContent.style.borderRadius = '8px';
-		infoContent.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
-		infoContent.style.fontSize = '14px';
-		infoContent.style.minWidth = '120px';
-
-		infoContent.innerHTML = `
-			<strong>${option.name}</strong><br/>
-			위도: ${option.latitude}<br/>
-			경도: ${option.longitude}
-		`;
-
 		const infoOverlay = new kakao.maps.CustomOverlay({
-			content: infoContent,
+			content: option.name ?? '',
 			position,
 			yAnchor: 1.3,
 		});
@@ -154,13 +156,14 @@ export default class KakaoMapCore {
 		if (!this.map || !option.center) return;
 
 		const pos = new kakao.maps.LatLng(option.center.lat, option.center.lng);
-		const imageSize = new kakao.maps.Size(100, 115);
+		const imageSize = new kakao.maps.Size(110, 110);
 		const markerImage = new kakao.maps.MarkerImage(회사핀, imageSize);
 
 		const marker = new kakao.maps.Marker({
 			position: pos,
 			image: markerImage,
 			map: this.map,
+			zIndex: 1000,
 		});
 
 		marker.setClickable(false);
