@@ -48,7 +48,7 @@ const Participant = () => {
 				</div>
 				<div className="relative group">
 					<Icon name="information" className="cursor-pointer" />
-					<div className="absolute right-[-10px] mt-3 px-3 py-2.5 bg-gray-09 rounded-[10px] z-10 w-[267px] opacity-0 group-hover:opacity-100 ">
+					<div className="absolute right-[-10px] mt-3 px-3 py-2.5 bg-gray-09 rounded-[10px] z-10 w-[267px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
 						<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.white}>
 							더보기 버튼을 누르면 참여자의 알러지 정보와 비선호 음식을 볼 수 있어요!
 						</Typography>

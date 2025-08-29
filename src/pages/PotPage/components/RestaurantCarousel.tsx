@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
+import winner from '@/assets/winner.png';
 import Icon from '@/components/Icon';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
@@ -189,53 +190,64 @@ const RestaurantCarousel = ({
 	};
 
 	// 카드 렌더링 함수
-	const renderCard = (candidate: Candidate) => (
-		<div
-			onClick={() => !isVoted && onCardClick?.(candidate)}
-			className={getCardStyle(candidate)}
-			style={{ borderRadius: '20px', boxShadow: isVoted && selectedRestaurantId === candidate.candidateId ? '0 0 7px 0 rgba(0, 0, 0, 0.05)' : undefined }}
-		>
-			<div className="w-full overflow-hidden relative h-[200px]" style={{ height: '200px' }}>
-				<img src={candidate.reviewImagePath} alt={`${candidate.restaurantName} 음식`} className="w-full h-full object-cover" />
-				<div className="absolute inset-0 gradient-overlay opacity-0 transition-opacity duration-300" />
+	const renderCard = (candidate: Candidate) => {
+		const isWinner = timeStatus === 'after_end' && getWinningRestaurants().some((restaurant) => restaurant.candidateId === candidate.candidateId);
 
-				{renderVoteBadge(candidate)}
-				{renderSelectionCheckbox(candidate)}
-			</div>
-
-			{/* 카드 정보 */}
+		return (
 			<div
-				className={`p-4 ${
-					timeStatus === 'after_end'
-						? (() => {
-								const winningRestaurants = getWinningRestaurants();
-								const isWinner = winningRestaurants.some((restaurant) => restaurant.candidateId === candidate.candidateId);
-								return isWinner ? 'bg-[#484848]' : 'bg-white';
-							})()
-						: isVoted && selectedRestaurantId === candidate.candidateId
-							? 'bg-[rgba(190,238,5,0.15)]'
-							: 'bg-white'
-				}`}
-				style={{ padding: '16px' }}
+				onClick={() => !isVoted && onCardClick?.(candidate)}
+				className={getCardStyle(candidate)}
+				style={{ borderRadius: '20px', boxShadow: isVoted && selectedRestaurantId === candidate.candidateId ? '0 0 7px 0 rgba(0, 0, 0, 0.05)' : undefined }}
 			>
-				<Typography variant={FONT_VARIANT.caption01} fontColor={getTextColor(candidate, 'category')} className="mb-1">
-					{getCategoryDisplay(candidate.restaurantCategory)}
-				</Typography>
-				<Typography variant={FONT_VARIANT.body01} fontColor={getTextColor(candidate, 'name')} className="font-semibold mb-0.75">
-					{candidate.restaurantName}
-				</Typography>
-				<div className="flex items-center gap-1" style={{ gap: '4px' }}>
-					<Icon name="star" size={14} className={getStarIconColor(candidate)} />
-					<Typography variant={FONT_VARIANT.body02} fontColor={getTextColor(candidate, 'rating')} className="font-medium">
-						{candidate.averageReviewScore.toFixed(1)}
+				<div className="w-full overflow-hidden relative h-[200px]" style={{ height: '200px' }}>
+					<img src={candidate.reviewImagePath} alt={`${candidate.restaurantName} 음식`} className="w-full h-full object-cover" />
+					<div className="absolute inset-0 gradient-overlay opacity-0 transition-opacity duration-300" />
+
+					{/* 1등 배지 */}
+					{isWinner && (
+						<div className="absolute top-2 right-2 z-20">
+							<img src={winner} alt="1등" className="w-15	 h-15" />
+						</div>
+					)}
+
+					{renderVoteBadge(candidate)}
+					{renderSelectionCheckbox(candidate)}
+				</div>
+
+				{/* 카드 정보 */}
+				<div
+					className={`p-4 ${
+						timeStatus === 'after_end'
+							? (() => {
+									const winningRestaurants = getWinningRestaurants();
+									const isWinner = winningRestaurants.some((restaurant) => restaurant.candidateId === candidate.candidateId);
+									return isWinner ? 'bg-[#484848]' : 'bg-white';
+								})()
+							: isVoted && selectedRestaurantId === candidate.candidateId
+								? 'bg-[rgba(190,238,5,0.15)]'
+								: 'bg-white'
+					}`}
+					style={{ padding: '16px' }}
+				>
+					<Typography variant={FONT_VARIANT.caption01} fontColor={getTextColor(candidate, 'category')} className="mb-1">
+						{getCategoryDisplay(candidate.restaurantCategory)}
 					</Typography>
-					<Typography variant={FONT_VARIANT.body02} fontColor={getTextColor(candidate, 'review')}>
-						· 리뷰 {candidate.reviewCount}
+					<Typography variant={FONT_VARIANT.body01} fontColor={getTextColor(candidate, 'name')} className="font-semibold mb-0.75">
+						{candidate.restaurantName}
 					</Typography>
+					<div className="flex items-center gap-1" style={{ gap: '4px' }}>
+						<Icon name="star" size={14} className={getStarIconColor(candidate)} />
+						<Typography variant={FONT_VARIANT.body02} fontColor={getTextColor(candidate, 'rating')} className="font-medium">
+							{candidate.averageReviewScore.toFixed(1)}
+						</Typography>
+						<Typography variant={FONT_VARIANT.body02} fontColor={getTextColor(candidate, 'review')}>
+							· 리뷰 {candidate.reviewCount}
+						</Typography>
+					</div>
 				</div>
 			</div>
-		</div>
-	);
+		);
+	};
 
 	// 1개일 때는 슬라이드 없이 렌더링
 	if (restaurants.length === 1) {

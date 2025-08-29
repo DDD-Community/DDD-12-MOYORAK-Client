@@ -5,6 +5,7 @@ import { useMutationAddRestaurantToParty } from '@/apis/useMutationAddRestaurant
 import { useMutationJoinParty } from '@/apis/useMutationJoinParty';
 import { useMutationVote } from '@/apis/useMutationVote';
 import { useQueryPotDetail } from '@/apis/useQueryPotDetail';
+import winner from '@/assets/winner.png';
 import FilterButton from '@/components/FilterButton/FilterButton';
 import Icon from '@/components/Icon';
 import NavBar from '@/components/NavBar/NavBar';
@@ -46,7 +47,7 @@ const PotDetail = () => {
 	const [showAddRestaurantPopup, setShowAddRestaurantPopup] = useState(false);
 
 	useEffect(() => {
-		if (potDetail) {
+		if (potDetail && !isVoted) {
 			const userVote = potDetail.voters.find((voter) => voter.userId === userId);
 			if (userVote) {
 				setIsVoted(true);
@@ -56,7 +57,7 @@ const PotDetail = () => {
 				setSelectedRestaurantId(null);
 			}
 		}
-	}, [potDetail, userId]);
+	}, [potDetail, userId, isVoted]);
 
 	const getCurrentTimeStatus = (): TimeStatus => {
 		if (!potDetail) return 'before_start';
@@ -356,7 +357,6 @@ const PotDetail = () => {
 					</Typography>
 				</div>
 
-				{/* Hover 시 참여자 정보 오버레이 */}
 				{hoveredRestaurantId === candidate.candidateId && voteCount > 0 && (
 					<div className="absolute bottom-11 left-1 bg-black/60 backdrop-blur-2px rounded-[10px] px-3.75 py-2.75 shadow-lg border border-gray-600 min-w-[100px] z-10">
 						<div className="flex flex-col gap-1.5">
@@ -364,8 +364,8 @@ const PotDetail = () => {
 								.filter((voter) => voter.candidateId === candidate.candidateId)
 								.map((voter) => (
 									<div key={voter.name} className="flex items-center gap-2">
-										<div className="w-4.5 h-4.5 rounded-[400px] bg-gray-02 border border-gray-04">
-											<img src={voter.profileImageUrl} alt={voter.name} className="w-full h-full object-cover" />
+										<div className="w-4.5 h-4.5 rounded-full bg-gray-02 border border-gray-04 flex items-center justify-center">
+											<img src={voter.profileImageUrl} alt={voter.name} className="w-full h-full object-cover rounded-full" />
 										</div>
 										<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray03} className="font-medium">
 											{voter.name}
@@ -404,89 +404,101 @@ const PotDetail = () => {
 
 	const renderRestaurantList = () => (
 		<div className="space-y-3.25 mb-6 mx-4.5">
-			{potDetail?.candidates.map((candidate) => (
-				<div
-					key={candidate.candidateId}
-					className={`rounded-[15px] p-2.5 flex items-center gap-3.5 transition-all ${
-						canSelectRestaurant() ? 'cursor-pointer' : 'cursor-default'
-					} ${getRestaurantCardStyle(candidate.candidateId)}`}
-					onClick={() => handleRestaurantSelect(candidate.candidateId)}
-				>
-					<div className="relative">
-						<img src={candidate.reviewImagePath} alt={candidate.restaurantName} className="w-20.75 h-20.75 rounded-[12px] object-cover" />
-						{renderVoteBadge(candidate)}
-					</div>
+			{potDetail?.candidates.map((candidate) => {
+				const isWinner = getCurrentTimeStatus() === 'after_end' && getWinningRestaurants().some((r) => r.candidateId === candidate.candidateId);
 
-					<div className="flex-1">
-						<Typography
-							variant={FONT_VARIANT.caption01}
-							fontColor={
-								getCurrentTimeStatus() === 'after_end' && getWinningRestaurants().some((r) => r.candidateId === candidate.candidateId)
-									? PALETTE.white
-									: PALETTE.gray07
-							}
-							className="font-medium"
-						>
-							{getCategoryDisplay(candidate.restaurantCategory)}
-						</Typography>
-						<Typography
-							variant={FONT_VARIANT.header03}
-							fontColor={
-								getCurrentTimeStatus() === 'after_end' && getWinningRestaurants().some((r) => r.candidateId === candidate.candidateId)
-									? PALETTE.white
-									: PALETTE.gray10
-							}
-							className="font-semibold mb-0.75"
-						>
-							{candidate.restaurantName}
-						</Typography>
-						<div className="flex items-center gap-1">
-							<Icon
-								name="star"
-								size={14}
-								className={
-									getCurrentTimeStatus() === 'after_end' && getWinningRestaurants().some((r) => r.candidateId === candidate.candidateId) ? 'text-white' : ''
-								}
-							/>
-							<Typography
-								variant={FONT_VARIANT.label01}
-								fontColor={
-									getCurrentTimeStatus() === 'after_end' && getWinningRestaurants().some((r) => r.candidateId === candidate.candidateId)
-										? PALETTE.white
-										: PALETTE.gray08
-								}
-								className="font-medium"
-							>
-								{candidate.averageReviewScore.toFixed(1)}
-							</Typography>
-							<Typography
-								variant={FONT_VARIANT.label01}
-								fontColor={
-									getCurrentTimeStatus() === 'after_end' && getWinningRestaurants().some((r) => r.candidateId === candidate.candidateId)
-										? PALETTE.white
-										: PALETTE.gray08
-								}
-								className="font-medium"
-							>
-								·
-							</Typography>
-							<Typography
-								variant={FONT_VARIANT.label01}
-								fontColor={
-									getCurrentTimeStatus() === 'after_end' && getWinningRestaurants().some((r) => r.candidateId === candidate.candidateId)
-										? PALETTE.white
-										: PALETTE.gray08
-								}
-								className="font-medium"
-							>
-								리뷰 {candidate.reviewCount}
-							</Typography>
+				return (
+					<div
+						key={candidate.candidateId}
+						className={`rounded-[15px] p-2.5 flex items-center gap-3.5 transition-all ${
+							canSelectRestaurant() ? 'cursor-pointer' : 'cursor-default'
+						} ${getRestaurantCardStyle(candidate.candidateId)}`}
+						onClick={() => handleRestaurantSelect(candidate.candidateId)}
+					>
+						<div className="relative">
+							<img src={candidate.reviewImagePath} alt={candidate.restaurantName} className="w-20.75 h-20.75 rounded-[12px] object-cover" />
+
+							{/* 1등 배지 */}
+							{isWinner && (
+								<div className="absolute top-2 right-2 z-20">
+									<img src={winner} alt="1등" className="w-15 h-15" />
+								</div>
+							)}
+
+							{renderVoteBadge(candidate)}
 						</div>
-					</div>
 
-					{renderRestaurantCheckbox(candidate.candidateId)}
-				</div>
-			))}
+						<div className="flex-1">
+							<Typography
+								variant={FONT_VARIANT.caption01}
+								fontColor={
+									getCurrentTimeStatus() === 'after_end' && getWinningRestaurants().some((r) => r.candidateId === candidate.candidateId)
+										? PALETTE.white
+										: PALETTE.gray07
+								}
+								className="font-medium"
+							>
+								{getCategoryDisplay(candidate.restaurantCategory)}
+							</Typography>
+							<Typography
+								variant={FONT_VARIANT.header03}
+								fontColor={
+									getCurrentTimeStatus() === 'after_end' && getWinningRestaurants().some((r) => r.candidateId === candidate.candidateId)
+										? PALETTE.white
+										: PALETTE.gray10
+								}
+								className="font-semibold mb-0.75"
+							>
+								{candidate.restaurantName}
+							</Typography>
+							<div className="flex items-center gap-1">
+								<Icon
+									name="star"
+									size={14}
+									className={
+										getCurrentTimeStatus() === 'after_end' && getWinningRestaurants().some((r) => r.candidateId === candidate.candidateId) ? 'text-white' : ''
+									}
+								/>
+								<Typography
+									variant={FONT_VARIANT.label01}
+									fontColor={
+										getCurrentTimeStatus() === 'after_end' && getWinningRestaurants().some((r) => r.candidateId === candidate.candidateId)
+											? PALETTE.white
+											: PALETTE.gray08
+									}
+									className="font-medium"
+								>
+									{candidate.averageReviewScore.toFixed(1)}
+								</Typography>
+								<Typography
+									variant={FONT_VARIANT.label01}
+									fontColor={
+										getCurrentTimeStatus() === 'after_end' && getWinningRestaurants().some((r) => r.candidateId === candidate.candidateId)
+											? PALETTE.white
+											: PALETTE.gray08
+									}
+									className="font-medium"
+								>
+									·
+								</Typography>
+								<Typography
+									variant={FONT_VARIANT.label01}
+									fontColor={
+										getCurrentTimeStatus() === 'after_end' && getWinningRestaurants().some((r) => r.candidateId === candidate.candidateId)
+											? PALETTE.white
+											: PALETTE.gray08
+									}
+									className="font-medium"
+								>
+									리뷰 {candidate.reviewCount}
+								</Typography>
+							</div>
+						</div>
+
+						{renderRestaurantCheckbox(candidate.candidateId)}
+					</div>
+				);
+			})}
 		</div>
 	);
 
