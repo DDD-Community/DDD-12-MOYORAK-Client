@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 
 import { useMutationDeleteReview } from '@/apis/useMutationDeleteReview';
 import { useQueryReviewList } from '@/apis/useQueryReviewList';
+import profile from '@/assets/profile.png';
 import reviewDelete from '@/assets/reviewDelete.png';
 import starIcon from '@/assets/star.png';
 import Button from '@/components/Button/Button';
@@ -142,7 +143,7 @@ const ReviewInfo = ({ restaurantName }: IReviewInfoProps) => {
 						<div className="mb-6" key={review.id}>
 							<div className="flex justify-between">
 								<div className="flex items-center gap-2.5 mb-2.5">
-									<img src={review.userProfileImageUrl} alt="profile" className="w-10 h-10 rounded-full" />
+									<img src={review.userProfileImageUrl ?? profile} alt="profile" className="w-10 h-10 rounded-full" />
 									<div className="flex flex-col gap-0.5">
 										<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray10} className="font-medium">
 											{review.userNickname}
