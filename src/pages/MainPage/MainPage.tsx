@@ -15,9 +15,19 @@ import MainNavSideBar from './components/MainNavSideBar';
 const MainPage = () => {
 	const [showInvitation, setShowInvitation] = useState(false);
 	const [copied, setCopied] = useState<boolean>(false);
+	const [isLogin, setIsLogin] = useState(false);
 
-	const isLogin = useLocation().state?.isLogin || Boolean(localStorage.getItem('accessToken'));
+	const location = useLocation();
 	const accessToken = localStorage.getItem('accessToken');
+
+	// 로그인 상태를 안정적으로 관리
+	useEffect(() => {
+		const loginFromState = location.state?.isLogin;
+		const loginFromToken = Boolean(accessToken);
+		const loginStatus = loginFromState || loginFromToken;
+
+		setIsLogin(loginStatus);
+	}, [location.state?.isLogin, accessToken]);
 
 	// // 테스트용 더미데이터 설정
 	// const companyId = '15'; // localStorage.getItem('companyId');
@@ -35,8 +45,8 @@ const MainPage = () => {
 
 	const companyLocation = {
 		center: {
-			lat: company?.latitude || 0,
-			lng: company?.longitude || 0,
+			lat: company?.latitude || 37.54419744589,
+			lng: company?.longitude || 126.95121385337,
 		},
 		placeName: '회사',
 	};
@@ -54,7 +64,6 @@ const MainPage = () => {
 
 				// userId가 유효한 값일 때만 저장
 				if (userId && userId !== 'undefined') {
-					console.log('JWT에서 추출된 userId:', userId);
 					localStorage.setItem('userId', String(userId));
 				}
 			} catch (error) {
@@ -75,25 +84,36 @@ const MainPage = () => {
 
 	if (isLogin) {
 		return (
-			<div className="flex flex-col h-screen relative z-0">
-				<div className="relative">
-					<NavBar variant="iconWithTextAndRightIcon" leftIcon="company" leftText="WEB 2팀" rightIcon="category" onRightIconClick={onShowInvitation} />
-
-					{showInvitation && <MainNavSideBar onCopy={setCopied} />}
-				</div>
+			<div className="relative w-full h-screen pb-[86px]">
+				{/* 지도를 풀 스크린으로 표시 (TabBar 공간 제외) */}
 				<KakaoMap companyLocation={companyLocation} optionsList={data?.locations || []} />
 
-				<MainBottomSheet />
+				{/* 상단 네비게이션 */}
+				<div className="absolute top-0 left-0 right-0 z-10">
+					<NavBar variant="iconWithTextAndRightIcon" leftIcon="company" leftText="WEB 2팀" rightIcon="category" onRightIconClick={onShowInvitation} />
+					{showInvitation && <MainNavSideBar onCopy={setCopied} />}
+				</div>
+
+				{/* BottomSheet를 지도 위에 절대 위치로 오버레이 (TabBar 위에) */}
+				<div className="absolute bottom-20 left-0 right-0 z-10">
+					<MainBottomSheet />
+				</div>
+
 				{copied && <CustomToast title="초대 링크가 복사되었습니다." icon="check" />}
 			</div>
 		);
 	}
 
 	return (
-		<>
+		<div className="relative w-full h-screen pb-[86px]">
+			{/* 비로그인 상태에서도 풀 스크린 지도 (TabBar 공간 제외) */}
 			<KakaoMap companyLocation={companyLocation} optionsList={data?.locations || []} />
-			<MainIntro />
-		</>
+
+			{/* MainIntro를 지도 위에 오버레이 */}
+			<div className="absolute inset-0 z-10">
+				<MainIntro />
+			</div>
+		</div>
 	);
 };
 

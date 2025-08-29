@@ -152,7 +152,7 @@ const ReviewInfo = ({ restaurantName }: IReviewInfoProps) => {
 										</Typography>
 									</div>
 								</div>
-								{review.userId === userId && (
+								{String(review.userId) === userId && (
 									<div className="relative option-menu-container">
 										<Icon name="selectOption" size={24} onClick={() => handleOptionClick(index)} className="cursor-pointer" />
 										{isOptionOpen && (

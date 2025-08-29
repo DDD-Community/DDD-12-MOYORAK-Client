@@ -5,6 +5,7 @@ import RedirectPage from '@/pages/AuthPage/RedirectPage';
 import Developer from '@/pages/Developer';
 import MainPage from '@/pages/MainPage/MainPage';
 import MyPage from '@/pages/MyPage/MyPage';
+import MyReview from '@/pages/MyPage/MyReview';
 import NewRestaurantRegistration from '@/pages/NewRestaurantPage/NewRestaurantRegistration';
 import NewRestaurantSelect from '@/pages/NewRestaurantPage/NewRestaurantSelect';
 import NotFound from '@/pages/NotFound';
@@ -34,6 +35,7 @@ const AppRouter = () => {
 			<Route path="/admin-team" element={<TeamAdminPage />} />
 			<Route path="/search" element={<SearchRestaurantPage />} />
 			<Route path="/mypage" element={<MyPage />} />
+			<Route path="/mypage/my-review" element={<MyReview />} />
 			<Route path="/pot" element={<Pot />} />
 			<Route path="/pot-make" element={<PotMake />} />
 			<Route path="/pot-make-success" element={<PotMakeSuccess />} />

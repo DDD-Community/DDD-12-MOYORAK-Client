@@ -6,9 +6,11 @@ import { useQueryTeamSearchHistory } from '@/apis/useQueryTeamSearchHistory';
 import { useQueryTeamViewHistory } from '@/apis/useQueryTeamViewHistory';
 import noInquiryData from '@/assets/noInquiryData.png';
 import noSearchData from '@/assets/noSearchData.png';
+import noSearchRestaurantData from '@/assets/noSearchRestaurantData.png';
 import FilterButton from '@/components/FilterButton/FilterButton';
 import Icon from '@/components/Icon';
 import SearchInput from '@/components/Input/SearchInput';
+import Pagination from '@/components/Pagination/Pagination';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 import { useCategoryMapping } from '@/hooks/useCategoryMapping';
@@ -48,8 +50,8 @@ const SearchRestaurantPage = () => {
 	const [searchValue, setSearchValue] = useState('');
 	const [debouncedSearchValue, setDebouncedSearchValue] = useState('');
 	const [selectedFilter, setSelectedFilter] = useState<FilterType>(FILTER_TYPES.DISTANCE);
+	const [currentPage, setCurrentPage] = useState(1);
 
-	// 디바운싱: 500ms 후에 검색어 업데이트
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setDebouncedSearchValue(searchValue);
@@ -58,15 +60,14 @@ const SearchRestaurantPage = () => {
 		return () => clearTimeout(timer);
 	}, [searchValue]);
 
-	// 검색 요청 파라미터
 	const searchRequest = useMemo(
 		() => ({
-			size: 10,
-			currentPage: 1,
+			size: 5,
+			currentPage,
 			keyword: debouncedSearchValue,
 			sortOption: getApiSortOption(selectedFilter),
 		}),
-		[debouncedSearchValue, selectedFilter]
+		[debouncedSearchValue, selectedFilter, currentPage]
 	);
 
 	const { data: searchResults, isLoading: isSearchLoading } = useQueryTeamRestaurantSearch(teamId || '', searchRequest);
@@ -95,23 +96,7 @@ const SearchRestaurantPage = () => {
 			{/* 컨텐츠 */}
 			<div className="px-4">
 				{showSearchResults ? (
-					/* 검색 결과 */
 					<>
-						<div className="flex items-center justify-between mt-5.5 mb-3">
-							<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray10} className="font-semibold">
-								검색 결과
-							</Typography>
-						</div>
-
-						{/* 필터 버튼들 */}
-						<div className="flex gap-2 mb-4">
-							{Object.entries(FILTER_TYPES).map(([key, value]) => (
-								<FilterButton key={key} variant={selectedFilter === value ? 'active' : 'general'} onClick={() => handleFilterClick(value)} borderRadius="16">
-									{value}
-								</FilterButton>
-							))}
-						</div>
-
 						<section className="bg-white rounded-[20px] px-4 py-4 mb-20">
 							{isSearchLoading ? (
 								<div className="h-40 flex items-center justify-center">
@@ -121,6 +106,19 @@ const SearchRestaurantPage = () => {
 								</div>
 							) : searchResults && searchResults.data.length > 0 ? (
 								<ul className="flex flex-col gap-5">
+									<div className="flex gap-2">
+										{Object.entries(FILTER_TYPES).map(([key, value]) => (
+											<FilterButton
+												key={key}
+												variant={selectedFilter === value ? 'active' : 'general'}
+												onClick={() => handleFilterClick(value)}
+												borderRadius="16"
+											>
+												{value}
+											</FilterButton>
+										))}
+									</div>
+
 									{searchResults.data.map((restaurant) => (
 										<li key={restaurant.teamRestaurantId} className="flex items-start gap-3.75 pb-3.75 border-b border-gray-02 last:border-b-0 last:pb-0">
 											<img
@@ -157,29 +155,34 @@ const SearchRestaurantPage = () => {
 											</div>
 										</li>
 									))}
+									<Pagination currentPage={currentPage} totalCount={searchResults.totalCount} size={searchRequest.size} onPageChange={setCurrentPage} />
 								</ul>
 							) : (
-								<div className="h-40 flex flex-col gap-3.25 items-center justify-center text-center">
-									<img src={noSearchData} alt="noSearchData" className="w-11.25 h-11.5" />
+								<div className="h-147.5 flex flex-col gap-5.25 items-center justify-center text-center">
 									<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
-										검색 결과가 없습니다.
+										검색 결과가 없어요...ㅠㅠ
 									</Typography>
+									<img src={noSearchRestaurantData} alt="noSearchRestaurantData" className="w-39.5 h-38" />
 								</div>
 							)}
 						</section>
 					</>
 				) : (
-					/* 기존 UI (최근 검색어, 최근 조회한 식당) */
 					<>
 						<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray10} className="mt-5.5 mb-3 font-semibold">
 							최근 검색어
 						</Typography>
 
-						<section className="bg-white rounded-[20px] px-3.5">
+						<section className="bg-white rounded-[20px] px-4.5 py-6.5">
 							{searchList && searchList.searchHistories.length > 0 && (
-								<ul>
+								<ul className="flex flex-col gap-3">
 									{searchList.searchHistories.map((item, index) => (
-										<SearchList key={item.id} item={item} className={index !== searchList.searchHistories.length - 1 ? 'border-b-[1px] border-gray-06' : ''} />
+										<SearchList
+											key={item.id}
+											item={item}
+											isLast={index === searchList.searchHistories.length - 1}
+											className={index !== searchList.searchHistories.length - 1 ? 'border-b-[1px] border-gray-02' : ''}
+										/>
 									))}
 								</ul>
 							)}
@@ -203,6 +206,7 @@ const SearchRestaurantPage = () => {
 										<ViewList
 											key={item.viewHistoryId}
 											item={item}
+											isLast={index === viewList.viewHistories.length - 1}
 											className={index !== viewList.viewHistories.length - 1 ? 'border-b-[1px] border-gray-02' : ''}
 										/>
 									))}

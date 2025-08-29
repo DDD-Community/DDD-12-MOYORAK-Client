@@ -35,7 +35,5 @@ export const useQueryTeamRestaurantSearch = (teamId: string, searchRequest: ITea
 				`/teams/${teamId}/restaurants/search?size=${size}&currentPage=${currentPage}&keyword=${encodeURIComponent(keyword)}&sortOption=${sortOption}`
 			),
 		enabled: !!teamId && !!keyword.trim(),
-		staleTime: 0,
-		gcTime: 0,
 	});
 };

@@ -17,7 +17,7 @@ import Typography from '@/components/Typography/Typography';
 import { FOOD_PREP_TIME_OPTIONS, SATISFACTION_OPTIONS, WAITING_TIME_OPTIONS } from '@/constants/data.constant';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 import { useGetValueFromLabel } from '@/hooks/useGetValueFromLabel';
-import { extractPathFromUrl, uploadMultipleImages, validateImageFiles } from '@/utils/imageUpload';
+import { uploadMultipleImages, validateImageFiles } from '@/utils/imageUpload';
 
 const RestaurantEdit = () => {
 	const { teamRestaurantId } = useParams<{ teamRestaurantId: string }>();
@@ -37,9 +37,9 @@ const RestaurantEdit = () => {
 	const [satisfaction, setSatisfaction] = useState<number>(0);
 	const [review, setReview] = useState<string>('');
 	const [images, setImages] = useState<File[]>([]);
-	const [imageUrls, setImageUrls] = useState<string[]>([]);
+	// const [imageUrls, setImageUrls] = useState<string[]>([]);
 	const [existingImageUrls, setExistingImageUrls] = useState<string[]>([]);
-	const [existingImagePaths, setExistingImagePaths] = useState<string[]>([]);
+	// const [existingImagePaths, setExistingImagePaths] = useState<string[]>([]);
 	const [isUploading, setIsUploading] = useState(false);
 	const [isOpen, setIsOpen] = useState(false);
 
@@ -61,9 +61,9 @@ const RestaurantEdit = () => {
 	useEffect(() => {
 		if (restaurantPhotos?.data && restaurantPhotos.data.length > 0) {
 			const existingImages = restaurantPhotos.data.map((photo) => photo.path);
-			const imagePaths = existingImages.map((url) => extractPathFromUrl(url));
+			// const imagePaths = existingImages.map((url) => extractPathFromUrl(url));
 			setExistingImageUrls(existingImages);
-			setExistingImagePaths(imagePaths);
+			// setExistingImagePaths(imagePaths);
 		}
 	}, [restaurantPhotos]);
 
@@ -78,10 +78,10 @@ const RestaurantEdit = () => {
 		if (validFiles.length === 0) return;
 
 		try {
-			const { successUrls, uploadedFiles } = await uploadMultipleImages(validFiles, 5 - totalImages, setIsUploading);
+			const { uploadedFiles } = await uploadMultipleImages(validFiles, 5 - totalImages, setIsUploading);
 
 			setImages((prev) => [...prev, ...uploadedFiles]);
-			setImageUrls((prev) => [...prev, ...successUrls]);
+			// setImageUrls((prev) => [...prev, ...successUrls]);
 		} catch (error) {
 			alert('이미지 업로드에 실패했습니다.');
 			console.error('이미지 업로드 에러:', error);
@@ -90,27 +90,22 @@ const RestaurantEdit = () => {
 
 	const removeNewImage = (index: number) => {
 		setImages((prev) => prev.filter((_, i) => i !== index));
-		setImageUrls((prev) => prev.filter((_, i) => i !== index));
+		// setImageUrls((prev) => prev.filter((_, i) => i !== index));
 	};
 
 	const removeExistingImage = (index: number) => {
 		setExistingImageUrls((prev) => prev.filter((_, i) => i !== index));
-		setExistingImagePaths((prev) => prev.filter((_, i) => i !== index));
+		// setExistingImagePaths((prev) => prev.filter((_, i) => i !== index));
 	};
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
-		const allImagePaths = [...existingImagePaths, ...imageUrls];
+		// const allImagePaths = [...existingImagePaths, ...imageUrls];
 
 		updateRestaurant(
 			{
 				summary: restaurantDescription,
-				servingTimeId: Number(foodPrepTime),
-				waitingTimeId: Number(waitingTime),
-				score: satisfaction,
-				photoPaths: allImagePaths,
-				extraText: review,
 			} as ITeamRestaurantUpdateRequest,
 			{
 				onSuccess: () => {

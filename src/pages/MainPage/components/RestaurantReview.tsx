@@ -59,7 +59,7 @@ const RestaurantReview = ({ item }: { item: ITeamRestaurantItem }) => {
 	const handleConfirmDelete = () => {
 		deleteTeamRestaurant(item.teamRestaurantId.toString(), {
 			onSuccess: () => {
-				toast(<CustomToast title="삭제가 완료되었습니다." icon="check" />);
+				toast(<CustomToast title="식당 삭제가 완료되었어요." icon="check" />);
 				setIsDeleteDialogOpen(false);
 			},
 			onError: (error) => {

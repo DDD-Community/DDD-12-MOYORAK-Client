@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
-import KakaoMapCore from '@/utils/KakaoMapCore';
 import type { ITeamRestaurantLocationItem } from '@/apis/useQueryTeamRestaurantsLocations';
+import KakaoMapCore from '@/utils/KakaoMapCore';
 
 interface IKakaoMapOptions {
 	center?: { lat: number; lng: number };
@@ -27,7 +27,9 @@ const KakaoMap = ({ companyLocation, optionsList = [] }: IKakaoMapProps) => {
 		 * - optionList에 따라 마커와 인포윈도우를 추가합니다.
 		 */
 		const initialize = async () => {
-			if (!mapRef.current) return;
+			if (!mapRef.current) {
+				return;
+			}
 
 			if (!mapInstance.current) {
 				mapInstance.current = new KakaoMapCore();
@@ -47,10 +49,7 @@ const KakaoMap = ({ companyLocation, optionsList = [] }: IKakaoMapProps) => {
 					mapInstance.current?.addMarker(opt, idx);
 				});
 			} catch (error) {
-				// TODO) 수연 - 지도 초기화 실패 시, UI 화면 처리
-				// TODO) Sentry 에러 로그 추가
-				// Alert 으로 지도 로드 실패와 같은 메시지 정의 필요
-				console.error(error);
+				console.error('KakaoMap - 지도 초기화 에러:', error);
 			}
 		};
 
@@ -63,8 +62,20 @@ const KakaoMap = ({ companyLocation, optionsList = [] }: IKakaoMapProps) => {
 	}, [optionsList, companyLocation]);
 
 	return (
-		<div className="relative flex-1 bg-white rounded-lg shadow-lg">
-			<div ref={mapRef} className="w-full h-full bg-gray-200" />
+		<div className="absolute inset-0 w-full h-full">
+			<div ref={mapRef} className="w-full h-full bg-gray-200">
+				<div className="flex items-center justify-center h-full text-gray-500">
+					<div className="text-center">
+						<div className="text-lg mb-2">🗺️</div>
+						<div className="text-sm">지도를 로딩 중입니다...</div>
+						<div className="text-xs mt-1">
+							환경변수가 설정되지 않은 경우
+							<br />
+							VITE_KAKAO_MAP_KEY를 설정해주세요
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	);
 };

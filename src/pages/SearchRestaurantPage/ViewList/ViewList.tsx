@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 import { useMutationViewHistoryDelete } from '@/apis/useMutationViewHistoryDelete';
 import type { IViewHistoryItem } from '@/apis/useQueryTeamViewHistory';
 import IconButton from '@/components/Button/IconButton';
@@ -9,16 +11,18 @@ import { useCategoryMapping } from '@/hooks/useCategoryMapping';
 interface IViewListProps {
 	item: IViewHistoryItem;
 	className?: string;
+	isLast?: boolean;
 }
 
-const ViewList = ({ item, className }: IViewListProps) => {
+const ViewList = ({ item, className, isLast = false }: IViewListProps) => {
+	const navigate = useNavigate();
 	const teamId = localStorage.getItem('teamId');
 	const { mutate: mutateDelViewHistory } = useMutationViewHistoryDelete(Number(teamId), item.viewHistoryId);
 	const { getCategoryDisplay } = useCategoryMapping();
 
 	return (
-		<li className={`flex pb-3.75 justify-between items-center ${className ?? ''}`}>
-			<div className="flex items-center gap-3.75">
+		<li className={`flex ${isLast ? '' : 'pb-3.75'} justify-between items-center ${className ?? ''}`}>
+			<div className="flex items-center gap-3.75" onClick={() => navigate(`/restaurant-detail/${item.teamRestaurantId}`)}>
 				<img src={item.reviewImagePath} alt="식당 사진" className="w-[71px] h-[71px] object-cover rounded-md" />
 
 				<div className="flex flex-1 flex-col justify-between">

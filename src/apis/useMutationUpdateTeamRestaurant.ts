@@ -4,11 +4,6 @@ import { put } from './index';
 
 export interface ITeamRestaurantUpdateRequest {
 	summary: string;
-	servingTimeId: number;
-	waitingTimeId: number;
-	score: number;
-	photoPaths: string[];
-	extraText: string;
 }
 
 export const useMutationUpdateTeamRestaurant = (teamId: string, teamRestaurantId: string) => {

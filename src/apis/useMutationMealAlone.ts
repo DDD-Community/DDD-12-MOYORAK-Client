@@ -1,9 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
 
-import { put } from '.';
+import { post } from '.';
 
 const postMeMealAlone = async (userId: number) => {
-	return await put('/me/meal/alone', { userId: userId });
+	return await post('/me/meal/alone', { userId: userId });
 };
 
 export const useMutationMealAlone = (userId: number) =>
