@@ -24,5 +24,8 @@ export const useQueryTeamRestaurantList = (teamId: string, sortOption: string, s
 		queryKey: ['team', 'restaurants', teamId, sortOption, size, currentPage],
 		queryFn: () => get<ITeamRestaurantResponse>(`/teams/${teamId}/restaurants?size=${size}&currentPage=${currentPage}&sortOption=${sortOption}`),
 		enabled: !!teamId && !!sortOption,
+		staleTime: 0,
+		gcTime: 0,
+		refetchOnWindowFocus: true,
 	});
 };

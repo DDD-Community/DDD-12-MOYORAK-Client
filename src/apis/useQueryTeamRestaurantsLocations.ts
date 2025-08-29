@@ -22,5 +22,8 @@ export const useQueryTeamRestaurantsLocations = (teamId: number, enabled = true)
 		queryKey: ['teams', teamId, 'restaurants', 'locations'],
 		enabled,
 		queryFn: () => getRestaurantLocation(teamId),
+		staleTime: 0,
+		gcTime: 0,
+		refetchOnWindowFocus: true,
 	});
 };
