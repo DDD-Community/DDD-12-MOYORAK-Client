@@ -45,9 +45,11 @@ const PotDetail = () => {
 	const [selectedRestaurantId, setSelectedRestaurantId] = useState<number | null>(null);
 	const [hoveredRestaurantId, setHoveredRestaurantId] = useState<number | null>(null);
 	const [showAddRestaurantPopup, setShowAddRestaurantPopup] = useState(false);
+	const [localAttended, setLocalAttended] = useState(false);
 
 	useEffect(() => {
-		if (potDetail && !isVoted) {
+		if (potDetail) {
+			setLocalAttended(potDetail.attended);
 			const userVote = potDetail.voters.find((voter) => voter.userId === userId);
 			if (userVote) {
 				setIsVoted(true);
@@ -57,7 +59,7 @@ const PotDetail = () => {
 				setSelectedRestaurantId(null);
 			}
 		}
-	}, [potDetail, userId, isVoted]);
+	}, [potDetail, userId]);
 
 	const getCurrentTimeStatus = (): TimeStatus => {
 		if (!potDetail) return 'before_start';
@@ -140,9 +142,9 @@ const PotDetail = () => {
 		const timeStatus = getCurrentTimeStatus();
 
 		if (potDetail.vote.voteType === 'RANDOM') {
-			return potDetail.attended && timeStatus === 'before_start';
+			return localAttended && timeStatus === 'before_start';
 		}
-		return potDetail.attended && (timeStatus === 'before_start' || timeStatus === 'voting_active');
+		return localAttended && (timeStatus === 'before_start' || timeStatus === 'voting_active');
 	};
 
 	const partyAttendance = async (): Promise<boolean> => {
@@ -172,13 +174,13 @@ const PotDetail = () => {
 	};
 
 	const handleParticipateClick = async (): Promise<void> => {
-		if (!potDetail?.attended) {
+		if (!localAttended) {
 			const success = await partyAttendance();
 			if (success) {
 				handleParticipate();
 			}
 		} else if (getCurrentTimeStatus() === 'voting_active') {
-			if (potDetail.vote.voteType === 'RANDOM') {
+			if (potDetail?.vote.voteType === 'RANDOM') {
 				return;
 			}
 
@@ -192,6 +194,7 @@ const PotDetail = () => {
 	};
 
 	const handleParticipate = (): void => {
+		setLocalAttended(true);
 		setToastMessage('팟에 참여하였습니다.');
 		setShowToast(true);
 		setTimeout(() => setShowToast(false), 3000);
@@ -254,7 +257,7 @@ const PotDetail = () => {
 		if (isVoted) {
 			return false;
 		}
-		return potDetail?.attended === true && getCurrentTimeStatus() === 'voting_active';
+		return localAttended === true && getCurrentTimeStatus() === 'voting_active';
 	};
 
 	// 식당 추가 핸들러
@@ -396,7 +399,7 @@ const PotDetail = () => {
 		}
 
 		return (
-			<div className="w-7.5 h-7.5 border-2 border-gray-04 rounded-lg bg-gray-02 flex items-center justify-center">
+			<div className="w-7.5 h-7.5 border-1 border-gray-04 rounded-lg bg-gray-02 flex items-center justify-center">
 				<Icon name="noCheck" size={16} />
 			</div>
 		);
@@ -693,7 +696,7 @@ const PotDetail = () => {
 								{/* 하단 버튼 */}
 								<ParticipationButton
 									timeStatus={getCurrentTimeStatus()}
-									attended={potDetail.attended}
+									attended={localAttended}
 									attendable={potDetail.attendable}
 									isVoted={isVoted}
 									selectedRestaurantId={selectedRestaurantId}
@@ -714,7 +717,7 @@ const PotDetail = () => {
 								<Participant />
 								<ParticipationButton
 									timeStatus={getCurrentTimeStatus()}
-									attended={potDetail.attended}
+									attended={localAttended}
 									attendable={potDetail.attendable}
 									isLoading={isVoting}
 									onParticipateClick={handleParticipateClick}
