@@ -205,8 +205,8 @@ const RestaurantCarousel = ({
 
 					{/* 1등 배지 */}
 					{isWinner && (
-						<div className="absolute top-2 right-2 z-20">
-							<img src={winner} alt="1등" className="w-15	 h-15" />
+						<div className="absolute top-1 right-1 z-20">
+							<img src={winner} alt="1등" className="w-15 h-15" />
 						</div>
 					)}
 

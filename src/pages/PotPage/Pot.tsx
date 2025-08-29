@@ -188,7 +188,7 @@ const Pot = () => {
 			{potList?.data && potList.data.length > 0 ? (
 				<div className="mb-20">
 					<div className="space-y-5.5">
-						{potList.data.map((pot) => {
+						{[...potList.data].reverse().map((pot) => {
 							const realTimeVoteInfo = getRealTimeVoteStatus(pot.startDate, pot.endDate);
 							return (
 								<div

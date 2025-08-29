@@ -418,13 +418,6 @@ const PotDetail = () => {
 						<div className="relative">
 							<img src={candidate.reviewImagePath} alt={candidate.restaurantName} className="w-20.75 h-20.75 rounded-[12px] object-cover" />
 
-							{/* 1등 배지 */}
-							{isWinner && (
-								<div className="absolute top-2 right-2 z-20">
-									<img src={winner} alt="1등" className="w-15 h-15" />
-								</div>
-							)}
-
 							{renderVoteBadge(candidate)}
 						</div>
 
@@ -494,6 +487,12 @@ const PotDetail = () => {
 								</Typography>
 							</div>
 						</div>
+
+						{isWinner && (
+							<div className="flex-shrink-0 ml-2">
+								<img src={winner} alt="1등" className="w-15 h-15" />
+							</div>
+						)}
 
 						{renderRestaurantCheckbox(candidate.candidateId)}
 					</div>
