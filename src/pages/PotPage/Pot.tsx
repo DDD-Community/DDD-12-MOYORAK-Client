@@ -7,6 +7,7 @@ import divider from '@/assets/divider.png';
 import noGallery from '@/assets/noGallery.png';
 import potIcon from '@/assets/potIcon.png';
 import potIconFinger from '@/assets/potIconFinger.png';
+import profile from '@/assets/profile.png';
 import voting from '@/assets/voting.png';
 import Button from '@/components/Button/Button';
 import FilterButton from '@/components/FilterButton/FilterButton';
@@ -262,7 +263,7 @@ const Pot = () => {
 										<div className="flex -space-x-2">
 											{pot.userProfileList.slice(0, 5).map((profileImage, profileIdx) => (
 												<div key={profileIdx} className="w-9 h-9 rounded-full border-[1px] border-solid border-gray-04 bg-gray-02">
-													<img src={profileImage} alt="팟 참가자 이미지" className="w-full h-full rounded-full" />
+													<img src={profileImage ?? profile} alt="팟 참가자 이미지" className="w-full h-full rounded-full" />
 												</div>
 											))}
 										</div>

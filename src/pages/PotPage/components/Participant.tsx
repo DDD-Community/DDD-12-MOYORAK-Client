@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 
 import { useQueryParticipantList } from '@/apis/useQueryParticipantList';
 import noParticipant from '@/assets/noParticipant.png';
+import profile from '@/assets/profile.png';
 import Icon from '@/components/Icon';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
@@ -73,7 +74,7 @@ const Participant = () => {
 											{participant.profileImage ? (
 												<img src={participant.profileImage} alt={participant.userName} className="w-full h-full object-cover rounded-full" />
 											) : (
-												<Icon name="avatar" size={20} className="text-gray-06" />
+												<img src={profile} alt="profile" className="w-full h-full object-cover rounded-full" />
 											)}
 										</div>
 										<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray10} className="font-semibold">
