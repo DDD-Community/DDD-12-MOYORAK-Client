@@ -30,5 +30,7 @@ export const useQueryPotList = (teamId: string, size: number = 5, currentPage: n
 		queryKey: ['pots', teamId, size, currentPage],
 		queryFn: () => get<IPotResponse>(`/teams/${teamId}/parties?size=${size}&currentPage=${currentPage}`),
 		enabled: !!teamId,
+		staleTime: 0,
+		gcTime: 0,
 	});
 };
