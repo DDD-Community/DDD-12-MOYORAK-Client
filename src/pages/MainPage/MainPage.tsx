@@ -61,7 +61,16 @@ const MainPage = () => {
 			console.error('AccessToken 디코딩 실패', error);
 			localStorage.setItem('userId', defaultUserId);
 		}
-	}, []);
+
+		// 디버깅: 로컬스토리지에 저장된 값 확인
+		console.log('로컬스토리지 저장 완료:', {
+			accessToken: localStorage.getItem('accessToken'),
+			refreshToken: localStorage.getItem('refreshToken'),
+			companyId: localStorage.getItem('companyId'),
+			teamId: localStorage.getItem('teamId'),
+			userId: localStorage.getItem('userId'),
+		});
+	}, [accessToken, refreshToken]);
 
 	// 로그인 상태 확인 - 하드코딩된 토큰이 있으면 자동 로그인
 	useEffect(() => {
@@ -73,10 +82,7 @@ const MainPage = () => {
 		console.log('로그인 상태:', loginStatus, '토큰 존재:', loginFromToken);
 	}, [location.state?.isLogin, accessToken]);
 
-	// 테스트용 더미데이터 설정
-	localStorage.setItem('companyId', '15');
-	localStorage.setItem('teamId', '7');
-
+	// companyId와 teamId를 로컬스토리지에서 가져오기
 	const companyId = localStorage.getItem('companyId');
 	const teamId = localStorage.getItem('teamId');
 
