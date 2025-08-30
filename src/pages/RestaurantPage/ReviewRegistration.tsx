@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
-import { post } from '@/apis';
+import { useMutationAddReview } from '@/apis/useMutationAddReview';
 import emptyStarIcon from '@/assets/emptyStar.png';
 import reviewRegistration from '@/assets/reviewRegistration.png';
 import starIcon from '@/assets/star.png';
@@ -15,15 +15,6 @@ import Typography from '@/components/Typography/Typography';
 import { FOOD_PREP_TIME_OPTIONS, SATISFACTION_OPTIONS, WAITING_TIME_OPTIONS } from '@/constants/data.constant';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 import { uploadMultipleImages, validateImageFiles } from '@/utils/imageUpload';
-
-interface IReviewRegistrationRequest {
-	userId: number;
-	servingTimeId: number;
-	waitingTimeId: number;
-	score: number;
-	photoPaths: string[];
-	extraText: string;
-}
 
 const ReviewRegistration = () => {
 	const { id } = useParams();
@@ -42,6 +33,9 @@ const ReviewRegistration = () => {
 	const teamRestaurantId = location.state?.teamRestaurantId;
 	const name = location.state?.name;
 	const userId = localStorage.getItem('userId') ?? '';
+
+	// TanStack Query mutation hook 사용
+	const addReviewMutation = useMutationAddReview(teamId, teamRestaurantId);
 
 	const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (!e.target.files) return;
@@ -75,7 +69,7 @@ const ReviewRegistration = () => {
 
 	const postReview = async () => {
 		try {
-			await post<IReviewRegistrationRequest>(`/teams/${teamId}/restaurants/${teamRestaurantId}/reviews`, {
+			await addReviewMutation.mutateAsync({
 				userId: Number(userId),
 				servingTimeId: Number(foodPrepTime),
 				waitingTimeId: Number(waitingTime),
@@ -232,8 +226,8 @@ const ReviewRegistration = () => {
 						</div>
 					</div>
 
-					<Button variant={isButtonActive ? 'active' : 'disabled'} disabled={!isButtonActive}>
-						{isUploading ? '이미지 업로드 중...' : '등록하기'}
+					<Button variant={isButtonActive ? 'active' : 'disabled'} disabled={!isButtonActive || addReviewMutation.isPending}>
+						{addReviewMutation.isPending ? '등록 중...' : isUploading ? '이미지 업로드 중...' : '등록하기'}
 					</Button>
 				</form>
 

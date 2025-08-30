@@ -250,7 +250,6 @@ const ReviewInfo = ({ restaurantName }: IReviewInfoProps) => {
 				})}
 			</>
 
-			{/* 삭제 확인 모달 */}
 			<CustomDialog
 				headerText={{
 					title: '리뷰 삭제하기',
