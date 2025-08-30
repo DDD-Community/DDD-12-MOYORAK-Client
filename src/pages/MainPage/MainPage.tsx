@@ -19,6 +19,7 @@ const MainPage = () => {
 
 	const location = useLocation();
 
+	console.log('배포테스트');
 	// 제공된 JWT 토큰
 	const accessToken =
 		'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzMyIsImVtYWlsIjoiZG9scGhpbi5sZWVAZGV2ZXJjb3JwLmNvbSIsIm5hbWUiOiLsnbTrrLTshLEiLCJpYXQiOjE3NTY1MzE2NTAsImV4cCI6MTc1NjYxODA1MH0.yaCgmjXTn8SwaJxEBLZqhIokM_zsgYuzaMIRUxr5hE0ZS4fer3VPdzzDOR9dj4LqEXGUiB4L_Aj7ZBHTqwDtiQ';
