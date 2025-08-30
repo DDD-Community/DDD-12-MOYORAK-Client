@@ -18,9 +18,12 @@ const MainPage = () => {
 	const [isLogin, setIsLogin] = useState(false);
 
 	const location = useLocation();
-	const accessToken = localStorage.getItem('accessToken');
 
-	// 로그인 상태를 안정적으로 관리
+	// 제공된 JWT 토큰
+	const accessToken =
+		'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzMyIsImVtYWlsIjoiZG9scGhpbi5sZWVAZGV2ZXJjb3JwLmNvbSIsIm5hbWUiOiLsnbTrrLTshLEiLCJpYXQiOjE3NTY1MzE2NTAsImV4cCI6MTc1NjYxODA1MH0.yaCgmjXTn8SwaJxEBLZqhIokM_zsgYuzaMIRUxr5hE0ZS4fer3VPdzzDOR9dj4LqEXGUiB4L_Aj7ZBHTqwDtiQ';
+	const refreshToken =
+		'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzMyIsImVtYWlsIjoiZG9scGhpbi5sZWVAZGV2ZXJjb3JwLmNvbSIsIm5hbWUiOiLsnbTrrLTshLEiLCJpYXQiOjE3NTY1MzE2NTAsImV4cCI6MTc1NjYxODA1MH0.yaCgmjXTn8SwaJxEBLZqhIokM_zsgYuzaMIRUxr5hE0ZS4fer3VPdzzDOR9dj4LqEXGUiB4L_Aj7ZBHTqwDtiQ';
 	useEffect(() => {
 		const loginFromState = location.state?.isLogin;
 		const loginFromToken = Boolean(accessToken);
@@ -28,6 +31,44 @@ const MainPage = () => {
 
 		setIsLogin(loginStatus);
 	}, [location.state?.isLogin, accessToken]);
+
+	// 사용자 정보 및 토큰을 로컬스토리지에 설정
+	useEffect(() => {
+		// 기본값 설정 (테스트용)
+		const defaultCompanyId = '15';
+		const defaultTeamId = '7';
+		const defaultUserId = '33';
+
+		// companyId 설정
+		localStorage.setItem('companyId', defaultCompanyId);
+
+		// teamId 설정
+		localStorage.setItem('teamId', defaultTeamId);
+
+		// userId 설정
+		localStorage.setItem('userId', defaultUserId);
+
+		// accessToken을 로컬스토리지에 저장
+		localStorage.setItem('accessToken', accessToken);
+
+		// refreshToken을 로컬스토리지에 저장
+		localStorage.setItem('refreshToken', refreshToken);
+
+		// JWT에서 userId 추출하여 설정
+		try {
+			const payloadBase64 = accessToken.split('.')[1];
+			const decodedPayload = JSON.parse(atob(payloadBase64));
+			const userId = decodedPayload.sub; // JWT 표준에서 sub는 subject(사용자 ID)
+
+			// userId가 유효한 값일 때만 저장
+			if (userId && userId !== 'undefined') {
+				localStorage.setItem('userId', String(userId));
+			}
+		} catch (error) {
+			console.error('AccessToken 디코딩 실패', error);
+			localStorage.setItem('userId', defaultUserId);
+		}
+	}, []);
 
 	// // 테스트용 더미데이터 설정
 	// const companyId = '15'; // localStorage.getItem('companyId');
@@ -54,26 +95,6 @@ const MainPage = () => {
 	const onShowInvitation = () => {
 		setShowInvitation((prev) => !prev);
 	};
-
-	useEffect(() => {
-		if (isLogin && accessToken) {
-			try {
-				const payloadBase64 = accessToken.split('.')[1];
-				const decodedPayload = JSON.parse(atob(payloadBase64));
-				const userId = decodedPayload.sub; // JWT 표준에서 sub는 subject(사용자 ID)
-
-				// userId가 유효한 값일 때만 저장
-				if (userId && userId !== 'undefined') {
-					localStorage.setItem('userId', String(userId));
-				}
-			} catch (error) {
-				console.error('AccessToken 디코딩 실패', error);
-				localStorage.setItem('userId', '31');
-			}
-		} else {
-			localStorage.setItem('userId', '31');
-		}
-	}, [isLogin, accessToken, user]);
 
 	useEffect(() => {
 		if (isLogin && user?.companyId && user?.teamId) {
