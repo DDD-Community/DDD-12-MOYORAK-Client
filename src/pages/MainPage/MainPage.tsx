@@ -23,14 +23,7 @@ const MainPage = () => {
 	const accessToken =
 		'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzMyIsImVtYWlsIjoiZG9scGhpbi5sZWVAZGV2ZXJjb3JwLmNvbSIsIm5hbWUiOiLsnbTrrLTshLEiLCJpYXQiOjE3NTY1MzE2NTAsImV4cCI6MTc1NjYxODA1MH0.yaCgmjXTn8SwaJxEBLZqhIokM_zsgYuzaMIRUxr5hE0ZS4fer3VPdzzDOR9dj4LqEXGUiB4L_Aj7ZBHTqwDtiQ';
 	const refreshToken =
-		'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzMyIsImVtYWlsIjoiZG9scGhpbi5sZWVAZGV2ZXJjb3JwLmNvbSIsIm5hbWUiOiLsnbTrrLTshLEiLCJpYXQiOjE3NTY1MzE2NTAsImV4cCI6MTc1NjYxODA1MH0.yaCgmjXTn8SwaJxEBLZqhIokM_zsgYuzaMIRUxr5hE0ZS4fer3VPdzzDOR9dj4LqEXGUiB4L_Aj7ZBHTqwDtiQ';
-	useEffect(() => {
-		const loginFromState = location.state?.isLogin;
-		const loginFromToken = Boolean(accessToken);
-		const loginStatus = loginFromState || loginFromToken;
-
-		setIsLogin(loginStatus);
-	}, [location.state?.isLogin, accessToken]);
+		'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkb2xwaGluLmxlZUBkZXZlcmNvcnAuY29tIiwibmFtZSI6IuyTtOustOyEsSIsImlhdCI6MTc1NjUzMTY1MCwiZXhwIjoxNzU2NjE4MDUwfS5hYUNnbWpYVG44U3dhSnhFQkxacWhJb2tNX3pzZ1l1emFNSVJVeHI1aEUwWlM0ZmVyM1ZQZHo6RE9SOWRqNExxRVhHVWlCNExfQWo3WkJIVHF3RHRpUSI7';
 
 	// 사용자 정보 및 토큰을 로컬스토리지에 설정
 	useEffect(() => {
@@ -70,10 +63,17 @@ const MainPage = () => {
 		}
 	}, []);
 
-	// // 테스트용 더미데이터 설정
-	// const companyId = '15'; // localStorage.getItem('companyId');
-	// const teamId = '7'; // localStorage.getItem('teamId');
+	// 로그인 상태 확인 - 하드코딩된 토큰이 있으면 자동 로그인
+	useEffect(() => {
+		const loginFromState = location.state?.isLogin;
+		const loginFromToken = Boolean(accessToken && accessToken.length > 0);
+		const loginStatus = loginFromState || loginFromToken;
 
+		setIsLogin(loginStatus);
+		console.log('로그인 상태:', loginStatus, '토큰 존재:', loginFromToken);
+	}, [location.state?.isLogin, accessToken]);
+
+	// 테스트용 더미데이터 설정
 	localStorage.setItem('companyId', '15');
 	localStorage.setItem('teamId', '7');
 
