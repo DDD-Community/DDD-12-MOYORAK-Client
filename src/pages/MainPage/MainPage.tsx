@@ -25,7 +25,7 @@ const MainPage = () => {
 	const refreshToken =
 		'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkb2xwaGluLmxlZUBkZXZlcmNvcnAuY29tIiwibmFtZSI6IuyTtOustOyEsSIsImlhdCI6MTc1NjUzMTY1MCwiZXhwIjoxNzU2NjE4MDUwfS5hYUNnbWpYVG44U3dhSnhFQkxacWhJb2tNX3pzZ1l1emFNSVJVeHI1aEUwWlM0ZmVyM1ZQZHo6RE9SOWRqNExxRVhHVWlCNExfQWo3WkJIVHF3RHRpUSI7';
 
-	// 사용자 정보 및 토큰을 로컬스토리지에 설정
+	// 사용자 정보 및 토큰을 로컬스토리지에 설정 - 컴포넌트 마운트 시 즉시 실행
 	useEffect(() => {
 		// 기본값 설정 (테스트용)
 		const defaultCompanyId = '15';
@@ -70,7 +70,10 @@ const MainPage = () => {
 			teamId: localStorage.getItem('teamId'),
 			userId: localStorage.getItem('userId'),
 		});
-	}, [accessToken, refreshToken]);
+
+		// 강제로 로컬스토리지 동기화
+		window.dispatchEvent(new Event('storage'));
+	}, []); // 빈 의존성 배열로 컴포넌트 마운트 시 한 번만 실행
 
 	// 로그인 상태 확인 - 하드코딩된 토큰이 있으면 자동 로그인
 	useEffect(() => {
