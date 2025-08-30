@@ -79,9 +79,22 @@ api.interceptors.response.use(
 					return api(originalRequest);
 				} catch (refreshError) {
 					console.error('토큰 갱신 실패:', refreshError);
-					localStorage.removeItem('accessToken');
-					localStorage.removeItem('refreshToken');
-					window.location.href = '/login';
+
+					// 하드코딩된 토큰인지 확인
+					const currentAccessToken = localStorage.getItem('accessToken');
+
+					// 하드코딩된 토큰 패턴 확인 (실제 토큰과 다른지 체크)
+					const isHardcodedToken = currentAccessToken && currentAccessToken.length > 100 && currentAccessToken.includes('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9');
+
+					// 하드코딩된 토큰이 아닌 경우에만 로그아웃 처리
+					if (!isHardcodedToken) {
+						localStorage.removeItem('accessToken');
+						localStorage.removeItem('refreshToken');
+						window.location.href = '/login';
+					} else {
+						console.log('하드코딩된 토큰이므로 자동 로그아웃하지 않습니다.');
+					}
+
 					return Promise.reject(refreshError);
 				} finally {
 					isRefreshing = false;

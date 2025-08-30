@@ -18,14 +18,14 @@ const MainPage = () => {
 	const [isLogin, setIsLogin] = useState(false);
 
 	const location = useLocation();
-
+	alert('배포테스트');
 	console.log('배포테스트');
 	// 제공된 JWT 토큰
 	const accessToken =
-		'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzMyIsImVtYWlsIjoiZG9scGhpbi5sZWVAZGV2ZXJjb3JwLmNvbSIsIm5hbWUiOiLsnbTrrLTshLEiLCJpYXQiOjE3NTY1MzE2NTAsImV4cCI6MTc1NjYxODA1MH0.yaCgmjXTn8SwaJxEBLZqhIokM_zsgYuzaMIRUxr5hE0ZS4fer3VPdzzDOR9dj4LqEXGUiB4L_Aj7ZBHTqwDtiQ';
-	const refreshToken =
-		'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkb2xwaGluLmxlZUBkZXZlcmNvcnAuY29tIiwibmFtZSI6IuyTtOustOyEsSIsImlhdCI6MTc1NjUzMTY1MCwiZXhwIjoxNzU2NjE4MDUwfS5hYUNnbWpYVG44U3dhSnhFQkxacWhJb2tNX3pzZ1l1emFNSVJVeHI1aEUwWlM0ZmVyM1ZQZHo6RE9SOWRqNExxRVhHVWlCNExfQWo3WkJIVHF3RHRpUSI7';
+		'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzMyIsImVtYWlsIjoiZG9scGhpbi5sZWVAZGV2ZXJjb3JwLmNvbSIsIm5hbWUiOiLsnbTrrLTshLEiLCJpYXQiOjE3NTY1MzM1MzgsImV4cCI6MTc1NjYxOTkzOH0.zAcQFhq4E1PifLP-Q5Mj1u8VdNtG5lcIE4DAQLFFZZVTG9xaAtuAFr2CFFAYpe_NnqTEWk3c-63pKBwMeJOQaQ';
 
+	const refreshToken =
+		'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzMyIsImVtYWlsIjoiZG9scGhpbi5sZWVAZGV2ZXJjb3JwLmNvbSIsIm5hbWUiOiLsnbTrrLTshLEiLCJpYXQiOjE3NTY1MzM1MzgsImV4cCI6MTc1NjYxOTkzOH0.zAcQFhq4E1PifLP-Q5Mj1u8VdNtG5lcIE4DAQLFFZZVTG9xaAtuAFr2CFFAYpe_NnqTEWk3c-63pKBwMeJOQaQ';
 	// 사용자 정보 및 토큰을 로컬스토리지에 설정 - 컴포넌트 마운트 시 즉시 실행
 	useEffect(() => {
 		// 기본값 설정 (테스트용)
