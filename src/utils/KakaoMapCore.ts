@@ -13,7 +13,7 @@ export default class KakaoMapCore {
 	private map: any = null;
 	private markers: any[] = [];
 	// private selectedMarkerElement: HTMLImageElement | null = null;
-	private selectedOverlay: any = null;
+	// private selectedOverlay: any = null;
 
 	async init(): Promise<void> {
 		return new Promise((resolve, reject) => {
@@ -137,21 +137,21 @@ export default class KakaoMapCore {
 		// };
 	}
 
-	private showInfoOverlay(option: ITeamRestaurantLocationItem, position: any) {
-		// 기존 팝업 제거
-		if (this.selectedOverlay) {
-			this.selectedOverlay.setMap(null);
-		}
+	// private showInfoOverlay(option: ITeamRestaurantLocationItem, position: any) {
+	// 	// 기존 팝업 제거
+	// 	if (this.selectedOverlay) {
+	// 		this.selectedOverlay.setMap(null);
+	// 	}
 
-		const infoOverlay = new kakao.maps.CustomOverlay({
-			content: option.name ?? '',
-			position,
-			yAnchor: 1.3,
-		});
+	// 	const infoOverlay = new kakao.maps.CustomOverlay({
+	// 		content: option.name ?? '',
+	// 		position,
+	// 		yAnchor: 1.3,
+	// 	});
 
-		infoOverlay.setMap(this.map);
-		this.selectedOverlay = infoOverlay;
-	}
+	// 	infoOverlay.setMap(this.map);
+	// 	this.selectedOverlay = infoOverlay;
+	// }
 
 	addCompanyMarker(option: IKakaoMapOptions) {
 		if (!this.map || !option.center) return;
