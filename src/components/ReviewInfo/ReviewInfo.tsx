@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 
 import { useMutationDeleteReview } from '@/apis/useMutationDeleteReview';
 import { useQueryReviewList } from '@/apis/useQueryReviewList';
+import noGallery from '@/assets/noGallery.png';
 import profile from '@/assets/profile.png';
 import reviewDelete from '@/assets/reviewDelete.png';
 import starIcon from '@/assets/star.png';
@@ -113,10 +114,13 @@ const ReviewInfo = ({ restaurantName }: IReviewInfoProps) => {
 	// 데이터가 없을 때 처리
 	if (!reviewList || reviewList.data.length === 0) {
 		return (
-			<div className="flex items-center justify-center py-10">
-				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
-					아직 리뷰가 없습니다.
+			<div className="flex flex-col items-center justify-center py-10">
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07} className="text-center">
+					등록된 리뷰가 없어요.
+					<br />
+					첫번째 리뷰를 남겨주세요!
 				</Typography>
+				<img src={noGallery} alt="noGallery" className="w-[215px] h-[128px]" />
 			</div>
 		);
 	}

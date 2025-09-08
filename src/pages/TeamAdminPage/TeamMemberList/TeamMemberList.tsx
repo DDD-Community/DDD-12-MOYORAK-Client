@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 
-import { useMutationTeamMemberDelete } from '@/apis/useMutationTeamMemberDelete';
-import { useMutationTeamMemberRole } from '@/apis/useMutationTeamMemberRole';
+import { useMutationKickTeamMember } from '@/apis/useMutationKickTeamMember';
+import { useMutationTransferAdminRole } from '@/apis/useMutationTransferAdminRole';
 import type { IGetTeamMemberItem } from '@/apis/useQueryTeamMember';
 import defaultProfile from '@/assets/defaultProfile.png';
 import Button from '@/components/Button/Button';
@@ -24,8 +25,36 @@ const TeamMemberList = ({ item }: ITeamMemberListProps) => {
 	// 권한 양도하기 다이얼로그
 	const [openTransferDialog, setOpenTransferDialog] = useState(false);
 
-	const { mutate: mutateRole } = useMutationTeamMemberRole(Number(teamId), item.teamUserId);
-	const { mutate: mutateDel } = useMutationTeamMemberDelete(Number(teamId), item.teamUserId);
+	const { mutate: mutateRole } = useMutationTransferAdminRole();
+	const { mutate: mutateDel } = useMutationKickTeamMember();
+
+	const handleKick = () => {
+		if (teamId) {
+			mutateDel(
+				{ teamId, teamMemberId: item.teamUserId.toString() },
+				{
+					onSuccess: () => {
+						setOpenKickDialog(false);
+						toast.success('탈퇴가 완료되었습니다.');
+					},
+				}
+			);
+		}
+	};
+
+	const handleTransferRole = () => {
+		if (teamId) {
+			mutateRole(
+				{ teamId, teamMemberId: item.teamUserId.toString() },
+				{
+					onSuccess: () => {
+						setOpenTransferDialog(false);
+						toast.success('권한이 양도되었습니다.');
+					},
+				}
+			);
+		}
+	};
 
 	return (
 		<div className="relative p-4 rounded-lg flex items-center justify-between">
@@ -95,7 +124,7 @@ const TeamMemberList = ({ item }: ITeamMemberListProps) => {
 					<Button className="w-[89px]" onClick={() => setOpenKickDialog(false)}>
 						취소
 					</Button>
-					<Button variant="active" className="w-[150px]" onClick={mutateDel}>
+					<Button variant="active" className="w-[150px]" onClick={handleKick}>
 						탈퇴시키기
 					</Button>
 				</div>
@@ -120,7 +149,7 @@ const TeamMemberList = ({ item }: ITeamMemberListProps) => {
 					<Button className="w-[89px]" onClick={() => setOpenTransferDialog(false)}>
 						취소
 					</Button>
-					<Button variant="active" className="w-[150px]" onClick={mutateRole}>
+					<Button variant="active" className="w-[150px]" onClick={handleTransferRole}>
 						양도하기
 					</Button>
 				</div>

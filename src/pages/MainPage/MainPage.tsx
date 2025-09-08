@@ -16,17 +16,10 @@ const MainPage = () => {
 	const [showInvitation, setShowInvitation] = useState(false);
 	const [copied, setCopied] = useState<boolean>(false);
 	const [isLogin, setIsLogin] = useState(false);
+	const accessToken = localStorage.getItem('accessToken');
 
 	const location = useLocation();
-	alert('배포테스트');
-	console.log('배포테스트');
-	// 제공된 JWT 토큰
-	const accessToken =
-		'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzMyIsImVtYWlsIjoiZG9scGhpbi5sZWVAZGV2ZXJjb3JwLmNvbSIsIm5hbWUiOiLsnbTrrLTshLEiLCJpYXQiOjE3NTY1MzM1MzgsImV4cCI6MTc1NjYxOTkzOH0.zAcQFhq4E1PifLP-Q5Mj1u8VdNtG5lcIE4DAQLFFZZVTG9xaAtuAFr2CFFAYpe_NnqTEWk3c-63pKBwMeJOQaQ';
 
-	const refreshToken =
-		'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzMyIsImVtYWlsIjoiZG9scGhpbi5sZWVAZGV2ZXJjb3JwLmNvbSIsIm5hbWUiOiLsnbTrrLTshLEiLCJpYXQiOjE3NTY1MzM1MzgsImV4cCI6MTc1NjYxOTkzOH0.zAcQFhq4E1PifLP-Q5Mj1u8VdNtG5lcIE4DAQLFFZZVTG9xaAtuAFr2CFFAYpe_NnqTEWk3c-63pKBwMeJOQaQ';
-	// 사용자 정보 및 토큰을 로컬스토리지에 설정 - 컴포넌트 마운트 시 즉시 실행
 	useEffect(() => {
 		// 기본값 설정 (테스트용)
 		const defaultCompanyId = '15';
@@ -42,16 +35,10 @@ const MainPage = () => {
 		// userId 설정
 		localStorage.setItem('userId', defaultUserId);
 
-		// accessToken을 로컬스토리지에 저장
-		localStorage.setItem('accessToken', accessToken);
-
-		// refreshToken을 로컬스토리지에 저장
-		localStorage.setItem('refreshToken', refreshToken);
-
 		// JWT에서 userId 추출하여 설정
 		try {
-			const payloadBase64 = accessToken.split('.')[1];
-			const decodedPayload = JSON.parse(atob(payloadBase64));
+			const payloadBase64 = accessToken?.split('.')[1];
+			const decodedPayload = JSON.parse(atob(payloadBase64 || ''));
 			const userId = decodedPayload.sub; // JWT 표준에서 sub는 subject(사용자 ID)
 
 			// userId가 유효한 값일 때만 저장
@@ -62,19 +49,7 @@ const MainPage = () => {
 			console.error('AccessToken 디코딩 실패', error);
 			localStorage.setItem('userId', defaultUserId);
 		}
-
-		// 디버깅: 로컬스토리지에 저장된 값 확인
-		console.log('로컬스토리지 저장 완료:', {
-			accessToken: localStorage.getItem('accessToken'),
-			refreshToken: localStorage.getItem('refreshToken'),
-			companyId: localStorage.getItem('companyId'),
-			teamId: localStorage.getItem('teamId'),
-			userId: localStorage.getItem('userId'),
-		});
-
-		// 강제로 로컬스토리지 동기화
-		window.dispatchEvent(new Event('storage'));
-	}, []); // 빈 의존성 배열로 컴포넌트 마운트 시 한 번만 실행
+	}, []);
 
 	// 로그인 상태 확인 - 하드코딩된 토큰이 있으면 자동 로그인
 	useEffect(() => {

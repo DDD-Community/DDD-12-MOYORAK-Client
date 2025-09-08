@@ -35,27 +35,26 @@ const TeamAdminPage = () => {
 			<div className="bg-gray-02 min-h-screen">
 				<NavBar variant="iconWithTextAndRightIcon" leftText="팀원 관리" rightIcon="help" onLeftIconClick={() => navigate(-1)} />
 				<div className="flex gap-1.5 mt-[25px] px-[18px] my-3">
-					<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray10}>
+					<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray10} className="font-semibold">
 						팀 가입 요청
 					</Typography>
-					<Typography as="span" variant={FONT_VARIANT.body01} fontColor={PALETTE.gray08}>
-						{pendingMemberList?.data.length}
+					<Typography as="span" variant={FONT_VARIANT.body01} fontColor={PALETTE.gray08} className="font-medium">
+						{pendingMemberList?.teamUsers.length}
 					</Typography>
 				</div>
 
 				<section className="bg-white rounded-[20px] mb-4">
-					{pendingMemberList && pendingMemberList.data.length > 0 && (
+					{pendingMemberList && pendingMemberList.teamUsers.length > 0 && (
 						<ul>
-							{pendingMemberList.data.map((item) => (
+							{pendingMemberList.teamUsers.map((item) => (
 								<PendingMemberList key={item.teamUserId} item={item} />
 							))}
 						</ul>
 					)}
 
-					{(!pendingMemberList || pendingMemberList.data.length === 0) && <div className="p-4 text-center text-gray-500">데이터가 없습니다.</div>}
+					{(!pendingMemberList || pendingMemberList.teamUsers.length === 0) && <div className="p-4 text-center text-gray-500">데이터가 없습니다.</div>}
 				</section>
 
-				{/* 팀 가입 요청 페이지네이션 */}
 				{pendingMemberList && (
 					<Pagination
 						currentPage={pendingCurrentPage}
@@ -69,22 +68,22 @@ const TeamAdminPage = () => {
 
 				<div className="flex gap-1.5 mt-[22px] px-[18px] my-3">
 					<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray10}>
-						WEB2 우가우가 차차차
+						{teamMemberList?.teamName}
 					</Typography>
 					<Typography as="span" variant={FONT_VARIANT.body01} fontColor={PALETTE.gray08}>
-						{teamMemberList?.data.length}
+						{teamMemberList?.teamUsers.length}
 					</Typography>
 				</div>
 
 				<section className="bg-white rounded-[20px] mb-4">
-					{teamMemberList && teamMemberList.data.length > 0 && (
+					{teamMemberList && teamMemberList.teamUsers.length > 0 && (
 						<ul>
-							{teamMemberList.data.map((item) => (
+							{teamMemberList.teamUsers.map((item) => (
 								<TeamMemberList key={item.teamUserId} item={item} />
 							))}
 						</ul>
 					)}
-					{(!teamMemberList || teamMemberList.data.length === 0) && <div className="p-4 text-center text-gray-500">데이터가 없습니다.</div>}
+					{(!teamMemberList || teamMemberList.teamUsers.length === 0) && <div className="p-4 text-center text-gray-500">데이터가 없습니다.</div>}
 				</section>
 
 				{/* 팀원 리스트 페이지네이션 */}
