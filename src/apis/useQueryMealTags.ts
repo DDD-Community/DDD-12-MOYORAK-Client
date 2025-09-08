@@ -13,7 +13,7 @@ interface MealTagsResponse {
 }
 
 const getMealTags = async (): Promise<MealTagsResponse> => {
-	return await get<MealTagsResponse>('/api/me/meal/tags');
+	return await get<MealTagsResponse>('/me/meal/tags');
 };
 
 export const useQueryMealTags = (enabled = true) => {

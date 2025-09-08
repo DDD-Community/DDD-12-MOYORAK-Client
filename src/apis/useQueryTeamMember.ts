@@ -29,7 +29,8 @@ interface IGetTeamMemberResponse {
 	size: number;
 	currentPage: number;
 	totalCount: number;
-	data: IGetTeamMemberItem[];
+	teamName: string;
+	teamUsers: IGetTeamMemberItem[];
 }
 
 const getTeamMemberList = async (teamId: number, request: IGetTeamInvitationRequest): Promise<IGetTeamMemberResponse> => {
@@ -38,7 +39,7 @@ const getTeamMemberList = async (teamId: number, request: IGetTeamInvitationRequ
 
 export const useQueryTeamMember = (teamId: number, request: IGetTeamInvitationRequest, enabled = true) => {
 	return useQuery({
-		queryKey: ['teams', teamId, 'team-membbers'],
+		queryKey: ['teams', teamId, 'team-members', request.status, request.currentPage],
 		enabled,
 		queryFn: () => getTeamMemberList(teamId, request),
 	});

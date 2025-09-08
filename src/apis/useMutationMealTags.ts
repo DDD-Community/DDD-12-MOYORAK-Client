@@ -13,7 +13,7 @@ interface MealTagsRequest {
 }
 
 const putMealTags = async (data: MealTagsRequest): Promise<unknown> => {
-	return await put<unknown>('/api/me/meal/tags', data);
+	return await put<unknown>('/me/meal/tags', data);
 };
 
 export const useMutationMealTags = () => {
@@ -23,7 +23,6 @@ export const useMutationMealTags = () => {
 		mutationKey: ['meal-tags'],
 		mutationFn: putMealTags,
 		onSuccess: () => {
-			// 음식 태그 쿼리 무효화하여 최신 정보 업데이트
 			queryClient.invalidateQueries({
 				queryKey: ['meal-tags'],
 			});
