@@ -42,5 +42,7 @@ export const useQueryTeamMember = (teamId: number, request: IGetTeamInvitationRe
 		queryKey: ['teams', teamId, 'team-members', request.status, request.currentPage],
 		enabled,
 		queryFn: () => getTeamMemberList(teamId, request),
+		staleTime: 0,
+		gcTime: 0,
 	});
 };
