@@ -205,8 +205,8 @@ const RestaurantDetail = () => {
 
 							{/* 정보 아이콘들 */}
 							<div className="flex flex-col rounded-[20px] border border-gray-03 bg-gray-01 px-4.5 py-6.5 mb-3.75">
-								<div className="flex justify-between ">
-									<div className="flex flex-col items-center">
+								<div className="flex">
+									<div className="flex flex-col items-center flex-1">
 										<Icon name="persons" size={24} className="mb-2" />
 										<Typography variant={FONT_VARIANT.label02} fontColor={PALETTE.gray08} className="mb-1">
 											입장 대기시간
@@ -215,7 +215,7 @@ const RestaurantDetail = () => {
 											{restaurantInfo?.waitingTime}
 										</Typography>
 									</div>
-									<div className="flex flex-col items-center">
+									<div className="flex flex-col items-center flex-1">
 										<Icon name="prepareHour" size={24} className="mb-2" />
 										<Typography variant={FONT_VARIANT.label02} fontColor={PALETTE.gray08} className="mb-1">
 											음식 준비시간
@@ -224,7 +224,7 @@ const RestaurantDetail = () => {
 											{restaurantInfo?.servingTime}
 										</Typography>
 									</div>
-									<div className="flex flex-col items-center" onClick={() => window.open(restaurantInfo?.placeUrl, '_blank')}>
+									<div className="flex flex-col items-center flex-1" onClick={() => window.open(restaurantInfo?.placeUrl, '_blank')}>
 										<Icon name="link" size={24} className="mb-2" />
 										<Typography variant={FONT_VARIANT.label02} fontColor={PALETTE.gray08} className="mb-1">
 											외부링크

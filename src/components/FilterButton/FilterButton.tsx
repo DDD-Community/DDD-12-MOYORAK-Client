@@ -19,7 +19,7 @@ const FilterButton = ({ children, variant = 'general', onClick, className, borde
 			case 'general':
 				return `${baseClasses} border-[1px] border-solid border-gray-05 bg-white text-gray-07 }`;
 			case 'active':
-				return `${baseClasses} bg-primary-200 text-primary-600`;
+				return `${baseClasses} bg-primary-200 text-primary-600 font-semibold`;
 			case 'clicked':
 				return `${baseClasses} border-[1px] border-solid border-primary-200 bg-[#beee054d] text-[#70CE13] }`;
 		}

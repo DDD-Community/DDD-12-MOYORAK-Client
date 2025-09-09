@@ -26,7 +26,7 @@ const MainIntro = () => {
 				<FilterButton
 					variant="active"
 					onClick={() => navigate('/auth')}
-					className="rounded-[17px] w-[135px] px-3.5 py-1.5 h-[26px] flex items-center justify-center mt-5"
+					className="rounded-[17px] w-[137px] flex items-center justify-center mt-5 h-8.5 pl-3.5 pr-2.5"
 				>
 					<Typography variant={FONT_VARIANT.label01}>로그인하러 가기</Typography>
 					<Icon name="arrowRight" width={18} />
