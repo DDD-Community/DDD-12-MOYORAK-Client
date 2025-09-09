@@ -16,52 +16,26 @@ const MainPage = () => {
 	const [showInvitation, setShowInvitation] = useState(false);
 	const [copied, setCopied] = useState<boolean>(false);
 	const [isLogin, setIsLogin] = useState(false);
-	const accessToken = localStorage.getItem('accessToken');
 
 	const location = useLocation();
+	const accessToken = localStorage.getItem('accessToken');
 
-	useEffect(() => {
-		// 기본값 설정 (테스트용)
-		const defaultCompanyId = '15';
-		const defaultTeamId = '7';
-		const defaultUserId = '33';
-
-		// companyId 설정
-		localStorage.setItem('companyId', defaultCompanyId);
-
-		// teamId 설정
-		localStorage.setItem('teamId', defaultTeamId);
-
-		// userId 설정
-		localStorage.setItem('userId', defaultUserId);
-
-		// JWT에서 userId 추출하여 설정
-		try {
-			const payloadBase64 = accessToken?.split('.')[1];
-			const decodedPayload = JSON.parse(atob(payloadBase64 || ''));
-			const userId = decodedPayload.sub; // JWT 표준에서 sub는 subject(사용자 ID)
-
-			// userId가 유효한 값일 때만 저장
-			if (userId && userId !== 'undefined') {
-				localStorage.setItem('userId', String(userId));
-			}
-		} catch (error) {
-			console.error('AccessToken 디코딩 실패', error);
-			localStorage.setItem('userId', defaultUserId);
-		}
-	}, []);
-
-	// 로그인 상태 확인 - 하드코딩된 토큰이 있으면 자동 로그인
+	// 로그인 상태를 안정적으로 관리
 	useEffect(() => {
 		const loginFromState = location.state?.isLogin;
-		const loginFromToken = Boolean(accessToken && accessToken.length > 0);
+		const loginFromToken = Boolean(accessToken);
 		const loginStatus = loginFromState || loginFromToken;
 
 		setIsLogin(loginStatus);
-		console.log('로그인 상태:', loginStatus, '토큰 존재:', loginFromToken);
 	}, [location.state?.isLogin, accessToken]);
 
-	// companyId와 teamId를 로컬스토리지에서 가져오기
+	// // 테스트용 더미데이터 설정
+	// const companyId = '15'; // localStorage.getItem('companyId');
+	// const teamId = '7'; // localStorage.getItem('teamId');
+
+	localStorage.setItem('companyId', '15');
+	localStorage.setItem('teamId', '7');
+
 	const companyId = localStorage.getItem('companyId');
 	const teamId = localStorage.getItem('teamId');
 
@@ -80,6 +54,26 @@ const MainPage = () => {
 	const onShowInvitation = () => {
 		setShowInvitation((prev) => !prev);
 	};
+
+	useEffect(() => {
+		if (isLogin && accessToken) {
+			try {
+				const payloadBase64 = accessToken.split('.')[1];
+				const decodedPayload = JSON.parse(atob(payloadBase64));
+				const userId = decodedPayload.sub; // JWT 표준에서 sub는 subject(사용자 ID)
+
+				// userId가 유효한 값일 때만 저장
+				if (userId && userId !== 'undefined') {
+					localStorage.setItem('userId', String(userId));
+				}
+			} catch (error) {
+				console.error('AccessToken 디코딩 실패', error);
+				localStorage.setItem('userId', '31');
+			}
+		} else {
+			localStorage.setItem('userId', '31');
+		}
+	}, [isLogin, accessToken, user]);
 
 	useEffect(() => {
 		if (isLogin && user?.companyId && user?.teamId) {
