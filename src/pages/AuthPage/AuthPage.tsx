@@ -10,6 +10,7 @@ const AuthPage = () => {
 	const navigate = useNavigate();
 
 	const googleLogin = () => {
+		alert('googleLogin');
 		const REDIRECT_URI = import.meta.env.VITE_GOOGLE_AUTH_REDIRECT_URI as string;
 
 		if (!REDIRECT_URI) {
