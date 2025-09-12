@@ -2,14 +2,18 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
+import { useMutationDeleteTeamRestaurant } from '@/apis/useMutationDeleteTeamRestaurant';
+import { useMutationUpdateTeamRestaurant } from '@/apis/useMutationUpdateTeamRestaurant';
 import { useQueryRestaurantDetail, useQueryRestaurantPhotos } from '@/apis/useQueryRestaurantDetail';
 import noGallery from '@/assets/noGallery.png';
+import reviewDelete from '@/assets/reviewDelete.png';
 import starIcon from '@/assets/star.png';
 import Icon from '@/components/Icon';
 import ReviewInfo from '@/components/ReviewInfo/ReviewInfo';
 import { CustomToast } from '@/components/Toast/BaseToaster';
 import Typography from '@/components/Typography/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
+import { useCategoryMapping } from '@/hooks/useCategoryMapping';
 
 const RestaurantDetail = () => {
 	const navigate = useNavigate();
@@ -17,6 +21,9 @@ const RestaurantDetail = () => {
 	const [isGalleryOpen, setIsGalleryOpen] = useState(false);
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const [lastToastTime, setLastToastTime] = useState(0);
+	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+	const [isEditingDescription, setIsEditingDescription] = useState(false);
+	const [editedDescription, setEditedDescription] = useState('');
 
 	const teamId = localStorage.getItem('teamId') ?? '';
 	const { teamRestaurantId } = useParams<{ teamRestaurantId: string }>();
@@ -24,9 +31,13 @@ const RestaurantDetail = () => {
 	// TanStack Query 훅 사용
 	const { data: restaurantInfo, isLoading: isLoadingRestaurant } = useQueryRestaurantDetail(teamId.toString(), teamRestaurantId || '');
 	const { data: reviewPhotos, isLoading: isLoadingPhotos } = useQueryRestaurantPhotos(teamId.toString(), teamRestaurantId || '');
+	const { mutate: deleteTeamRestaurant, isPending } = useMutationDeleteTeamRestaurant(teamId);
+	const { mutate: updateTeamRestaurant, isPending: isUpdating } = useMutationUpdateTeamRestaurant(teamId, teamRestaurantId || '');
 
 	const imageUrl = restaurantInfo?.photoPath;
 	const allImages = reviewPhotos?.data?.map((photo) => photo.path) || [];
+
+	const { getCategoryDisplay } = useCategoryMapping();
 
 	const handleReviewWrite = () => {
 		navigate('/review-registration', {
@@ -67,6 +78,70 @@ const RestaurantDetail = () => {
 		setLastToastTime(currentTime);
 	};
 
+	const handleDelete = () => {
+		setIsDeleteDialogOpen(true);
+	};
+
+	const handleConfirmDelete = () => {
+		if (teamRestaurantId) {
+			deleteTeamRestaurant(teamRestaurantId.toString(), {
+				onSuccess: () => {
+					toast(<CustomToast title="식당 삭제가 완료되었어요." icon="check" />);
+					setIsDeleteDialogOpen(false);
+					navigate('/');
+				},
+				onError: (error) => {
+					console.error('팀 식당 삭제 실패:', error);
+					toast(<CustomToast title="식당 삭제에 실패했습니다." icon="invalidInput" />);
+					setIsDeleteDialogOpen(false);
+				},
+			});
+		}
+	};
+
+	const handleCancelDelete = () => {
+		setIsDeleteDialogOpen(false);
+	};
+
+	const handleEditDescription = () => {
+		setEditedDescription(restaurantInfo?.summary || '');
+		setIsEditingDescription(true);
+	};
+
+	const handleSaveDescription = () => {
+		if (!editedDescription.trim()) {
+			toast(<CustomToast title="설명을 입력해주세요." icon="invalidInput" />);
+			return;
+		}
+
+		updateTeamRestaurant(
+			{ summary: editedDescription.trim() },
+			{
+				onSuccess: () => {
+					setIsEditingDescription(false);
+					toast(<CustomToast title="식당 설명이 수정되었습니다." icon="check" />);
+				},
+				onError: (error) => {
+					console.error('식당 설명 수정 실패:', error);
+					toast(<CustomToast title="설명 수정에 실패했습니다. 한줄 소개는 20자 미만입니다." icon="invalidInput" />);
+				},
+			}
+		);
+	};
+
+	const handleCancelEdit = () => {
+		setEditedDescription('');
+		setIsEditingDescription(false);
+	};
+
+	const handleKeyPress = (e: React.KeyboardEvent) => {
+		if (e.key === 'Enter') {
+			handleSaveDescription();
+		} else if (e.key === 'Escape') {
+			handleCancelEdit();
+		}
+	};
+
 	if (!teamRestaurantId) {
 		return (
 			<div className="bg-gray-02 min-h-screen flex items-center justify-center">
@@ -91,7 +166,7 @@ const RestaurantDetail = () => {
 	return (
 		<>
 			{isGalleryOpen ? (
-				<div className="fixed inset-0 z-50 flex flex-col">
+				<div className="fixed inset-0 z-50 flex flex-col max-w-[480px] mx-auto">
 					{/* 헤더 */}
 					<div className="bg-gray-10 h-55">
 						<div className="flex items-center gap-5 px-5 py-4">
@@ -114,7 +189,7 @@ const RestaurantDetail = () => {
 					<div className="flex-1 flex items-center justify-center relative">
 						<div className="w-full h-full bg-gray-03" />
 
-						<img src={allImages[currentImageIndex]} alt="galleryImage" className="w-full h-full object-cover" />
+						<img src={allImages[currentImageIndex]} alt="galleryImage" className="w-full h-full" />
 
 						<button
 							onClick={goToPrevImage}
@@ -141,13 +216,16 @@ const RestaurantDetail = () => {
 				<div className="bg-gray-02 min-h-screen">
 					<div className="relative">
 						<div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-gray-10/80 to-transparent ">
-							<div>
+							<div className="flex justify-between">
 								<nav className="flex items-center gap-5 h-15 px-5">
 									<Icon name="restaurantBack" size={24} onClick={() => navigate('/')} />
 									<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.white} className="font-semibold">
 										{restaurantInfo?.name}
 									</Typography>
 								</nav>
+								<div className="flex items-center gap-5 h-15 px-5" onClick={handleDelete}>
+									<Icon name="deleteIcon" size={24} />
+								</div>
 							</div>
 						</div>
 						{imageUrl ? (
@@ -178,16 +256,40 @@ const RestaurantDetail = () => {
 									{restaurantInfo?.name}
 								</Typography>
 								<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray07}>
-									{/* {restaurantInfo?.category} */}
-									한식
+									{getCategoryDisplay(restaurantInfo?.restaurantCategory || '')}
 								</Typography>
 							</div>
 
 							{/* 설명 */}
 							<div className="mb-2 text-center">
-								<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray08}>
-									{restaurantInfo?.summary}
-								</Typography>
+								{isEditingDescription ? (
+									<div className="flex items-center gap-2 justify-center">
+										<input
+											type="text"
+											value={editedDescription}
+											onChange={(e) => setEditedDescription(e.target.value)}
+											onKeyDown={handleKeyPress}
+											placeholder="식당을 한줄로 설명해주세요"
+											disabled={isUpdating}
+											className="wflex-1 px-3 py-2 border border-gray-03 rounded-[8px] text-center focus:outline-none focus:border-primary-200 disabled:opacity-50"
+											autoFocus
+										/>
+										<button
+											onClick={handleSaveDescription}
+											disabled={isUpdating}
+											className="px-3 py-2 bg-primary-200 text-[#1F2511] rounded-[8px] text-sm font-semibold disabled:opacity-50"
+										>
+											{isUpdating ? '저장 중...' : '저장'}
+										</button>
+									</div>
+								) : (
+									<div className="flex items-center justify-center">
+										<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray08}>
+											{restaurantInfo?.summary || '식당을 한줄로 설명해주세요'}
+										</Typography>
+										<Icon name="edit" size={14} onClick={handleEditDescription} />
+									</div>
+								)}
 							</div>
 
 							{/* 별점 */}
@@ -198,8 +300,11 @@ const RestaurantDetail = () => {
 								<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray08}>
 									{restaurantInfo?.score}
 								</Typography>
+								<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray08} className="mx-1.25">
+									·
+								</Typography>
 								<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray08}>
-									· 리뷰 {restaurantInfo?.reviewCount}
+									리뷰 {restaurantInfo?.reviewCount}
 								</Typography>
 							</div>
 
@@ -245,12 +350,20 @@ const RestaurantDetail = () => {
 							{/* 탭 */}
 							<div className="flex border-b border-gray-04 mb-7.5 ml-[-18px] mr-[-18px]">
 								<button onClick={() => setActiveTab('reviews')} className={`flex-1 py-3 ${activeTab === 'reviews' ? 'border-b-2 border-gray-10' : ''}`}>
-									<Typography variant={FONT_VARIANT.body01} fontColor={activeTab === 'reviews' ? PALETTE.gray10 : PALETTE.gray07}>
+									<Typography
+										variant={FONT_VARIANT.body01}
+										fontColor={activeTab === 'reviews' ? PALETTE.gray10 : PALETTE.gray07}
+										className={activeTab === 'reviews' ? 'font-semibold' : 'font-normal'}
+									>
 										팀원들의 리뷰
 									</Typography>
 								</button>
 								<button onClick={() => setActiveTab('photos')} className={`flex-1 py-3 ${activeTab === 'photos' ? 'border-b-2 border-gray-10' : ''}`}>
-									<Typography variant={FONT_VARIANT.body01} fontColor={activeTab === 'photos' ? PALETTE.gray10 : PALETTE.gray07}>
+									<Typography
+										variant={FONT_VARIANT.body01}
+										fontColor={activeTab === 'photos' ? PALETTE.gray10 : PALETTE.gray07}
+										className={activeTab === 'photos' ? 'font-semibold' : 'font-normal'}
+									>
 										팀원들의 사진
 									</Typography>
 								</button>
@@ -304,6 +417,48 @@ const RestaurantDetail = () => {
 									})()}
 								</div>
 							)}
+						</div>
+					</div>
+				</div>
+			)}
+
+			{/* 식당 삭제 모달 */}
+			{isDeleteDialogOpen && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center">
+					<div className="absolute inset-0 bg-black/50" onClick={handleCancelDelete} />
+
+					<div className="relative bg-white rounded-[20px] w-[271px] p-6 shadow-lg">
+						<div className="text-center mb-1.75">
+							<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.gray10} className="font-semibold">
+								우리팀 식당 삭제하기
+							</Typography>
+						</div>
+
+						<div className="text-center mb-6">
+							<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray08}>
+								식당 삭제를 하시면 우리 팀에 등록된
+								<br />
+								모든 정보가 영구적으로 삭제돼요.
+							</Typography>
+						</div>
+
+						<img src={reviewDelete} alt="식당 삭제 완료" className="w-[133px] h-[128px] absolute bottom-44 left-18" />
+
+						<div className="flex gap-2 max-w-[283px]">
+							<button
+								onClick={handleCancelDelete}
+								disabled={isPending}
+								className="w-[89px] rounded-[20px] border border-gray-03 bg-white h-[50px] disabled:opacity-50"
+							>
+								<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray08} className="font-medium">
+									취소
+								</Typography>
+							</button>
+							<button onClick={handleConfirmDelete} disabled={isPending} className="w-[154px] rounded-[20px] bg-primary-200 h-[50px] disabled:opacity-50">
+								<Typography variant={FONT_VARIANT.body01} className="font-semibold text-[#1F2511]">
+									{isPending ? '삭제 중...' : '삭제하기'}
+								</Typography>
+							</button>
 						</div>
 					</div>
 				</div>

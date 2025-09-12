@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useMutationAddReview } from '@/apis/useMutationAddReview';
 import emptyStarIcon from '@/assets/emptyStar.png';
 import reviewRegistration from '@/assets/reviewRegistration.png';
 import starIcon from '@/assets/star.png';
 import Button from '@/components/Button/Button';
-import CustomDialog from '@/components/Dialog/CustomDialog';
 import FilterButton from '@/components/FilterButton/FilterButton';
 import Icon from '@/components/Icon';
 import FormLabel from '@/components/Input/FormLabel';
@@ -17,8 +16,6 @@ import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 import { uploadMultipleImages, validateImageFiles } from '@/utils/imageUpload';
 
 const ReviewRegistration = () => {
-	const { id } = useParams();
-	const isEdit = !!id;
 	const navigate = useNavigate();
 	const [waitingTime, setWaitingTime] = useState('');
 	const [foodPrepTime, setFoodPrepTime] = useState('');
@@ -209,8 +206,8 @@ const ReviewRegistration = () => {
 								))}
 							</div>
 							<textarea
-								className="w-full h-[137px] border border-gray-04 rounded-[12px] p-[15px] placeholder:text-gray-06 text-[16px]"
-								placeholder="소중한 경험을 남겨주세요! 남겨주신 리뷰는 팀원에게 도움이 됩니다."
+								className="w-full h-[137px] border border-gray-04 rounded-[12px] p-[15px] placeholder:text-gray-06 leading-[150%] text-[16px]"
+								placeholder="소중한 경험을 남겨주세요!&#10;남겨주신 리뷰는 팀원에게 도움이 돼요."
 								maxLength={200}
 								value={review}
 								onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setReview(e.target.value)}
@@ -231,27 +228,35 @@ const ReviewRegistration = () => {
 					</Button>
 				</form>
 
-				{isEdit ? (
-					<CustomDialog headerText={{ title: '리뷰 수정이 완료되었어요' }} onOpen={isOpen} onOpenChange={setIsOpen} className="w-[271px]">
-						<Button variant="active" onClick={() => navigate(`/restaurant-detail/${teamRestaurantId}`)} className="mt-[24px]">
-							확인
-						</Button>
-					</CustomDialog>
-				) : (
-					<CustomDialog
-						headerText={{
-							title: '리뷰 등록이 완료되었어요',
-							description: '작성하신 리뷰는 언제든지 식당페이지에서 수정 가능해요!',
-						}}
-						onOpen={isOpen}
-						onOpenChange={setIsOpen}
-						className="w-[271px]"
-					>
-						<img src={reviewRegistration} alt="리뷰 등록 완료" className="w-[175px] h-[102px] absolute bottom-44 left-11" />
-						<Button variant="active" onClick={() => navigate(`/restaurant-detail/${teamRestaurantId}`)} className="mt-[24px]">
-							확인
-						</Button>
-					</CustomDialog>
+				{isOpen && (
+					<div className="fixed inset-0 z-50 flex items-center justify-center">
+						<div className="absolute inset-0 bg-black/50" onClick={() => setIsOpen(false)} />
+
+						<div className="relative bg-white rounded-[20px] w-[271px] p-6 shadow-lg">
+							<div className="text-center mb-1.75">
+								<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.gray10} className="font-semibold">
+									리뷰 등록이 완료되었어요
+								</Typography>
+							</div>
+
+							<div className="text-center mb-6">
+								<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray08}>
+									작성하신 리뷰는 언제든지
+									<br /> 식당페이지에서 수정 가능해요!
+								</Typography>
+							</div>
+
+							<img src={reviewRegistration} alt="리뷰 등록 완료" className="w-[175px] h-[102px] absolute bottom-44 left-12" />
+
+							<div className="flex justify-center">
+								<button onClick={() => navigate(`/restaurant-detail/${teamRestaurantId}`)} className="w-full rounded-[20px] bg-primary-200 h-[50px]">
+									<Typography variant={FONT_VARIANT.body01} className="font-semibold text-[#1F2511]">
+										확인
+									</Typography>
+								</button>
+							</div>
+						</div>
+					</div>
 				)}
 			</div>
 		</>
