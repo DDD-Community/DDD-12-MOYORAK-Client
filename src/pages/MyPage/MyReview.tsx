@@ -5,11 +5,8 @@ import { toast } from 'sonner';
 import { useMutationDeleteReview } from '@/apis/useMutationDeleteReview';
 import { useQueryMyReviews } from '@/apis/useQueryMyReviews';
 import noGallery from '@/assets/noGallery.png';
-import profile from '@/assets/profile.png';
 import reviewDelete from '@/assets/reviewDelete.png';
 import starIcon from '@/assets/star.png';
-import Button from '@/components/Button/Button';
-import CustomDialog from '@/components/Dialog/CustomDialog';
 import Icon from '@/components/Icon';
 import NavBar from '@/components/NavBar/NavBar';
 import Pagination from '@/components/Pagination/Pagination';
@@ -28,7 +25,7 @@ const MyReview = () => {
 	const teamId = localStorage.getItem('teamId') ?? '';
 
 	const { data: myReviews, isLoading: isLoadingReviews } = useQueryMyReviews(5, currentPage);
-	const { mutate: deleteReview } = useMutationDeleteReview(teamId, '');
+	const { mutate: deleteReview } = useMutationDeleteReview(teamId);
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
@@ -52,12 +49,11 @@ const MyReview = () => {
 
 	const handleEdit = (review: any) => {
 		setOpenOptionMenu(null);
-		// 리뷰 수정 페이지로 이동 (기존 ReviewInfo와 동일한 방식)
 		navigate(`/review-edit/${review.id}`, {
 			state: {
-				teamId: '',
-				teamRestaurantId: '', // MyReview에서는 teamRestaurantId가 없으므로 빈 문자열
-				name: '리뷰 수정', // 제목
+				teamId: teamId,
+				teamRestaurantId: review.teamRestaurantId,
+				name: review.teamRestaurantName,
 				waitingTime: review.waitingTime,
 				foodPrepTime: review.servingTime,
 				score: review.score,
@@ -68,16 +64,22 @@ const MyReview = () => {
 		});
 	};
 
-	const handleDeleteReview = (reviewId: number) => {
-		deleteReview(reviewId.toString(), {
-			onSuccess: () => {
-				toast(<CustomToast title="리뷰가 삭제되었습니다." icon="check" />);
+	const handleDeleteReview = (reviewId: number, teamRestaurantId: number) => {
+		deleteReview(
+			{
+				reviewId: reviewId.toString(),
+				teamRestaurantId: teamRestaurantId.toString(),
 			},
-			onError: (error) => {
-				console.error('리뷰를 삭제하는데 실패했습니다:', error);
-				toast(<CustomToast title="리뷰 삭제에 실패했습니다." icon="invalidInput" />);
-			},
-		});
+			{
+				onSuccess: () => {
+					toast(<CustomToast title="리뷰가 삭제되었습니다." icon="check" />);
+				},
+				onError: (error) => {
+					console.error('리뷰를 삭제하는데 실패했습니다:', error);
+					toast(<CustomToast title="리뷰 삭제에 실패했습니다." icon="invalidInput" />);
+				},
+			}
+		);
 	};
 
 	const handleDelete = (reviewId: number) => {
@@ -87,10 +89,13 @@ const MyReview = () => {
 	};
 
 	const handleConfirmDelete = () => {
-		if (selectedReviewId) {
-			handleDeleteReview(selectedReviewId);
-			setIsOpen(false);
-			setSelectedReviewId(null);
+		if (selectedReviewId && myReviews?.data) {
+			const selectedReview = myReviews.data.find((review: any) => review.id === selectedReviewId);
+			if (selectedReview) {
+				handleDeleteReview(selectedReviewId, Number(selectedReview.teamRestaurantId));
+				setIsOpen(false);
+				setSelectedReviewId(null);
+			}
 		}
 	};
 
@@ -121,7 +126,7 @@ const MyReview = () => {
 	// 데이터가 없을 때 처리
 	if (!myReviews || myReviews.data.length === 0) {
 		return (
-			<div>
+			<div className="bg-gray-02 min-h-screen pb-5">
 				<NavBar variant="iconWithText" leftText="내가 쓴 리뷰" leftIcon="back" onLeftIconClick={() => navigate(-1)} />
 				<div className="py-6.25 px-4.5 bg-gray-02">
 					<div className="flex gap-1.5">
@@ -146,7 +151,7 @@ const MyReview = () => {
 	}
 
 	return (
-		<div>
+		<div className="bg-gray-02 min-h-screen pb-5">
 			<NavBar variant="iconWithText" leftText="내가 쓴 리뷰" leftIcon="back" onLeftIconClick={() => navigate(-1)} />
 
 			<div className="py-6.25 px-4.5 bg-gray-02">
@@ -171,11 +176,15 @@ const MyReview = () => {
 								<div className="mb-6 rounded-[20px] bg-white px-4.5 py-6.5" key={review.id}>
 									<div className="flex justify-between">
 										<div className="flex items-center gap-2.5 mb-2.5">
-											<img src={review.userProfileImageUrl ?? profile} alt="profile" className="w-10 h-10 rounded-full" />
-											<div className="flex flex-col gap-0.5">
-												<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray10} className="font-medium">
-													{review.userNickname}
+											<div className="flex gap-1.5 items-center">
+												<Typography
+													variant={FONT_VARIANT.header04}
+													fontColor={PALETTE.gray10}
+													className="font-semibold max-width-[170px] overflow-hidden text-ellipsis whitespace-nowrap"
+												>
+													{review.teamRestaurantName}
 												</Typography>
+
 												<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray07}>
 													{review.createdDate}
 												</Typography>
@@ -183,7 +192,10 @@ const MyReview = () => {
 										</div>
 										{String(review.userId) === userId && (
 											<div className="relative option-menu-container">
-												<Icon name="selectOption" size={24} onClick={() => handleOptionClick(index)} className="cursor-pointer" />
+												{review.isDeletedTeamRestaurantReview === true && (
+													<Icon name="selectOption" size={24} onClick={() => handleOptionClick(index)} className="cursor-pointer" />
+												)}
+
 												{isOptionOpen && (
 													<div className="absolute right-0 top-2 bg-white border border-gray-03 rounded-[8px] shadow-[0px_0px_14px_0px_rgba(102,102,102,0.20)] z-10 w-30">
 														<button
@@ -286,31 +298,42 @@ const MyReview = () => {
 				</div>
 			</div>
 
-			<CustomDialog
-				headerText={{
-					title: '내 리뷰 삭제하기',
-					description: (
-						<>
-							이 리뷰를 삭제하면 식당에
-							<br />
-							등록된 리뷰도 함께 삭제돼요.
-						</>
-					),
-				}}
-				onOpen={isOpen}
-				onOpenChange={setIsOpen}
-				className="w-[271px]"
-			>
-				<img src={reviewDelete} alt="리뷰 삭제 완료" className="w-[133px] h-[128px] absolute bottom-44 left-18" />
-				<div className="flex gap-2 mt-[24px]">
-					<button onClick={handleCancelDelete} className="rounded-[20px] border border-gray-03 bg-white w-[89px] px-5">
-						취소
-					</button>
-					<Button variant="active" onClick={handleConfirmDelete}>
-						삭제하기
-					</Button>
+			{isOpen && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center">
+					<div className="absolute inset-0 bg-black/50" onClick={handleCancelDelete} />
+
+					<div className="relative bg-white rounded-[20px] w-[271px] p-6 shadow-lg">
+						<div className="text-center mb-1.75">
+							<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.gray10} className="font-semibold">
+								내 리뷰 삭제하기
+							</Typography>
+						</div>
+
+						<div className="text-center mb-6">
+							<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray08}>
+								이 리뷰를 삭제하면 식당에
+								<br />
+								등록된 리뷰도 함께 삭제돼요.
+							</Typography>
+						</div>
+
+						<img src={reviewDelete} alt="리뷰 삭제 완료" className="w-[133px] h-[128px] absolute bottom-44 left-18" />
+
+						<div className="flex gap-2 max-w-[283px]">
+							<button onClick={handleCancelDelete} className="w-[89px] rounded-[20px] border border-gray-03 bg-white h-[50px]">
+								<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray08} className="font-medium">
+									취소
+								</Typography>
+							</button>
+							<button onClick={handleConfirmDelete} className="w-[154px] rounded-[20px] bg-primary-200 h-[50px]">
+								<Typography variant={FONT_VARIANT.body01} className="font-semibold text-[#1F2511]">
+									삭제하기
+								</Typography>
+							</button>
+						</div>
+					</div>
 				</div>
-			</CustomDialog>
+			)}
 		</div>
 	);
 };

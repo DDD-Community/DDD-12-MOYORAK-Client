@@ -7,8 +7,6 @@ import { useMutationMealTags } from '@/apis/useMutationMealTags';
 import { useQueryMealAlone } from '@/apis/useQueryMealAlone';
 import { useQueryMealTags } from '@/apis/useQueryMealTags';
 import reviewDelete from '@/assets/reviewDelete.png';
-import Button from '@/components/Button/Button';
-import CustomDialog from '@/components/Dialog/CustomDialog';
 import FilterButton from '@/components/FilterButton/FilterButton';
 import Icon from '@/components/Icon';
 import NavBar from '@/components/NavBar/NavBar';
@@ -38,6 +36,7 @@ const MyPage = () => {
 
 	const email = localStorage.getItem('email');
 	const name = localStorage.getItem('name');
+	const profileImage = localStorage.getItem('profileImage');
 
 	// 음식 태그 업데이트 함수 - 두 리스트 모두 포함
 	const updateMealTags = () => {
@@ -140,7 +139,7 @@ const MyPage = () => {
 				{/* 프로필 정보 */}
 				<div className="relative flex flex-col items-center bg-white rounded-[20px] h-[123px] mx-auto mt-[50px] mb-[22px]">
 					<div className="absolute -top-[30px] w-[60px] h-[60px] rounded-full bg-gray-200 flex items-center justify-center">
-						<Icon name="mypage" width={30} height={30} />
+						<img src={profileImage ?? ''} alt="profile" className="w-[60px] h-[60px] rounded-full" />
 					</div>
 					<div className="flex flex-col items-center justify-center h-full pt-[15px]">
 						<Typography variant={FONT_VARIANT.header02} className="text-[#171719]">
@@ -372,55 +371,69 @@ const MyPage = () => {
 			</div>
 
 			{/* 팀 탈퇴 다이얼로그 */}
-			<CustomDialog
-				headerText={{
-					title: '모여락에서 탈퇴하기',
-					description: (
-						<>
-							탈퇴 시 모든 계정 정보와 이용 기록이
-							<br />
-							삭제되며, 복구가 불가능해요.
-						</>
-					),
-				}}
-				onOpen={isLeaveTeamOpen}
-				onOpenChange={setIsLeaveTeamOpen}
-				className="w-[271px]"
-			>
-				<img src={reviewDelete} alt="리뷰 삭제 완료" className="w-[133px] h-[128px] absolute bottom-44 left-18" />
+			{isLeaveTeamOpen && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center">
+					<div className="absolute inset-0 bg-black/50" onClick={handleLeaveTeamCancel} />
 
-				<div className="flex gap-2 mt-[24px]">
-					<button onClick={handleLeaveTeamCancel} className="rounded-[20px] border border-gray-03 bg-white w-[89px] px-5 py-2">
-						<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray10}>
-							취소
-						</Typography>
-					</button>
-					<Button variant="active" onClick={handleLeaveTeam}>
-						탈퇴하기
-					</Button>
-				</div>
-			</CustomDialog>
+					<div className="relative bg-white rounded-[20px] w-[271px] p-6 shadow-lg">
+						<div className="text-center mb-[7px]">
+							<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.gray10} className="font-semibold">
+								모여락에서 탈퇴하기
+							</Typography>
+						</div>
 
-			{/* 로그아웃 다이얼로그 */}
-			<CustomDialog
-				headerText={{
-					title: '모여락에서 로그아웃하기',
-				}}
-				onOpen={isLogoutOpen}
-				onOpenChange={setIsLogoutOpen}
-				className="w-[271px]"
-			>
-				<div className="flex gap-2 mt-[24px]">
-					<button onClick={handleLogoutCancel} className="rounded-[20px] border border-gray-03 bg-white w-[89px] px-5 py-2">
-						<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray10}>
-							취소
-						</Typography>
-					</button>
-					<Button variant="active" onClick={handleLogout}>
-						로그아웃
-					</Button>
+						<div className="text-center mb-6">
+							<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray08}>
+								탈퇴 시 모든 계정 정보와 이용 기록이
+								<br />
+								삭제되며, 복구가 불가능해요.
+							</Typography>
+						</div>
+
+						<img src={reviewDelete} alt="리뷰 삭제 완료" className="w-[133px] h-[128px] absolute bottom-44 left-18" />
+
+						<div className="flex gap-2 max-w-[283px]">
+							<button onClick={handleLeaveTeamCancel} className="w-[89px] rounded-[20px] border border-gray-03 bg-white h-[50px]">
+								<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray08} className="font-medium">
+									취소
+								</Typography>
+							</button>
+							<button onClick={handleLeaveTeam} className="w-[154px] rounded-[20px] bg-primary-200 h-[50px]">
+								<Typography variant={FONT_VARIANT.body01} className="font-semibold text-[#1F2511]">
+									탈퇴하기
+								</Typography>
+							</button>
+						</div>
+					</div>
 				</div>
-			</CustomDialog>
+			)}
+
+			{isLogoutOpen && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center">
+					<div className="absolute inset-0 bg-black/50" onClick={handleLogoutCancel} />
+
+					<div className="relative bg-white rounded-[20px] w-[271px] p-6 shadow-lg">
+						<div className="text-center mb-6">
+							<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.gray10} className="font-semibold">
+								모여락에서 로그아웃하기
+							</Typography>
+						</div>
+
+						<div className="flex gap-2 max-w-[283px]">
+							<button onClick={handleLogoutCancel} className="w-[89px] rounded-[20px] border border-gray-03 bg-white h-[50px]">
+								<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray08} className="font-medium">
+									취소
+								</Typography>
+							</button>
+							<button onClick={handleLogout} className="w-[154px] rounded-[20px] bg-primary-200 h-[50px]">
+								<Typography variant={FONT_VARIANT.body01} className="font-semibold text-[#1F2511]">
+									로그아웃
+								</Typography>
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 };
