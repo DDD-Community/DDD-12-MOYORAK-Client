@@ -20,6 +20,8 @@ export { default as company } from './company.svg?react';
 export { default as compass } from './compass.svg?react';
 export { default as copy } from './copy.svg?react';
 export { default as delete } from './delete.svg?react';
+export { default as deleteIcon } from './deleteIcon.svg?react';
+export { default as edit } from './edit.svg?react';
 export { default as googleLogin } from './googleLogin.svg?react';
 export { default as help } from './help.svg?react';
 export { default as homeTab } from './homeTab.svg?react';
