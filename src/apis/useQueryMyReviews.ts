@@ -13,6 +13,9 @@ interface MyReview {
 	userProfileImageUrl: string;
 	photoUrls: string[];
 	createdDate: string;
+	teamRestaurantId: string;
+	teamRestaurantName: string;
+	isDeletedTeamRestaurantReview: boolean;
 }
 
 interface MyReviewsResponse {
@@ -31,7 +34,5 @@ export const useQueryMyReviews = (size: number = 5, currentPage: number = 1) => 
 		queryKey: ['my-reviews', size, currentPage],
 		queryFn: () => getMyReviews(size, currentPage),
 		enabled: true,
-		staleTime: 0,
-		gcTime: 0,
 	});
 };

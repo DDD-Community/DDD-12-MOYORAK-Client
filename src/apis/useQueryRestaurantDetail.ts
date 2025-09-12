@@ -11,6 +11,7 @@ interface RestaurantDetail {
 	waitingTime: number;
 	reviewCount: number;
 	score: number;
+	restaurantCategory: string;
 	photoPath: string;
 }
 
