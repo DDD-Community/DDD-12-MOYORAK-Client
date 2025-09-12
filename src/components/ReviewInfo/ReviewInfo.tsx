@@ -8,8 +8,6 @@ import noGallery from '@/assets/noGallery.png';
 import profile from '@/assets/profile.png';
 import reviewDelete from '@/assets/reviewDelete.png';
 import starIcon from '@/assets/star.png';
-import Button from '@/components/Button/Button';
-import CustomDialog from '@/components/Dialog/CustomDialog';
 import Icon from '@/components/Icon';
 import { CustomToast } from '@/components/Toast/BaseToaster';
 import Typography from '@/components/Typography/Typography';
@@ -30,7 +28,7 @@ const ReviewInfo = ({ restaurantName }: IReviewInfoProps) => {
 	const userId = localStorage.getItem('userId') ?? '';
 
 	const { data: reviewList, isLoading: isLoadingReviews } = useQueryReviewList(teamId.toString(), teamRestaurantId || '');
-	const { mutate: deleteReview } = useMutationDeleteReview(teamId.toString(), teamRestaurantId || '');
+	const { mutate: deleteReview } = useMutationDeleteReview(teamId);
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
@@ -70,15 +68,21 @@ const ReviewInfo = ({ restaurantName }: IReviewInfoProps) => {
 	};
 
 	const handleDeleteReview = (reviewId: number) => {
-		deleteReview(reviewId.toString(), {
-			onSuccess: () => {
-				toast(<CustomToast title="리뷰가 삭제되었습니다." icon="check" />);
+		deleteReview(
+			{
+				reviewId: reviewId.toString(),
+				teamRestaurantId: teamRestaurantId || '',
 			},
-			onError: (error) => {
-				console.error('리뷰를 삭제하는데 실패했습니다:', error);
-				toast(<CustomToast title="리뷰 삭제에 실패했습니다." icon="invalidInput" />);
-			},
-		});
+			{
+				onSuccess: () => {
+					toast(<CustomToast title="리뷰가 삭제되었습니다." icon="check" />);
+				},
+				onError: (error) => {
+					console.error('리뷰를 삭제하는데 실패했습니다:', error);
+					toast(<CustomToast title="리뷰 삭제에 실패했습니다." icon="invalidInput" />);
+				},
+			}
+		);
 	};
 
 	const handleDelete = (reviewId: number) => {
@@ -254,31 +258,42 @@ const ReviewInfo = ({ restaurantName }: IReviewInfoProps) => {
 				})}
 			</>
 
-			<CustomDialog
-				headerText={{
-					title: '리뷰 삭제하기',
-					description: (
-						<>
-							리뷰 삭제 시 복구가 불가능하며
-							<br />
-							팀원들에게도 보이지 않아요.
-						</>
-					),
-				}}
-				onOpen={isOpen}
-				onOpenChange={setIsOpen}
-				className="w-[271px]"
-			>
-				<img src={reviewDelete} alt="리뷰 삭제 완료" className="w-[133px] h-[128px] absolute bottom-44 left-18" />
-				<div className="flex gap-2 mt-[24px]">
-					<button onClick={handleCancelDelete} className="rounded-[20px] border border-gray-03 bg-white w-[89px] px-5">
-						취소
-					</button>
-					<Button variant="active" onClick={handleConfirmDelete}>
-						삭제하기
-					</Button>
+			{isOpen && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center">
+					<div className="absolute inset-0 bg-black/50" onClick={handleCancelDelete} />
+
+					<div className="relative bg-white rounded-[20px] w-[271px] p-6 shadow-lg">
+						<div className="text-center mb-1.75">
+							<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.gray10} className="font-semibold">
+								리뷰 삭제하기
+							</Typography>
+						</div>
+
+						<div className="text-center mb-6">
+							<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray08}>
+								리뷰 삭제 시 복구가 불가능하며
+								<br />
+								팀원들에게도 보이지 않아요.
+							</Typography>
+						</div>
+
+						<img src={reviewDelete} alt="리뷰 삭제 완료" className="w-[133px] h-[128px] absolute bottom-44 left-18" />
+
+						<div className="flex gap-2 max-w-[283px]">
+							<button onClick={handleCancelDelete} className="w-[89px] rounded-[20px] border border-gray-03 bg-white h-[50px]">
+								<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray08} className="font-medium">
+									취소
+								</Typography>
+							</button>
+							<button onClick={handleConfirmDelete} className="w-[154px] rounded-[20px] bg-primary-200 h-[50px]">
+								<Typography variant={FONT_VARIANT.body01} className="font-semibold text-[#1F2511]">
+									삭제하기
+								</Typography>
+							</button>
+						</div>
+					</div>
 				</div>
-			</CustomDialog>
+			)}
 		</div>
 	);
 };
