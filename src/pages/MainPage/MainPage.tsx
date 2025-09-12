@@ -29,6 +29,17 @@ const MainPage = () => {
 		setIsLogin(loginStatus);
 	}, [location.state?.isLogin, accessToken]);
 
+	// 3초 후에 토스트 자동으로 사라지게 하기
+	useEffect(() => {
+		if (copied) {
+			const timer = setTimeout(() => {
+				setCopied(false);
+			}, 3000);
+
+			return () => clearTimeout(timer);
+		}
+	}, [copied]);
+
 	// // 테스트용 더미데이터 설정
 	// const companyId = '15'; // localStorage.getItem('companyId');
 	// const teamId = '7'; // localStorage.getItem('teamId');
@@ -99,7 +110,15 @@ const MainPage = () => {
 					<MainBottomSheet />
 				</div>
 
-				{copied && <CustomToast title="초대 링크가 복사되었습니다." icon="check" />}
+				{copied && (
+					<div className="absolute bottom-24 left-0 right-0 z-10">
+						<CustomToast
+							title="초대 링크가 복사되었습니다."
+							icon="check"
+							className="bg-black/70 rounded-[10px] shadow-[0_0_9px_0_rgba(0,0,0,0.25)] backdrop-blur-[2px] py-2.5 px-5 mx-5.5"
+						/>
+					</div>
+				)}
 			</div>
 		);
 	}

@@ -7,7 +7,7 @@ import Empty from '../Empty';
 
 import RestaurantReview from './RestaurantReview';
 
-const BASIC_HEIGHT = 300;
+const BASIC_HEIGHT = 255;
 const MIN_HEIGHT = 120;
 
 const UP_THRESHOLD = 8;
