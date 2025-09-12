@@ -109,8 +109,8 @@ const TimePicker = ({ value, onChange, disabled, displayValue }: ITimePickerProp
 							</div>
 						</div>
 						<div className="flex justify-between items-center border-t border-gray-02 px-4.5 py-3.5 bg-white sticky bottom-0">
-							<Typography variant={FONT_VARIANT.label01} className="font-semibold" fontColor={PALETTE.gray07}>
-								현재
+							<Typography variant={FONT_VARIANT.label01} className="font-semibold" fontColor={PALETTE.gray07} onClick={() => setOpen(false)}>
+								취소
 							</Typography>
 							<button onClick={handleApply}>
 								<Typography variant={FONT_VARIANT.label01} className="text-[#70CE13] font-semibold">

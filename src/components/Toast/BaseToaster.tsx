@@ -8,6 +8,7 @@ import Typography from '../Typography';
 interface ICustomToast {
 	title: string;
 	icon: IconTypes;
+	className?: string;
 }
 
 /**
@@ -20,9 +21,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
 /**
  * @description 공통 CustomToast 컴포넌트
  */
-const CustomToast = ({ title, icon }: ICustomToast) => {
+const CustomToast = ({ title, icon, className }: ICustomToast) => {
 	return (
-		<div className="flex items-center gap-[5px]">
+		<div className={`flex items-center gap-[5px] ${className}`}>
 			<Icon name={icon} width={14} height={14} />
 			<Typography fontColor={PALETTE.white} variant={FONT_VARIANT.label01}>
 				{title}

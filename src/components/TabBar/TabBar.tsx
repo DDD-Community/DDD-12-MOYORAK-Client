@@ -47,7 +47,7 @@ const TabBar = () => {
 	};
 
 	return (
-		<div className="fixed bottom-0 w-full px-2 z-[10000] max-w-[480px] mx-auto">
+		<div className="fixed bottom-0 w-full px-2 z-[10000] max-w-[480px] mx-auto mb-3.5">
 			<div
 				className="
 				flex
