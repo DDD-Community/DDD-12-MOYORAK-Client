@@ -254,12 +254,11 @@ const AddRestaurantPopup = ({ onClose, existingRestaurantIds, existingRestaurant
 						))}
 					</div>
 				</div>
-
-				<div className="fixed bottom-[30px] left-0 w-full px-4.5">
-					<Button variant={newSelectedIds.length > 0 ? 'active' : 'disabled'} onClick={handleComplete}>
-						선택 완료
-					</Button>
-				</div>
+			</div>
+			<div className="fixed bottom-[30px] w-full px-4.5 max-w-[480px]">
+				<Button variant={newSelectedIds.length > 0 ? 'active' : 'disabled'} onClick={handleComplete}>
+					선택 완료
+				</Button>
 			</div>
 		</div>
 	);

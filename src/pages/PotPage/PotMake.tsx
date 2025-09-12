@@ -500,8 +500,8 @@ const PotMake = () => {
 													displayValue={isDefaultTime(announceTime) ? '시간을 선택해주세요' : getDisplayTime(announceTime)}
 												/>
 											</div>
-											<div className="flex justify-between items-center">
-												<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray08} className="pt-2.5">
+											<div className="flex justify-between items-center pt-2.5">
+												<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray08}>
 													식사 시간
 												</Typography>
 												<TimePicker
@@ -528,8 +528,8 @@ const PotMake = () => {
 													displayValue={isDefaultTime(announceTime) ? '시간을 선택해주세요' : getDisplayTime(announceTime)}
 												/>
 											</div>
-											<div className="flex justify-between items-center">
-												<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray08} className="pt-2.5">
+											<div className="flex justify-between items-center pt-2.5">
+												<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray08}>
 													식사 시간
 												</Typography>
 												<TimePicker

@@ -113,7 +113,7 @@ const SelectRestaurantPopup = ({ onClose, initialSelectedIds = [] }: ISelectRest
 	};
 
 	return (
-		<div className="bg-gray-02 min-h-screen ">
+		<div className="bg-gray-02 min-h-screen pb-[60px]">
 			<NavBar
 				variant="iconWithText"
 				leftText="식당 선택하기"
@@ -235,12 +235,12 @@ const SelectRestaurantPopup = ({ onClose, initialSelectedIds = [] }: ISelectRest
 						<Pagination currentPage={currentPage} totalCount={teamRestaurantList.totalCount} size={size} onPageChange={setCurrentPage} variant="large" />
 					)}
 				</div>
+			</div>
 
-				<div className="fixed bottom-[30px] left-0 w-full px-4.5">
-					<Button variant={selectedIds.length > 0 ? 'active' : 'disabled'} onClick={handleComplete}>
-						선택 완료
-					</Button>
-				</div>
+			<div className="w-full px-4.5 fixed bottom-[30px] max-w-[480px]">
+				<Button variant={selectedIds.length > 0 ? 'active' : 'disabled'} onClick={handleComplete}>
+					선택 완료
+				</Button>
 			</div>
 		</div>
 	);

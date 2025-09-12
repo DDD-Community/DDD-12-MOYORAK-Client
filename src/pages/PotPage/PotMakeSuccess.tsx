@@ -19,8 +19,8 @@ const PotMakeSuccess = () => {
 				</Typography>
 				<img src={potSuccess} alt="potSuccess" className="w-[270px] h-[160px]" />
 			</div>
-			<div className="w-full px-4.5 fixed bottom-[30px]">
-				<Button variant="active" className="w-full" onClick={() => navigate('/pot')}>
+			<div className="w-full px-4.5 fixed bottom-[30px] max-w-[480px]">
+				<Button variant="active" onClick={() => navigate('/pot')}>
 					확인
 				</Button>
 			</div>

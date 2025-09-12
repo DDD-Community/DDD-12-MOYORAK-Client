@@ -27,12 +27,10 @@ const ParticipationButton = ({
 	const getButtonText = (): string => {
 		if (isLoading) return '처리 중...';
 		if (!attendable) return BUTTON_TEXT.notAttendable;
-		if (!attended) return BUTTON_TEXT.participate;
 
-		// 투표 진행 중일 때
-		if (timeStatus === 'voting_active') {
-			if (isVoted) return BUTTON_TEXT.voteAgain;
-			return BUTTON_TEXT.vote;
+		if (timeStatus === 'after_end') {
+			if (voteType === 'RANDOM') return BUTTON_TEXT.randomEnded;
+			return BUTTON_TEXT.voteEnded;
 		}
 
 		// 투표 시작 전
@@ -41,11 +39,15 @@ const ParticipationButton = ({
 			return BUTTON_TEXT.participated;
 		}
 
-		// 투표 종료 후
-		if (timeStatus === 'after_end') {
-			if (voteType === 'RANDOM') return BUTTON_TEXT.randomEnded;
-			return BUTTON_TEXT.voteEnded;
+		// 투표 진행 중일 때
+		if (timeStatus === 'voting_active') {
+			if (!attended) return BUTTON_TEXT.participate;
+			if (isVoted) return BUTTON_TEXT.voteAgain;
+			return BUTTON_TEXT.vote;
 		}
+
+		// 참여하지 않은 경우
+		if (!attended) return BUTTON_TEXT.participate;
 
 		return BUTTON_TEXT.participate;
 	};
@@ -54,7 +56,12 @@ const ParticipationButton = ({
 	const isButtonDisabled = (): boolean => {
 		if (isLoading) return true;
 		if (!attendable) return true; // 참여할 수 없는 팟
-		if (!attended) return false; // 참여하지 않은 경우 참여 가능
+
+		// 투표가 종료된 경우 항상 비활성화
+		if (timeStatus === 'after_end') return true;
+
+		// 참여하지 않은 경우 참여 가능
+		if (!attended) return false;
 
 		// RANDOM 타입일 때는 참여 후에만 버튼 비활성화
 		if (voteType === 'RANDOM') {
@@ -69,7 +76,7 @@ const ParticipationButton = ({
 			// 투표하지 않은 경우, 식당 선택 여부에 따라 버튼 활성화/비활성화
 			return selectedRestaurantId === null; // 식당 선택 안 함 → 버튼 비활성화
 		}
-		if (timeStatus === 'after_end') return true; // 투표 종료 후
+
 		return true;
 	};
 

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useQueryPotList } from '@/apis/useQueryPotList';
@@ -12,7 +11,6 @@ import voting from '@/assets/voting.png';
 import Button from '@/components/Button/Button';
 import FilterButton from '@/components/FilterButton/FilterButton';
 import Icon from '@/components/Icon';
-import Pagination from '@/components/Pagination/Pagination';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 import { useCategoryMapping } from '@/hooks/useCategoryMapping';
@@ -22,11 +20,10 @@ const Pot = () => {
 	const currentTime = new Date();
 	const { getCategoryDisplay } = useCategoryMapping();
 
-	const [currentPage, setCurrentPage] = useState(1);
 	const teamId = localStorage.getItem('teamId') ?? '';
-	const size = 10; // 10개씩 표시
+	const size = 10;
 
-	const { data: potList, isLoading } = useQueryPotList(teamId.toString(), size, currentPage);
+	const { data: potList, isLoading } = useQueryPotList(teamId.toString(), size, 1);
 
 	const getTimeRemaining = (targetTime: Date) => {
 		const diff = targetTime.getTime() - currentTime.getTime();
@@ -205,7 +202,7 @@ const Pot = () => {
 										<FilterButton variant="clicked" borderRadius="20" className={getVoteStatusStyle(pot.voteType, realTimeVoteInfo.status)}>
 											{getVoteStatusText(pot.voteType, realTimeVoteInfo.status)}
 										</FilterButton>
-										<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray08} className="font-medium ml-1">
+										<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray08} className="font-medium ml-2">
 											{getVoteStatusDescription(pot.voteType, realTimeVoteInfo.status, realTimeVoteInfo.timeRemaining)}
 										</Typography>
 									</div>
@@ -223,19 +220,19 @@ const Pot = () => {
 													>
 														{restaurant.name}
 													</Typography>
-													<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray07} className="font-medium">
+													<Typography variant={FONT_VARIANT.label02} fontColor={PALETTE.gray07} className="font-medium">
 														{getCategoryDisplay(restaurant.restaurantCategory)}
 													</Typography>
 												</div>
 												<div className="flex items-center">
 													<Icon name="star" width={11} className="mr-0.5 mb-0.5" />
-													<Typography variant={FONT_VARIANT.caption02} fontColor={PALETTE.gray08} className="font-medium">
+													<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray08} className="font-medium">
 														{restaurant.reviewScore}
 													</Typography>
-													<Typography variant={FONT_VARIANT.caption02} fontColor={PALETTE.gray08} className="font-medium mx-1">
+													<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray08} className="font-medium mx-1">
 														·
 													</Typography>
-													<Typography variant={FONT_VARIANT.caption02} fontColor={PALETTE.gray08} className="font-medium">
+													<Typography variant={FONT_VARIANT.caption01} fontColor={PALETTE.gray08} className="font-medium">
 														리뷰 {restaurant.reviewCount}
 													</Typography>
 												</div>
@@ -244,8 +241,12 @@ const Pot = () => {
 									</div>
 
 									<div className="relative">
-										<div className="absolute top-[77%] left-0 w-8 h-8 bg-gray-02 rounded-r-full transform -translate-y-1/2 -translate-x-9" />
-										<div className="absolute top-[77%] right-0 w-8 h-8 bg-gray-02 rounded-l-full transform -translate-y-1/2 translate-x-9" />
+										<div
+											className={`absolute top-[77%] left-0 w-8 h-8 bg-gray-02 rounded-r-full border-r ${pot.isParticipating === true ? 'border-[#BEEE0540] stroke-primary-200' : 'border-gray-04'} transform -translate-y-1/2 -translate-x-9`}
+										/>
+										<div
+											className={`absolute top-[77%] right-0 w-8 h-8 bg-gray-02 rounded-l-full border-l ${pot.isParticipating === true ? 'border-[#BEEE0540] stroke-primary-200' : 'border-gray-04'} transform -translate-y-1/2 translate-x-9`}
+										/>
 										<div className="flex items-center mt-7 mb-6 ">
 											<img src={divider} alt="divider" className="w-full" />
 										</div>
@@ -272,11 +273,6 @@ const Pot = () => {
 							);
 						})}
 					</div>
-
-					{/* 페이지네이션 */}
-					{potList && (
-						<Pagination currentPage={currentPage} totalCount={potList.totalCount} size={size} onPageChange={setCurrentPage} variant="large" className="mt-8" />
-					)}
 				</div>
 			) : (
 				<div className="flex flex-col items-center justify-center gap-3.25 mt-28">
