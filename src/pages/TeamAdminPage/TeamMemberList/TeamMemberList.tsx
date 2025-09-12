@@ -4,17 +4,16 @@ import { toast } from 'sonner';
 import { useMutationKickTeamMember } from '@/apis/useMutationKickTeamMember';
 import { useMutationTransferAdminRole } from '@/apis/useMutationTransferAdminRole';
 import type { IGetTeamMemberItem } from '@/apis/useQueryTeamMember';
-import Button from '@/components/Button/Button';
 import IconButton from '@/components/Button/IconButton';
-import CustomDialog from '@/components/Dialog/CustomDialog';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 
 interface ITeamMemberListProps {
 	item: IGetTeamMemberItem;
+	isLast?: boolean;
 }
 
-const TeamMemberList = ({ item }: ITeamMemberListProps) => {
+const TeamMemberList = ({ item, isLast = false }: ITeamMemberListProps) => {
 	const teamId = localStorage.getItem('teamId');
 	const [showOption, setShowOption] = useState(false);
 
@@ -56,7 +55,7 @@ const TeamMemberList = ({ item }: ITeamMemberListProps) => {
 	};
 
 	return (
-		<div className="flex items-center justify-between py-3.75 border-b border-gray-02">
+		<div className={`flex items-center justify-between py-3.75 ${!isLast ? 'border-b border-gray-02' : ''}`}>
 			{/* 프로필 정보 */}
 			<div className="flex items-center gap-2">
 				<img src={item.profileImage} alt="프로필 사진" className="w-8.5 h-8.5 rounded-full object-cover" />
@@ -111,54 +110,75 @@ const TeamMemberList = ({ item }: ITeamMemberListProps) => {
 			</div>
 
 			{/* 탈퇴시키기 모달 */}
-			<CustomDialog
-				className="w-[283px]"
-				onOpen={openKickDialog}
-				onOpenChange={setOpenKickDialog}
-				headerText={{
-					title: `${item.name}님 탈퇴시키기`,
-					description: (
-						<>
-							탈퇴 시킨 후에도 대상자가 원할 경우 <br />
-							다시 가입 승인 요청을 할 수 있어요.
-						</>
-					),
-				}}
-			>
-				<div className="flex gap-2 mt-6">
-					<Button className="min-w-[89px]" onClick={() => setOpenKickDialog(false)}>
-						취소
-					</Button>
-					<Button variant="active" className="min-w-[154px]" onClick={handleKick}>
-						탈퇴시키기
-					</Button>
+			{openKickDialog && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center">
+					<div className="absolute inset-0 bg-black/50" onClick={() => setOpenKickDialog(false)} />
+
+					<div className="relative bg-white rounded-[20px] w-[283px] p-6 shadow-lg">
+						<div className="text-center mb-1.75">
+							<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.gray10} className="font-semibold">
+								{item.name}님 탈퇴시키기
+							</Typography>
+						</div>
+
+						<div className="text-center mb-6">
+							<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray08}>
+								탈퇴 시킨 후에도 대상자가 원할 경우
+								<br />
+								다시 가입 승인 요청을 할 수 있어요.
+							</Typography>
+						</div>
+
+						<div className="flex gap-2 max-w-[283px]">
+							<button onClick={() => setOpenKickDialog(false)} className="w-[89px] rounded-[20px] border border-gray-03 bg-white h-[50px]">
+								<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray08} className="font-medium">
+									취소
+								</Typography>
+							</button>
+							<button onClick={handleKick} className="w-[154px] rounded-[20px] bg-primary-200 h-[50px]">
+								<Typography variant={FONT_VARIANT.body01} className="font-semibold text-[#1F2511]">
+									탈퇴시키기
+								</Typography>
+							</button>
+						</div>
+					</div>
 				</div>
-			</CustomDialog>
+			)}
 
 			{/* 권한 양도하기 모달 */}
-			<CustomDialog
-				className="w-[283px]"
-				onOpen={openTransferDialog}
-				onOpenChange={setOpenTransferDialog}
-				headerText={{
-					title: '관리자 권한 양도하기',
-					description: (
-						<>
-							관리자 권한을 양도하면
-							<br />팀 관리 기능을 사용할 수 없어요.
-						</>
-					),
-				}}
-			>
-				<div className="flex gap-2 mt-6">
-					<Button className="min-w-[89px]" onClick={() => setOpenTransferDialog(false)}>
-						취소
-					</Button>
-					<Button variant="active" className="min-w-[154px]" onClick={handleTransferRole}>
-						양도하기
-					</Button>
+			{openTransferDialog && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center">
+					<div className="absolute inset-0 bg-black/50" onClick={() => setOpenTransferDialog(false)} />
+
+					<div className="relative bg-white rounded-[20px] w-[283px] p-6 shadow-lg">
+						<div className="text-center mb-1.75">
+							<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.gray10} className="font-semibold">
+								관리자 권한 양도하기
+							</Typography>
+						</div>
+
+						<div className="text-center mb-6">
+							<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.gray08}>
+								관리자 권한을 양도하면
+								<br />팀 관리 기능을 사용할 수 없어요.
+							</Typography>
+						</div>
+
+						<div className="flex gap-2 max-w-[283px]">
+							<button onClick={() => setOpenTransferDialog(false)} className="w-[89px] rounded-[20px] border border-gray-03 bg-white h-[50px]">
+								<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray08} className="font-medium">
+									취소
+								</Typography>
+							</button>
+							<button onClick={handleTransferRole} className="w-[154px] rounded-[20px] bg-primary-200 h-[50px]">
+								<Typography variant={FONT_VARIANT.body01} className="font-semibold text-[#1F2511]">
+									양도하기
+								</Typography>
+							</button>
+						</div>
+					</div>
 				</div>
-			</CustomDialog>
+			)}
 		</div>
 	);
 };

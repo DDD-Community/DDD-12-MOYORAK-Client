@@ -160,7 +160,7 @@ const SearchRestaurantPage = () => {
 							) : (
 								<div className="h-147.5 flex flex-col gap-5.25 items-center justify-center text-center">
 									<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07}>
-										검색 결과가 없어요...ㅠㅠ
+										검색 결과가 없어요.
 									</Typography>
 									<img src={noSearchRestaurantData} alt="noSearchRestaurantData" className="w-39.5 h-38" />
 								</div>

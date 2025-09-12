@@ -2,7 +2,6 @@ import { Route, Routes } from 'react-router-dom';
 
 import AuthPage from '@/pages/AuthPage/AuthPage';
 import RedirectPage from '@/pages/AuthPage/RedirectPage';
-import Developer from '@/pages/Developer';
 import MainPage from '@/pages/MainPage/MainPage';
 import MyPage from '@/pages/MyPage/MyPage';
 import MyReview from '@/pages/MyPage/MyReview';
@@ -40,7 +39,6 @@ const AppRouter = () => {
 			<Route path="/pot-make" element={<PotMake />} />
 			<Route path="/pot-make-success" element={<PotMakeSuccess />} />
 			<Route path="/pot-detail/:id" element={<PotDetail />} />
-			<Route path="/developer" element={<Developer />} />
 			<Route path="/restaurant-registration" element={<RestaurantRegistration />} />
 			<Route path="/restaurant-edit/:teamRestaurantId" element={<RestaurantEdit />} />
 			<Route path="/restaurant-search" element={<RestaurantSearch />} />
