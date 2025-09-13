@@ -3,7 +3,7 @@ import { useMutation } from '@tanstack/react-query';
 import { put } from '.';
 
 const putTeamMemberRole = async (teamId: number, teamMemberId: number): Promise<unknown> => {
-	return await put<unknown>(`/team/${teamId}/team-members/${teamMemberId}/role`, { role: 'TEAM_ADMIN' });
+	return await put<unknown>(`/teams/${teamId}/team-members/${teamMemberId}/role`, { role: 'TEAM_ADMIN' });
 };
 
 export const useMutationTeamMemberRole = (teamId: number, teamMemberid: number) =>

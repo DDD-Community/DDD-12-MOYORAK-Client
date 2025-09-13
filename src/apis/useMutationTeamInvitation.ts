@@ -7,7 +7,7 @@ interface IPostTeamInvitationResponse {
 }
 
 const postTeamInvitation = async (teamId: number): Promise<IPostTeamInvitationResponse> => {
-	return await post<IPostTeamInvitationResponse>(`/team/${teamId}/invitation`);
+	return await post<IPostTeamInvitationResponse>(`/teams/${teamId}/invitation`);
 };
 
 export const useMutationTeamInvitation = (teamId: number) =>
