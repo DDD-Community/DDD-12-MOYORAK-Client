@@ -1,6 +1,6 @@
 import type { ITeamRestaurantLocationItem } from '@/apis/useQueryTeamRestaurantsLocations';
 import location from '@/assets/location.png';
-import navigate from '@/assets/navigate.png';
+// import navigate from '@/assets/navigate.png';
 import 회사핀 from '@/assets/회사핀.png';
 
 export interface IKakaoMapOptions {
@@ -177,12 +177,12 @@ export default class KakaoMapCore {
 		const adjustedLat = option.center.lat - 0.0015; // 위도 조정 (아래쪽으로)
 		const adjustedLng = option.center.lng - 0.0005; // 경도 조정 (왼쪽으로)
 		const pos = new kakao.maps.LatLng(adjustedLat, adjustedLng);
-		const imageSize = new kakao.maps.Size(44, 44);
-		const markerImage = new kakao.maps.MarkerImage(navigate, imageSize);
+		// const imageSize = new kakao.maps.Size(44, 44);
+		// const markerImage = new kakao.maps.MarkerImage(navigate, imageSize);
 
 		const marker = new kakao.maps.Marker({
 			position: pos,
-			image: markerImage,
+			// image: markerImage,
 			map: this.map,
 			zIndex: 999,
 		});
