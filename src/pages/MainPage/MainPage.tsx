@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import { useQueryCompanyPosition } from '@/apis/useQueryCompanyPosition';
+import { TEAM_MEMBER_STATUS, useQueryTeamMember } from '@/apis/useQueryTeamMember';
 import { useQueryTeamRestaurantsLocations } from '@/apis/useQueryTeamRestaurantsLocations';
 import { useQueryUser } from '@/apis/useQueryUser';
 import KakaoMap from '@/components/KakaoMap';
@@ -47,6 +48,14 @@ const MainPage = () => {
 	const { data: company } = useQueryCompanyPosition(Number(companyId), isLogin);
 	const { data: user } = useQueryUser(isLogin);
 
+	const size = 5;
+
+	const { data: teamMemberList } = useQueryTeamMember(Number(teamId), {
+		status: TEAM_MEMBER_STATUS.APPROVED,
+		size,
+		currentPage: 1,
+	});
+
 	const companyLocation = {
 		center: {
 			lat: company?.latitude || 37.54419744589,
@@ -91,7 +100,13 @@ const MainPage = () => {
 
 				{/* 상단 네비게이션 */}
 				<div className="absolute top-0 left-0 right-0 z-10">
-					<NavBar variant="iconWithTextAndRightIcon" leftIcon="company" leftText="WEB 2팀" rightIcon="category" onRightIconClick={onShowInvitation} />
+					<NavBar
+						variant="iconWithTextAndRightIcon"
+						leftIcon="company"
+						leftText={teamMemberList?.teamName ?? ''}
+						rightIcon="category"
+						onRightIconClick={onShowInvitation}
+					/>
 					{showInvitation && <MainNavSideBar onCopy={setCopied} />}
 				</div>
 
