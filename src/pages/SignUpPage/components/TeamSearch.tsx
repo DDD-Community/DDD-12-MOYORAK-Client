@@ -22,7 +22,7 @@ const TeamSearch = () => {
 
 	const { mutate, isSuccess } = useMutationAddTeam({
 		onSuccess: (data) => {
-			localStorage.setItem('companyId', String(data.teamId));
+			localStorage.setItem('teamId', String(data.teamId));
 		},
 	});
 
