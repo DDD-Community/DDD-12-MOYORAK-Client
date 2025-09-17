@@ -20,7 +20,7 @@ const BasicProfile = () => {
 
 	const email = localStorage.getItem('email');
 	const name = localStorage.getItem('name');
-	const profileImage = localStorage.getItem('profileImage');
+	// const profileImage = localStorage.getItem('profileImage');
 
 	useEffect(() => {
 		if (!email || !name) {
@@ -37,7 +37,7 @@ const BasicProfile = () => {
 				name: username,
 				gender: gender,
 				birthday: birth.replace(/\//g, '-'),
-				profileImage: profileImage ?? '',
+				profileImage: '',
 			},
 			{
 				onSuccess: (data) => {
