@@ -72,10 +72,7 @@ const MainPage = () => {
 				}
 			} catch (error) {
 				console.error('AccessToken 디코딩 실패', error);
-				localStorage.setItem('userId', '31');
 			}
-		} else {
-			localStorage.setItem('userId', '31');
 		}
 	}, [isLogin, accessToken, user]);
 

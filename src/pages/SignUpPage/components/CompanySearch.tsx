@@ -82,14 +82,14 @@ const CompanySearch = () => {
 	};
 
 	const onSaveCompany = async () => {
-		if (!companyList) return;
-
-		if (companyList.searchResponses.length === 1) {
+		// 기존 회사가 검색된 경우
+		if (companyList && companyList.searchResponses.length === 1) {
 			localStorage.setItem('companyId', String(companyList.searchResponses[0].companyId));
 			return nextStep();
 		}
 
-		if (!company && !baseAddress) return;
+		// 신규 회사 등록인 경우
+		if (!company || !baseAddress) return;
 
 		try {
 			const { longitude, latitude } = await getCoordinates(baseAddress);

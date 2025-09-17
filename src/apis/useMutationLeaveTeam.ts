@@ -15,6 +15,13 @@ export const useMutationLeaveTeam = () => {
 		onSuccess: () => {
 			// 팀 탈퇴 성공 시 로컬 스토리지에서 teamId 제거
 			localStorage.removeItem('teamId');
+			localStorage.removeItem('companyId');
+			localStorage.removeItem('userId');
+			localStorage.removeItem('accessToken');
+			localStorage.removeItem('refreshToken');
+			localStorage.removeItem('email');
+			localStorage.removeItem('name');
+			localStorage.removeItem('profileImage');
 
 			// 팀 관련 쿼리 캐시 무효화
 			queryClient.invalidateQueries({ queryKey: ['team'] });
