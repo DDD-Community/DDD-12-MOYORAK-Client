@@ -43,14 +43,20 @@ const BasicProfile = () => {
 				onSuccess: (data) => {
 					localStorage.setItem('userId', String(data.userId));
 					// 로그인 호출
-					signIn(data.userId);
-
-					// 로그인 후 다음 단계
-					nextStep();
+					signIn(data.userId, {
+						onSuccess: () => {
+							// 로그인 성공 후 다음 단계
+							nextStep();
+						},
+						onError: (error) => {
+							console.error('Login failed:', error);
+							alert('로그인에 실패했습니다. 다시 시도해주세요.');
+						},
+					});
 				},
 				onError: (error) => {
-					nextStep();
 					console.error('Signup failed:', error);
+					alert('회원가입에 실패했습니다. 다시 시도해주세요.');
 				},
 			}
 		);

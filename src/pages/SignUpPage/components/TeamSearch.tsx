@@ -42,14 +42,17 @@ const TeamSearch = () => {
 
 		if (teamList && teamList.teams.length === 0) return `${team}는 아직 등록되어 있지 않습니다.`;
 		if (isSuccess) return `${team}이 우리 회사에 등록되었습니다.`;
-	}, [isSearchEnabled, teamList, isSuccess]);
+	}, [isSearchEnabled, teamList, isSuccess, team]);
 
 	const onSaveTeam = () => {
 		if (teamList && teamList.teams.length === 1) {
 			const teamId = teamList.teams[0].teamId;
 			localStorage.setItem('teamId', String(teamId));
+			nextStep();
+		} else if (isRegisterTeam && isSuccess) {
+			// 신규 등록한 팀인 경우
+			nextStep();
 		}
-		nextStep();
 	};
 
 	return (
@@ -94,7 +97,10 @@ const TeamSearch = () => {
 			)}
 
 			<div className="fixed bottom-[30px] left-0 w-full px-5">
-				<Button variant={!team ? 'disabled' : 'active'} onClick={onSaveTeam}>
+				<Button
+					variant={!team || (teamList && teamList.teams.length === 0 && !isRegisterTeam) || (isRegisterTeam && !isSuccess) ? 'disabled' : 'active'}
+					onClick={onSaveTeam}
+				>
 					다음
 				</Button>
 			</div>

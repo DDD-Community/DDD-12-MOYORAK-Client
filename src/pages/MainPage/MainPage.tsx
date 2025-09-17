@@ -40,13 +40,6 @@ const MainPage = () => {
 		}
 	}, [copied]);
 
-	// // 테스트용 더미데이터 설정
-	// const companyId = '15'; // localStorage.getItem('companyId');
-	// const teamId = '7'; // localStorage.getItem('teamId');
-
-	localStorage.setItem('companyId', '15');
-	localStorage.setItem('teamId', '7');
-
 	const companyId = localStorage.getItem('companyId');
 	const teamId = localStorage.getItem('teamId');
 

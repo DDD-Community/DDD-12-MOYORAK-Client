@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 
+import { useMutationAddCompany } from '@/apis/useMutationAddCompany';
 import { useQuerySearchCompany } from '@/apis/useQuerySearchCompany';
 import Button from '@/components/Button/Button';
 import IconButton from '@/components/Button/IconButton';
@@ -8,9 +9,8 @@ import Icon from '@/components/Icon';
 import Input from '@/components/Input/Input';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
-import { useSignupStore } from '@/store/signupStore';
-import { useMutationAddCompany } from '@/apis/useMutationAddCompany';
 import useKakaoMapSdk from '@/hooks/useKakaoMapSdk';
+import { useSignupStore } from '@/store/signupStore';
 
 const CompanySearch = () => {
 	const { nextStep, company, setCompany, baseAddress, setBaseAddress, detailAddress, setDetailAddress } = useSignupStore();
@@ -26,7 +26,8 @@ const CompanySearch = () => {
 	// 회사 저장
 	const { mutate } = useMutationAddCompany({
 		onSuccess: (data) => {
-			(localStorage.setItem('companyId', String(data.companyId)), nextStep());
+			localStorage.setItem('companyId', String(data.companyId));
+			nextStep();
 		},
 	});
 
@@ -35,7 +36,7 @@ const CompanySearch = () => {
 
 		if (companyList && companyList.searchResponses.length === 1) return '입력한 회사 이름이 초대받은 회사 이름과 일치합니다.';
 		if (companyList && companyList.searchResponses.length === 0) return `${company}는 아직 등록되어 있지 않습니다.`;
-	}, [isSearchEnabled, companyList]);
+	}, [isSearchEnabled, companyList, company]);
 
 	const handleOpenPostcodePopup = () => {
 		const popup = window.open('/popup-address', '우편번호 찾기', 'width=500,height=600,scrollbars=yes');
@@ -100,8 +101,6 @@ const CompanySearch = () => {
 				longitude,
 				latitude,
 			});
-
-			nextStep();
 		} catch (error: unknown) {
 			if (error instanceof Error) {
 				alert(error.message);
@@ -144,7 +143,7 @@ const CompanySearch = () => {
 				message={validMessage}
 			/>
 			{companyList?.searchResponses.map((item) => (
-				<ul>
+				<ul key={item.companyId}>
 					<li>{item.name}</li>
 				</ul>
 			))}
