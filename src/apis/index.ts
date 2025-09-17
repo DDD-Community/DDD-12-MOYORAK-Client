@@ -81,7 +81,7 @@ api.interceptors.response.use(
 					console.error('토큰 갱신 실패:', refreshError);
 					localStorage.removeItem('accessToken');
 					localStorage.removeItem('refreshToken');
-					window.location.href = '/login';
+					window.location.href = '/auth';
 					return Promise.reject(refreshError);
 				} finally {
 					isRefreshing = false;
