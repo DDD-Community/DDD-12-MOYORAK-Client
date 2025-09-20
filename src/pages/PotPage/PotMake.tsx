@@ -475,7 +475,7 @@ const PotMake = () => {
 								<FormLabel id="potMethod" label="방식 선택" isEssential />
 								<div className="flex flex-col mt-[15px]">
 									<Radio label="일반 투표" checked={potMethod === 'normal'} onChange={() => handleMethodChange('normal')} value="normal" name="potMethod" />
-									<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray06} className="mt-0.25 mb-3 ml-7">
+									<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray07} className="mt-0.25 mb-3 ml-7">
 										팀원과 함께 투표로 식당을 결정해요
 									</Typography>
 									{potMethod === 'normal' && (

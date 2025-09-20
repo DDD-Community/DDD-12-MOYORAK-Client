@@ -73,7 +73,7 @@ const MainNavSideBar = ({ onCopy }: IMainNavBarProps) => {
 
 						{/* 제목 */}
 						<div className="text-center mb-[7px]">
-							<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.gray10} className="font-semibold mt-5">
+							<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.gray10} className="font-semibold mt-5 ">
 								우리 팀에 초대하기
 							</Typography>
 						</div>
@@ -91,7 +91,7 @@ const MainNavSideBar = ({ onCopy }: IMainNavBarProps) => {
 
 						<div className="w-full h-[46px] rounded-[8px] border border-primary-200 flex items-center">
 							<div className="flex-1 pl-2 pr-2">
-								<Typography variant={FONT_VARIANT.label02} fontColor={PALETTE.gray07} className="text-ellipsis overflow-hidden whitespace-nowrap">
+								<Typography variant={FONT_VARIANT.label02} fontColor={PALETTE.gray07} className="text-ellipsis overflow-hidden whitespace-nowrap max-w-[159px]">
 									{redirectUrl}
 								</Typography>
 							</div>

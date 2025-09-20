@@ -506,7 +506,7 @@ const PotDetail = () => {
 
 	const renderToast = () =>
 		showToast && (
-			<div className="fixed bottom-24 left-0 w-full px-4.5 z-20">
+			<div className="fixed bottom-24 left-1/2 transform -translate-x-1/2 w-full max-w-[480px] px-4.5 z-20">
 				<div className="px-5 py-2.5 rounded-[10px] bg-black/70 backdrop-blur-2px shadow-md flex items-center gap-1.25">
 					<Icon name="check" size={14} />
 					<Typography variant={FONT_VARIANT.body02} fontColor={PALETTE.white} className="font-medium">
