@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { useMutationAddCompany } from '@/apis/useMutationAddCompany';
 import { useQuerySearchCompany } from '@/apis/useQuerySearchCompany';
@@ -16,12 +16,24 @@ const CompanySearch = () => {
 	const { nextStep, company, setCompany, baseAddress, setBaseAddress, detailAddress, setDetailAddress } = useSignupStore();
 
 	const [isSearchEnabled, setIsSearchEnabled] = useState<boolean>(false);
+	const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+	const [selectedCompany, setSelectedCompany] = useState<string>('');
 
 	// 신규 등록 버튼 클릭 여부
 	const [isRegisterCompany, setIsRegisterCompany] = useState<boolean>(false);
 
-	// 회사 검색
-	const { isSuccess, isError, data: companyList } = useQuerySearchCompany(company, isSearchEnabled && !isRegisterCompany);
+	const { isError, data: companyList } = useQuerySearchCompany(company, company.length > 0 && !isRegisterCompany);
+
+	useEffect(() => {
+		if (company.length > 0 && !selectedCompany) {
+			setIsSearchEnabled(true);
+			setShowSuggestions(true);
+		} else if (company.length === 0) {
+			setIsSearchEnabled(false);
+			setShowSuggestions(false);
+			setSelectedCompany('');
+		}
+	}, [company, selectedCompany]);
 
 	// 회사 저장
 	const { mutate } = useMutationAddCompany({
@@ -34,9 +46,18 @@ const CompanySearch = () => {
 	const validMessage = useMemo(() => {
 		if (!isSearchEnabled) return '';
 
-		if (companyList && companyList.searchResponses.length === 1) return '입력한 회사 이름이 초대받은 회사 이름과 일치합니다.';
-		if (companyList && companyList.searchResponses.length === 0) return `${company}는 아직 등록되어 있지 않습니다.`;
-	}, [isSearchEnabled, companyList, company]);
+		// 선택된 회사가 있고 정확히 일치하는 경우
+		// if (selectedCompany && companyList && companyList.searchResponses.length === 1) {
+		// 	return '입력한 회사 이름이 초대받은 회사 이름과 일치합니다.';
+		// }
+
+		// 검색 결과가 없는 경우
+		if (companyList && companyList.searchResponses.length === 0) {
+			return `${company}는 아직 등록되어 있지 않습니다.`;
+		}
+
+		return '';
+	}, [isSearchEnabled, companyList, company, selectedCompany]);
 
 	const handleOpenPostcodePopup = () => {
 		const popup = window.open('/popup-address', '우편번호 찾기', 'width=500,height=600,scrollbars=yes');
@@ -58,6 +79,12 @@ const CompanySearch = () => {
 	const onRegisterCompany = () => {
 		setIsRegisterCompany(true);
 		setIsSearchEnabled(false);
+	};
+
+	const handleCompanySelect = (companyName: string) => {
+		setCompany(companyName);
+		setSelectedCompany(companyName);
+		setShowSuggestions(false);
 	};
 
 	const kakaoLoaded = useKakaoMapSdk();
@@ -126,29 +153,33 @@ const CompanySearch = () => {
 				placeholder="회사 이름을 입력해주세요."
 				className={`mb-[${isError ? '20px' : '50px'}]`}
 				value={company}
-				onChange={(e) => setCompany(e.target.value)}
-				rightButton={
-					company &&
-					!isError &&
-					!companyList && (
-						<button type="button" className="absolute right-2 top-1/2 -translate-y-1/2" onClick={() => setIsSearchEnabled(true)}>
-							<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.primary200}>
-								입력
-							</Typography>
-						</button>
-					)
-				}
-				isSuccess={!isRegisterCompany && isSuccess && companyList?.searchResponses.length === 1}
-				isError={!isRegisterCompany && companyList?.searchResponses.length === 0}
+				onChange={(e) => {
+					setCompany(e.target.value);
+					setSelectedCompany(''); // 입력할 때마다 선택된 회사 초기화
+				}}
+				isSuccess={!isRegisterCompany && !!selectedCompany && companyList?.searchResponses.length === 1 ? true : undefined}
+				isError={!isRegisterCompany && companyList?.searchResponses.length === 0 ? true : undefined}
 				message={validMessage}
 			/>
-			{companyList?.searchResponses.map((item) => (
-				<ul key={item.companyId}>
-					<li>{item.name}</li>
-				</ul>
-			))}
+			{showSuggestions && companyList?.searchResponses && companyList.searchResponses.length > 0 && (
+				<div className="mb-4">
+					{companyList.searchResponses.map((item) => (
+						<button
+							key={item.companyId}
+							type="button"
+							className="w-full text-left py-1.75 flex items-center justify-between border-gray200 hover:border-primary200"
+							onClick={() => handleCompanySelect(item.name)}
+						>
+							<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07} className="font-medium">
+								{item.name}
+							</Typography>
+							<Icon name="searchTeam" size={16} />
+						</button>
+					))}
+				</div>
+			)}
 
-			{companyList && companyList.searchResponses.length === 0 && (
+			{companyList && companyList.searchResponses.length === 0 && !isRegisterCompany && (
 				<FilterButton variant="general" className="rounded-[17px] py-1.5 flex items-center gap-0.5 mt-5" onClick={onRegisterCompany}>
 					신규 등록하기
 					<Icon name="plus" width={18} height={18} />
@@ -177,8 +208,21 @@ const CompanySearch = () => {
 			)}
 
 			<div className="fixed bottom-[30px] left-0 w-full px-5">
-				<Button variant={isSuccess || (company && baseAddress) ? 'active' : 'disabled'} onClick={onSaveCompany}>
-					<Typography variant={FONT_VARIANT.header04} fontColor={isSuccess || (company && baseAddress) ? PALETTE.primary600 : PALETTE.gray06}>
+				<Button
+					variant={
+						// 회사 리스트에서 선택했거나 신규 등록 모드에서 주소까지 입력한 경우
+						(selectedCompany && companyList?.searchResponses.length === 1) || (isRegisterCompany && company && baseAddress) ? 'active' : 'disabled'
+					}
+					onClick={onSaveCompany}
+				>
+					<Typography
+						variant={FONT_VARIANT.header04}
+						fontColor={
+							(selectedCompany && companyList?.searchResponses.length === 1) || (isRegisterCompany && company && baseAddress)
+								? PALETTE.primary600
+								: PALETTE.gray06
+						}
+					>
 						{isRegisterCompany ? '등록하기' : '다음'}
 					</Typography>
 				</Button>
