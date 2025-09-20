@@ -20,5 +20,7 @@ export const useQuerySearchCompany = (company: string, enabled = true) => {
 		enabled,
 		refetchOnMount: false,
 		refetchOnWindowFocus: false,
+		staleTime: 0,
+		gcTime: 0,
 	});
 };

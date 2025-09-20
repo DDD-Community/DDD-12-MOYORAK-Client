@@ -18,5 +18,7 @@ export const useQuerySearchTeam = (companyId: number, team: string, enabled = tr
 		queryKey: ['companies'],
 		enabled,
 		queryFn: () => getSearchTeam(companyId, team),
+		staleTime: 0,
+		gcTime: 0,
 	});
 };
