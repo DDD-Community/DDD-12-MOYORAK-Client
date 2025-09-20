@@ -31,6 +31,8 @@ const BasicProfile = () => {
 	const onSignup = () => {
 		if (!gender || !email) return;
 
+		localStorage.setItem('name', username);
+
 		mutate(
 			{
 				email: email,

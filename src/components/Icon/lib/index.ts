@@ -49,6 +49,7 @@ export { default as restaurantBack } from './restaurantBack.svg?react';
 export { default as restaurantPlus } from './restaurantPlus.svg?react';
 export { default as restaurantPlusButton } from './restaurantPlusButton.svg?react';
 export { default as search } from './search.svg?react';
+export { default as searchTeam } from './searchTeam.svg?react';
 export { default as selectArrow } from './selectArrow.svg?react';
 export { default as selectClose } from './selectClose.svg?react';
 export { default as selectOpen } from './selectOpen.svg?react';

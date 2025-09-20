@@ -112,7 +112,17 @@ const MyPage = () => {
 	const handleLeaveTeam = () => {
 		const teamId = localStorage.getItem('teamId');
 		if (teamId) {
-			leaveTeam(teamId);
+			leaveTeam(teamId, {
+				onSuccess: () => {
+					setIsLeaveTeamOpen(false);
+				},
+				onError: (error) => {
+					console.error('팀 탈퇴 실패:', error);
+					alert('팀 탈퇴에 실패했습니다. 다시 시도해주세요.');
+				},
+			});
+		} else {
+			alert('팀 정보를 찾을 수 없습니다.');
 		}
 	};
 
