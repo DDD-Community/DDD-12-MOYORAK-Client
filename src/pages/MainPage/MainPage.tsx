@@ -85,13 +85,6 @@ const MainPage = () => {
 		}
 	}, [isLogin, accessToken, user]);
 
-	useEffect(() => {
-		if (isLogin && user?.companyId && user?.teamId) {
-			localStorage.setItem('companyId', String(user.companyId));
-			localStorage.setItem('teamId', String(user.teamId));
-		}
-	}, [isLogin, user]);
-
 	if (isLogin) {
 		return (
 			<div className="relative w-full h-screen pb-[86px]">
