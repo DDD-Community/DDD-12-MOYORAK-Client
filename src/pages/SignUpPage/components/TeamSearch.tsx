@@ -96,57 +96,59 @@ const TeamSearch = () => {
 	};
 
 	return (
-		<section className="px-5">
-			<Typography as="h1" variant={FONT_VARIANT.header02} fontColor={PALETTE.gray10} className="mb-[5px]">
-				{isRegisterTeam ? '우리 팀 등록하기' : '우리 팀 찾기'}
-			</Typography>
-			<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07} className="mb-[60px]">
-				{name}님의 점심을 함께할 팀원들을 찾기 위해 <br /> 현재 근무 중인 팀을 알려주세요.
-			</Typography>
+		<>
+			<section className="px-5">
+				<Typography as="h1" variant={FONT_VARIANT.header02} fontColor={PALETTE.gray10} className="mb-[5px]">
+					{isRegisterTeam ? '우리 팀 등록하기' : '우리 팀 찾기'}
+				</Typography>
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07} className="mb-[60px]">
+					{name}님의 점심을 함께할 팀원들을 찾기 위해 <br /> 현재 근무 중인 팀을 알려주세요.
+				</Typography>
 
-			<Input
-				label="팀 이름"
-				isEssential={true}
-				placeholder="팀 이름을 입력해주세요."
-				value={team}
-				onChange={(e) => {
-					setTeam(e.target.value);
-					setSelectedTeam('');
-					setSelectedTeamId(null);
-					setIsRegisterTeam(false);
-				}}
-				isSuccess={(!isRegisterTeam && !!selectedTeam && teamList?.teams.length === 1) || (isRegisterTeam && isSuccess) ? true : undefined}
-				isError={!isRegisterTeam && teamList?.teams.length === 0 ? true : undefined}
-				message={validMessage}
-			/>
+				<Input
+					label="팀 이름"
+					isEssential={true}
+					placeholder="팀 이름을 입력해주세요."
+					value={team}
+					onChange={(e) => {
+						setTeam(e.target.value);
+						setSelectedTeam('');
+						setSelectedTeamId(null);
+						setIsRegisterTeam(false);
+					}}
+					isSuccess={(!isRegisterTeam && !!selectedTeam && teamList?.teams.length === 1) || (isRegisterTeam && isSuccess) ? true : undefined}
+					isError={!isRegisterTeam && teamList?.teams.length === 0 ? true : undefined}
+					message={validMessage}
+				/>
 
-			{showSuggestions && teamList?.teams && teamList.teams.length > 0 && (
-				<div className="mb-4">
-					{teamList.teams.map((teamItem) => (
-						<button
-							key={teamItem.teamId}
-							type="button"
-							className="w-full text-left py-1.75 flex items-center justify-between border-gray200 hover:border-primary200"
-							onClick={() => handleTeamSelect(teamItem.teamId, teamItem.name)}
-						>
-							<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07} className="font-medium">
-								{teamItem.name}
-							</Typography>
-							<Icon name="searchTeam" size={16} />
-						</button>
-					))}
-				</div>
-			)}
+				{showSuggestions && teamList?.teams && teamList.teams.length > 0 && (
+					<div className="mb-4">
+						{teamList.teams.map((teamItem) => (
+							<button
+								key={teamItem.teamId}
+								type="button"
+								className="w-full text-left py-1.75 flex items-center justify-between border-gray200 hover:border-primary200"
+								onClick={() => handleTeamSelect(teamItem.teamId, teamItem.name)}
+							>
+								<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07} className="font-medium">
+									{teamItem.name}
+								</Typography>
+								<Icon name="searchTeam" size={16} />
+							</button>
+						))}
+					</div>
+				)}
 
-			{/* 신규 등록 버튼 */}
-			{teamList && teamList.teams.length === 0 && !isRegisterTeam && (
-				<FilterButton variant="general" className="rounded-[17px] py-1.5 flex items-center gap-0.5 mt-4" onClick={onRegisterTeam}>
-					신규 등록하기
-					<Icon name="plus" width={18} height={18} />
-				</FilterButton>
-			)}
+				{/* 신규 등록 버튼 */}
+				{teamList && teamList.teams.length === 0 && !isRegisterTeam && (
+					<FilterButton variant="general" className="rounded-[17px] py-1.5 flex items-center gap-0.5 mt-4" onClick={onRegisterTeam}>
+						신규 등록하기
+						<Icon name="plus" width={18} height={18} />
+					</FilterButton>
+				)}
+			</section>
 
-			<div className="fixed bottom-[30px] left-0 w-full px-5">
+			<div className="fixed bottom-[30px] w-full px-5 max-w-[480px]">
 				<Button
 					variant={
 						// 팀 리스트에서 선택했거나 신규 등록 모드에서 성공한 경우
@@ -162,7 +164,7 @@ const TeamSearch = () => {
 					</Typography>
 				</Button>
 			</div>
-		</section>
+		</>
 	);
 };
 

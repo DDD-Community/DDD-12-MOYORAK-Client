@@ -1,13 +1,12 @@
-import { useState, useCallback } from 'react';
-import type { ChangeEvent, KeyboardEvent } from 'react';
+import { useCallback, useState } from 'react';
 
+import { useMutationMeMealTags } from '@/apis/useMutationMeMealTags';
 import Button from '@/components/Button/Button';
 import IconButton from '@/components/Button/IconButton';
 import Input from '@/components/Input/Input';
 import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 import { useSignupStore } from '@/store/signupStore';
-import { useMutationMeMealTags } from '@/apis/useMutationMeMealTags';
 
 const FoodPreference = () => {
 	const { allergyFoods = [], dislikedFoods = [], setAllergyFoods, setDislikedFoods, nextStep } = useSignupStore();
@@ -41,7 +40,7 @@ const FoodPreference = () => {
 
 	// Enter 입력 시 추가
 	const handleKeyDown = useCallback(
-		(e: KeyboardEvent<HTMLInputElement>, type: 'ALLERGY' | 'DISLIKE') => {
+		(e: React.KeyboardEvent<HTMLInputElement>, type: 'ALLERGY' | 'DISLIKE') => {
 			if (e.nativeEvent.isComposing) return;
 
 			if (e.key === 'Enter') {
@@ -115,70 +114,72 @@ const FoodPreference = () => {
 	};
 
 	return (
-		<section className="px-5">
-			<Typography as="h1" variant={FONT_VARIANT.header02} fontColor={PALETTE.gray10} className="mb-[5px]">
-				알러지 비선호 음식
-			</Typography>
-			<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07} className="mb-[60px]">
-				모두가 만족할 점심 메뉴를 고르기 위해 <br /> 식사기호를 공유해 주세요!
-			</Typography>
+		<>
+			<section className="px-5">
+				<Typography as="h1" variant={FONT_VARIANT.header02} fontColor={PALETTE.gray10} className="mb-[5px]">
+					알러지 비선호 음식
+				</Typography>
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07} className="mb-[60px]">
+					모두가 만족할 점심 메뉴를 고르기 위해 <br /> 식사기호를 공유해 주세요!
+				</Typography>
 
-			<div className="flex flex-col gap-[50px]">
-				{/* 알러지 */}
-				<div>
-					<Input
-						label="알러지"
-						name="ALLERGY"
-						isEssential={false}
-						placeholder="알러지가 있는 음식을 입력해주세요."
-						value={allergyInput}
-						onChange={(e: ChangeEvent<HTMLInputElement>) => setAllergyInput(e.target.value)}
-						onKeyDown={(e) => handleKeyDown(e as KeyboardEvent<HTMLInputElement>, 'ALLERGY')}
-						rightButton={
-							allergyInput && (
-								<button type="button" className="absolute right-2 top-1/2 -translate-y-1/2" onClick={() => addFood('ALLERGY')}>
-									<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.primary200}>
-										입력
-									</Typography>
-								</button>
-							)
-						}
-					/>
-					<div className="flex flex-wrap gap-2 mt-2">{renderFoodTags(allergyFoods, 'ALLERGY')}</div>
+				<div className="flex flex-col gap-[50px]">
+					{/* 알러지 */}
+					<div>
+						<Input
+							label="알러지"
+							name="ALLERGY"
+							isEssential={false}
+							placeholder="알러지가 있는 음식을 입력해주세요."
+							value={allergyInput}
+							onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAllergyInput(e.target.value)}
+							onKeyDown={(e) => handleKeyDown(e as React.KeyboardEvent<HTMLInputElement>, 'ALLERGY')}
+							rightButton={
+								allergyInput && (
+									<button type="button" className="absolute right-2 top-1/2 -translate-y-1/2" onClick={() => addFood('ALLERGY')}>
+										<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.primary200}>
+											입력
+										</Typography>
+									</button>
+								)
+							}
+						/>
+						<div className="flex flex-wrap gap-2 mt-2">{renderFoodTags(allergyFoods, 'ALLERGY')}</div>
+					</div>
+
+					{/* 비선호 음식 */}
+					<div>
+						<Input
+							label="비선호 음식"
+							name="DISLIKE"
+							isEssential={false}
+							placeholder="선호하지 않는 음식을 입력해주세요."
+							value={dislikeInput}
+							onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDislikeInput(e.target.value)}
+							onKeyDown={(e) => handleKeyDown(e as React.KeyboardEvent<HTMLInputElement>, 'DISLIKE')}
+							rightButton={
+								dislikeInput && (
+									<button type="button" className="absolute right-2 top-1/2 -translate-y-1/2" onClick={() => addFood('DISLIKE')}>
+										<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.primary200}>
+											입력
+										</Typography>
+									</button>
+								)
+							}
+						/>
+						<div className="flex flex-wrap gap-2 mt-2">{renderFoodTags(dislikedFoods, 'DISLIKE')}</div>
+					</div>
 				</div>
+			</section>
 
-				{/* 비선호 음식 */}
-				<div>
-					<Input
-						label="비선호 음식"
-						name="DISLIKE"
-						isEssential={false}
-						placeholder="선호하지 않는 음식을 입력해주세요."
-						value={dislikeInput}
-						onChange={(e: ChangeEvent<HTMLInputElement>) => setDislikeInput(e.target.value)}
-						onKeyDown={(e) => handleKeyDown(e as KeyboardEvent<HTMLInputElement>, 'DISLIKE')}
-						rightButton={
-							dislikeInput && (
-								<button type="button" className="absolute right-2 top-1/2 -translate-y-1/2" onClick={() => addFood('DISLIKE')}>
-									<Typography variant={FONT_VARIANT.header03} fontColor={PALETTE.primary200}>
-										입력
-									</Typography>
-								</button>
-							)
-						}
-					/>
-					<div className="flex flex-wrap gap-2 mt-2">{renderFoodTags(dislikedFoods, 'DISLIKE')}</div>
-				</div>
-			</div>
-
-			<div className="fixed bottom-[30px] left-0 w-full px-5">
-				<Button variant={allergyFoods.length === 0 || dislikedFoods.length === 0 ? 'disabled' : 'active'} onClick={onRegisterFoodPreference}>
+			<div className="fixed bottom-[30px] w-full px-5 max-w-[480px]">
+				<Button variant={allergyFoods.length === 0 || dislikedFoods.length === 0 ? 'disabled' : 'active'} onClick={onRegisterFoodPreference} className="w-full">
 					<Typography variant={FONT_VARIANT.header04} fontColor={allergyFoods.length === 0 || dislikedFoods.length === 0 ? PALETTE.gray06 : PALETTE.primary600}>
 						다음
 					</Typography>
 				</Button>
 			</div>
-		</section>
+		</>
 	);
 };
 

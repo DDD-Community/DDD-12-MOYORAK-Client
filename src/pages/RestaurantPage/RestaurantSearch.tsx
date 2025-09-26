@@ -96,6 +96,20 @@ const RestaurantSearch = () => {
 							</div>
 						))}
 					</div>
+
+					<button
+						className="flex items-center gap-0.5 px-3 h-[32px] bg-white rounded-[17px] border border-gray-05 mt-5.5"
+						onClick={() =>
+							navigate('/new-restaurant-select', {
+								state: { restaurant: { name: searchValue } },
+							})
+						}
+					>
+						<Typography variant={FONT_VARIANT.label01} fontColor={PALETTE.gray07}>
+							다른 식당 추가하기
+						</Typography>
+						<Icon name="arrow" size={18} />
+					</button>
 				</div>
 			);
 		}
@@ -107,7 +121,7 @@ const RestaurantSearch = () => {
 					{searchValue}은 아직 모여락에 등록되어 있지 않습니다. 모여락에 추가하시겠습니까?
 				</Typography>
 				<button
-					className="flex items-center gap-0.5 px-3 w-[125px] h-[32px] bg-white rounded-[17px] pborder border-gray-05"
+					className="flex items-center gap-0.5 px-3 w-[125px] h-[32px] bg-white rounded-[17px] border border-gray-05"
 					onClick={() =>
 						navigate('/new-restaurant-select', {
 							state: { restaurant: { name: searchValue } },

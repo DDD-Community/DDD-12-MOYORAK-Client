@@ -57,7 +57,7 @@ const CompanySearch = () => {
 		}
 
 		return '';
-	}, [isSearchEnabled, companyList, company, selectedCompany]);
+	}, [isSearchEnabled, companyList, company]);
 
 	const handleOpenPostcodePopup = () => {
 		const popup = window.open('/popup-address', '우편번호 찾기', 'width=500,height=600,scrollbars=yes');
@@ -139,75 +139,77 @@ const CompanySearch = () => {
 	};
 
 	return (
-		<section className="px-5 relative">
-			<Typography as="h1" variant={FONT_VARIANT.header02} fontColor={PALETTE.gray10} className="mb-[5px]">
-				우리 회사 찾기
-			</Typography>
-			<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07} className="mb-[60px]">
-				함께 점심을 즐길 팀을 찾을 수 있도록 <br /> 현재 근무 중인 회사를 알려주세요.
-			</Typography>
+		<>
+			<section className="px-5 relative">
+				<Typography as="h1" variant={FONT_VARIANT.header02} fontColor={PALETTE.gray10} className="mb-[5px]">
+					우리 회사 찾기
+				</Typography>
+				<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07} className="mb-[60px]">
+					함께 점심을 즐길 팀을 찾을 수 있도록 <br /> 현재 근무 중인 회사를 알려주세요.
+				</Typography>
 
-			<Input
-				label="회사 이름"
-				isEssential={true}
-				placeholder="회사 이름을 입력해주세요."
-				className={`mb-[${isError ? '20px' : '50px'}]`}
-				value={company}
-				onChange={(e) => {
-					setCompany(e.target.value);
-					setSelectedCompany(''); // 입력할 때마다 선택된 회사 초기화
-				}}
-				isSuccess={!isRegisterCompany && !!selectedCompany && companyList?.searchResponses.length === 1 ? true : undefined}
-				isError={!isRegisterCompany && companyList?.searchResponses.length === 0 ? true : undefined}
-				message={validMessage}
-			/>
-			{showSuggestions && companyList?.searchResponses && companyList.searchResponses.length > 0 && (
-				<div className="mb-4">
-					{companyList.searchResponses.map((item) => (
-						<button
-							key={item.companyId}
-							type="button"
-							className="w-full text-left py-1.75 flex items-center justify-between border-gray200 hover:border-primary200"
-							onClick={() => handleCompanySelect(item.name)}
-						>
-							<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07} className="font-medium">
-								{item.name}
-							</Typography>
-							<Icon name="searchTeam" size={16} />
-						</button>
-					))}
-				</div>
-			)}
+				<Input
+					label="회사 이름"
+					isEssential={true}
+					placeholder="회사 이름을 입력해주세요."
+					className={`mb-[${isError ? '20px' : '50px'}]`}
+					value={company}
+					onChange={(e) => {
+						setCompany(e.target.value);
+						setSelectedCompany(''); // 입력할 때마다 선택된 회사 초기화
+					}}
+					isSuccess={!isRegisterCompany && !!selectedCompany && companyList?.searchResponses.length === 1 ? true : undefined}
+					isError={!isRegisterCompany && companyList?.searchResponses.length === 0 ? true : undefined}
+					message={validMessage}
+				/>
+				{showSuggestions && companyList?.searchResponses && companyList.searchResponses.length > 0 && (
+					<div className="mb-4">
+						{companyList.searchResponses.map((item) => (
+							<button
+								key={item.companyId}
+								type="button"
+								className="w-full text-left py-1.75 flex items-center justify-between border-gray200 hover:border-primary200"
+								onClick={() => handleCompanySelect(item.name)}
+							>
+								<Typography variant={FONT_VARIANT.body01} fontColor={PALETTE.gray07} className="font-medium">
+									{item.name}
+								</Typography>
+								<Icon name="searchTeam" size={16} />
+							</button>
+						))}
+					</div>
+				)}
 
-			{companyList && companyList.searchResponses.length === 0 && !isRegisterCompany && (
-				<FilterButton variant="general" className="rounded-[17px] py-1.5 flex items-center gap-0.5 mt-5" onClick={onRegisterCompany}>
-					신규 등록하기
-					<Icon name="plus" width={18} height={18} />
-				</FilterButton>
-			)}
+				{companyList && companyList.searchResponses.length === 0 && !isRegisterCompany && (
+					<FilterButton variant="general" className="rounded-[17px] py-1.5 flex items-center gap-0.5 mt-5" onClick={onRegisterCompany}>
+						신규 등록하기
+						<Icon name="plus" width={18} height={18} />
+					</FilterButton>
+				)}
 
-			{isRegisterCompany && (
-				<>
-					<Input
-						label="회사 주소"
-						isEssential={true}
-						placeholder="회사 주소를 검색해 주세요."
-						value={baseAddress}
-						className="mt-[50px] mb-[30px]"
-						readOnly
-						rightButton={
-							<IconButton
-								onClick={handleOpenPostcodePopup}
-								className="absolute right-2 top-1/2 -translate-y-1/2"
-								iconStyle={{ name: 'inputSearch', width: 22, height: 22, className: baseAddress ? 'text-primary-200' : 'text-gray-05' }}
-							/>
-						}
-					/>
-					<Input placeholder="상세 주소" value={detailAddress} onChange={(e) => setDetailAddress(e.target.value)} />
-				</>
-			)}
+				{isRegisterCompany && (
+					<>
+						<Input
+							label="회사 주소"
+							isEssential={true}
+							placeholder="회사 주소를 검색해 주세요."
+							value={baseAddress}
+							className="mt-[50px] mb-[30px]"
+							readOnly
+							rightButton={
+								<IconButton
+									onClick={handleOpenPostcodePopup}
+									className="absolute right-2 top-1/2 -translate-y-1/2"
+									iconStyle={{ name: 'inputSearch', width: 22, height: 22, className: baseAddress ? 'text-primary-200' : 'text-gray-05' }}
+								/>
+							}
+						/>
+						<Input placeholder="상세 주소" value={detailAddress} onChange={(e) => setDetailAddress(e.target.value)} />
+					</>
+				)}
+			</section>
 
-			<div className="fixed bottom-[30px] left-0 w-full px-5">
+			<div className="fixed bottom-[30px] w-full px-5 max-w-[480px]">
 				<Button
 					variant={
 						// 회사 리스트에서 선택했거나 신규 등록 모드에서 주소까지 입력한 경우
@@ -227,7 +229,7 @@ const CompanySearch = () => {
 					</Typography>
 				</Button>
 			</div>
-		</section>
+		</>
 	);
 };
 
