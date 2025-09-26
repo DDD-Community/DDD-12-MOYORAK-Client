@@ -16,8 +16,7 @@ const AuthPage = () => {
 			throw new Error('Google OAuth 설정이 누락되었습니다.');
 			return;
 		}
-
-		window.location.href = REDIRECT_URI;
+		navigate(`${REDIRECT_URI}`);
 	};
 
 	return (
