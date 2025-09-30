@@ -17,7 +17,7 @@ const putMeMealTags = async (request: IMeMeatlTagsRequest) => {
 export const useMutationMeMealTags = () => {
 	const queryClient = useQueryClient();
 
-	useMutation<any, Error, IMeMeatlTagsRequest>({
+	return useMutation<any, Error, IMeMeatlTagsRequest>({
 		mutationKey: ['me', 'meal', 'tags'],
 		mutationFn: putMeMealTags,
 		onSuccess: () => {
