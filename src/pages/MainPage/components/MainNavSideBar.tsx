@@ -8,13 +8,21 @@ import Typography from '@/components/Typography';
 import { FONT_VARIANT, PALETTE } from '@/constants/styles';
 import useDialogHandler from '@/hooks/useDialogHandler';
 
-interface IMainNavBarProps {
-	onCopy: Dispatch<SetStateAction<boolean>>;
+interface IUser {
+	companyId: number;
+	teamId: number;
+	teamRole: string;
 }
 
-const MainNavSideBar = ({ onCopy }: IMainNavBarProps) => {
+interface IMainNavBarProps {
+	onCopy: Dispatch<SetStateAction<boolean>>;
+	user: IUser;
+}
+
+const MainNavSideBar = ({ onCopy, user }: IMainNavBarProps) => {
 	const teamId = localStorage.getItem('teamId');
 	const { mutate, data } = useMutationTeamInvitation(Number(teamId));
+	const isAdmin = user.teamRole === '관리자';
 
 	const navigate = useNavigate();
 
@@ -55,7 +63,10 @@ const MainNavSideBar = ({ onCopy }: IMainNavBarProps) => {
 						<Icon name="ourTeamRestaurantPlus" className="w-4 h-4" />
 					</div>
 				</button>
-				<button className="w-full text-left px-4 py-2 hover:bg-gray-100 " onClick={() => navigate('/admin-team')}>
+				<button
+					className="w-full text-left px-4 py-2 hover:bg-gray-100 "
+					onClick={() => (isAdmin ? navigate('/admin-team') : alert('관리자만 접근할 수 있습니다.'))}
+				>
 					<Typography variant={FONT_VARIANT.label01} className="font-medium">
 						팀원 관리
 					</Typography>

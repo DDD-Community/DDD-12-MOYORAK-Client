@@ -5,6 +5,7 @@ import { get } from '.';
 interface IUserResponse {
 	teamId: number;
 	companyId: number;
+	teamRole: string;
 }
 
 const getUser = async (): Promise<IUserResponse> => {

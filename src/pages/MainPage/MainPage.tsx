@@ -100,7 +100,7 @@ const MainPage = () => {
 						rightIcon="category"
 						onRightIconClick={onShowInvitation}
 					/>
-					{showInvitation && <MainNavSideBar onCopy={setCopied} />}
+					{showInvitation && user && <MainNavSideBar onCopy={setCopied} user={user} />}
 				</div>
 
 				{/* BottomSheet를 지도 위에 절대 위치로 오버레이 (TabBar 위에) */}
