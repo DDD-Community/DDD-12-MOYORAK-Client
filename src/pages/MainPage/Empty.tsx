@@ -10,7 +10,7 @@ const Empty = () => {
 				{'\n'}
 				우리팀 맛집을 등록해주세요!
 			</Typography>
-			<img src={emptyMain} className="mx-auto" />
+			<img src={emptyMain} className="mx-auto w-[215px] h-[128px]" />
 		</div>
 	);
 };
