@@ -18,11 +18,19 @@ const CompanySearch = () => {
 	const [isSearchEnabled, setIsSearchEnabled] = useState<boolean>(false);
 	const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
 	const [selectedCompany, setSelectedCompany] = useState<string>('');
+	const [debouncedCompany, setDebouncedCompany] = useState<string>('');
 
-	// 신규 등록 버튼 클릭 여부
 	const [isRegisterCompany, setIsRegisterCompany] = useState<boolean>(false);
 
-	const { isError, data: companyList } = useQuerySearchCompany(company, company.length > 0 && !isRegisterCompany);
+	const { isError, data: companyList } = useQuerySearchCompany(debouncedCompany, debouncedCompany.length > 0 && !isRegisterCompany);
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setDebouncedCompany(company);
+		}, 500);
+
+		return () => clearTimeout(timer);
+	}, [company]);
 
 	useEffect(() => {
 		if (company.length > 0 && !selectedCompany) {
@@ -35,7 +43,6 @@ const CompanySearch = () => {
 		}
 	}, [company, selectedCompany]);
 
-	// 회사 저장
 	const { mutate } = useMutationAddCompany({
 		onSuccess: (data) => {
 			localStorage.setItem('companyId', String(data.companyId));
@@ -109,13 +116,14 @@ const CompanySearch = () => {
 	};
 
 	const onSaveCompany = async () => {
-		// 기존 회사가 검색된 경우
-		if (companyList && companyList.searchResponses.length === 1) {
-			localStorage.setItem('companyId', String(companyList.searchResponses[0].companyId));
-			return nextStep();
+		if (companyList && selectedCompany && companyList.searchResponses.some((item) => item.name === selectedCompany)) {
+			const selectedCompanyData = companyList.searchResponses.find((item) => item.name === selectedCompany);
+			if (selectedCompanyData) {
+				localStorage.setItem('companyId', String(selectedCompanyData.companyId));
+				return nextStep();
+			}
 		}
 
-		// 신규 회사 등록인 경우
 		if (!company || !baseAddress) return;
 
 		try {
@@ -156,9 +164,9 @@ const CompanySearch = () => {
 					value={company}
 					onChange={(e) => {
 						setCompany(e.target.value);
-						setSelectedCompany(''); // 입력할 때마다 선택된 회사 초기화
+						setSelectedCompany('');
 					}}
-					isSuccess={!isRegisterCompany && !!selectedCompany && companyList?.searchResponses.length === 1 ? true : undefined}
+					isSuccess={!isRegisterCompany && !!selectedCompany && companyList?.searchResponses.some((item) => item.name === selectedCompany) ? true : undefined}
 					isError={!isRegisterCompany && companyList?.searchResponses.length === 0 ? true : undefined}
 					message={validMessage}
 				/>
@@ -212,15 +220,16 @@ const CompanySearch = () => {
 			<div className="fixed bottom-[30px] w-full px-5 max-w-[480px]">
 				<Button
 					variant={
-						// 회사 리스트에서 선택했거나 신규 등록 모드에서 주소까지 입력한 경우
-						(selectedCompany && companyList?.searchResponses.length === 1) || (isRegisterCompany && company && baseAddress) ? 'active' : 'disabled'
+						(selectedCompany && companyList?.searchResponses.some((item) => item.name === selectedCompany)) || (isRegisterCompany && company && baseAddress)
+							? 'active'
+							: 'disabled'
 					}
 					onClick={onSaveCompany}
 				>
 					<Typography
 						variant={FONT_VARIANT.header04}
 						fontColor={
-							(selectedCompany && companyList?.searchResponses.length === 1) || (isRegisterCompany && company && baseAddress)
+							(selectedCompany && companyList?.searchResponses.some((item) => item.name === selectedCompany)) || (isRegisterCompany && company && baseAddress)
 								? PALETTE.primary600
 								: PALETTE.gray06
 						}

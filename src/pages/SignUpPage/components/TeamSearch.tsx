@@ -17,6 +17,7 @@ const TeamSearch = () => {
 	const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
 	const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
 	const [selectedTeam, setSelectedTeam] = useState<string>('');
+	const [debouncedTeam, setDebouncedTeam] = useState<string>('');
 
 	const name = localStorage.getItem('name');
 
@@ -27,14 +28,20 @@ const TeamSearch = () => {
 
 	const { mutate, isSuccess } = useMutationAddTeam({
 		onSuccess: (data) => {
-			console.log('data', data);
 			localStorage.setItem('teamId', String(data.teamId));
 		},
 	});
 
-	const { data: teamList } = useQuerySearchTeam(Number(companyId), team, team.length > 0 && Boolean(companyId) && !isRegisterTeam);
+	const { data: teamList } = useQuerySearchTeam(Number(companyId), debouncedTeam, debouncedTeam.length > 0 && Boolean(companyId) && !isRegisterTeam);
 
-	// 입력이 변경될 때마다 자동 검색 활성화
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setDebouncedTeam(team);
+		}, 200);
+
+		return () => clearTimeout(timer);
+	}, [team]);
+
 	useEffect(() => {
 		if (team.length > 0 && !selectedTeam) {
 			setIsSearchEnabled(true);
@@ -82,15 +89,13 @@ const TeamSearch = () => {
 		}
 
 		return '';
-	}, [isSearchEnabled, teamList, team, selectedTeam]);
+	}, [isSearchEnabled, teamList, team, isSuccess]);
 
 	const onSaveTeam = () => {
 		if (selectedTeamId) {
-			// 선택된 팀이 있는 경우
 			localStorage.setItem('teamId', String(selectedTeamId));
 			nextStep();
 		} else if (isRegisterTeam && isSuccess) {
-			// 신규 등록한 팀인 경우
 			nextStep();
 		}
 	};
@@ -149,13 +154,7 @@ const TeamSearch = () => {
 			</section>
 
 			<div className="fixed bottom-[30px] w-full px-5 max-w-[480px]">
-				<Button
-					variant={
-						// 팀 리스트에서 선택했거나 신규 등록 모드에서 성공한 경우
-						(selectedTeam && teamList?.teams.length === 1) || (isRegisterTeam && isSuccess) ? 'active' : 'disabled'
-					}
-					onClick={onSaveTeam}
-				>
+				<Button variant={(selectedTeam && teamList?.teams.length === 1) || (isRegisterTeam && isSuccess) ? 'active' : 'disabled'} onClick={onSaveTeam}>
 					<Typography
 						variant={FONT_VARIANT.header04}
 						fontColor={(selectedTeam && teamList?.teams.length === 1) || (isRegisterTeam && isSuccess) ? PALETTE.primary600 : PALETTE.gray06}

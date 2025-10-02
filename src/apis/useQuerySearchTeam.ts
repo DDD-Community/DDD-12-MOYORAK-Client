@@ -15,7 +15,7 @@ const getSearchTeam = async (companyId: number, team: string): Promise<ISearchTe
 
 export const useQuerySearchTeam = (companyId: number, team: string, enabled = true) => {
 	return useQuery({
-		queryKey: ['companies'],
+		queryKey: ['companies', companyId, 'teams', team],
 		enabled,
 		queryFn: () => getSearchTeam(companyId, team),
 		staleTime: 0,
